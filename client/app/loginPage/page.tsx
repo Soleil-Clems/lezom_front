@@ -25,16 +25,18 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Bon retour</CardTitle>
-          <CardDescription>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-own-dark">
+      <Card className="w-full max-w-md p-6 sm:p-8 rounded-xl shadow bg-card">
+        <CardHeader >
+          <CardTitle className="mb-6 text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold">Bon retour</h1>
+          </CardTitle>
+          <CardDescription className="mt-1 text-sm text-gray-500">
             On est content de te revoir !
           </CardDescription>
         </CardHeader>
 
-        {/* ✅ Le form englobe aussi le footer pour que submit marche */}
+        {/* Le form englobe aussi le footer pour que submit marche */}
         <form onSubmit={onSubmit}>
           <CardContent>
             <div className="flex flex-col gap-6">
@@ -71,12 +73,9 @@ export default function Page() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
+          <CardFooter className="flex-col gap-2 mt-5">
+            <Button type="submit" className="w-full bg-purple-discord text-white hover:bg-gray-400 hover:text-white" >
               Connexion
-            </Button>
-            <Button type="button" variant="outline" className="w-full">
-              Se connecter avec Google?
             </Button>
           </CardFooter>
         </form>
