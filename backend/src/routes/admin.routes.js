@@ -8,6 +8,11 @@ const {
   deleteUser,
 } = require("../controllers/admin.controller");
 const { verifyToken, verifyAdmin } = require("../middleware/auth");
+const validate = require("../middleware/validate");
+const {
+  createUserSchema,
+  updateUserSchema,
+} = require("../validators/admin.validator");
 
 router.use(verifyToken, verifyAdmin);
 
@@ -140,7 +145,7 @@ router.get("/users/:id", getUserById);
  *       500:
  *         description: Internal server error
  */
-router.post("/users", createUser);
+router.post("/users", validate(createUserSchema), createUser);
 
 /**
  * @swagger
@@ -203,7 +208,7 @@ router.post("/users", createUser);
  *       500:
  *         description: Internal server error
  */
-router.put("/users/:id", updateUser);
+router.put("/users/:id", validate(updateUserSchema), updateUser);
 
 /**
  * @swagger
