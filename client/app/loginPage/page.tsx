@@ -21,7 +21,6 @@ export default function Page() {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     console.log({ email, password });
-    // TODO: fetch POST /auth/login
   }
 
   return (
@@ -36,7 +35,6 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
 
-        {/* Le form englobe aussi le footer pour que submit marche */}
         <form onSubmit={onSubmit}>
           <CardContent>
             <div className="flex flex-col gap-6">
