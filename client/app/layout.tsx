@@ -25,9 +25,9 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <SidebarProvider>
           <ServerSidebar>
-            <ServerItem name="RTC" />
-            <ServerItem name="DEV" />
-            <ServerItem name="DESIGN" />
+            <ServerItem name="RTC" id={""} />
+            <ServerItem name="DEV" id={""} />
+            <ServerItem name="DESIGN" id={""} />
           </ServerSidebar>
 
           <SidebarInset>
@@ -38,7 +38,7 @@ export default function RootLayout({
             </header>
 
             
-            <main className="flex-1 p-4">
+            <main className="flex-1 ">
               {children}
             </main>
           </SidebarInset>
