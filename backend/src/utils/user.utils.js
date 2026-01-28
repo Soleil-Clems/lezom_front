@@ -3,28 +3,6 @@ const { prisma } = require("../config/database");
 
 const SALT_ROUNDS = 10;
 
-// Password: min 8 chars, at least 1 uppercase, 1 lowercase, 1 number
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-/**
- * Validate password strength
- * @param {string} password - Password to validate
- * @returns {{ valid: boolean, message: string|null }}
- */
-const validatePassword = (password) => {
-  if (!password || password.length < 8) {
-    return { valid: false, message: "Password must be at least 8 characters." };
-  }
-  if (!PASSWORD_REGEX.test(password)) {
-    return {
-      valid: false,
-      message:
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number.",
-    };
-  }
-  return { valid: true, message: null };
-};
-
 /**
  * Hash a password
  * @param {string} password - Plain text password
@@ -65,7 +43,6 @@ const isUsernameTaken = async (username, excludeUserId = null) => {
 };
 
 module.exports = {
-  validatePassword,
   hashPassword,
   comparePassword,
   isEmailTaken,

@@ -1,6 +1,5 @@
 const { prisma } = require("../config/database");
 const {
-  validatePassword,
   hashPassword,
   isEmailTaken,
   isUsernameTaken,
@@ -62,23 +61,11 @@ const createUser = async (req, res) => {
   try {
     const { email, password, username, firstname, lastname, role } = req.body;
 
-    if (!email || !password || !username || !firstname || !lastname) {
-      return res.status(400).json({
-        message:
-          "All fields are required (email, password, username, firstname, lastname).",
-      });
-    }
-
     if (await isEmailTaken(email)) {
       return res.status(400).json({ message: "Email already in use." });
     }
     if (await isUsernameTaken(username)) {
       return res.status(400).json({ message: "Username already in use." });
-    }
-
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.valid) {
-      return res.status(400).json({ message: passwordValidation.message });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -124,7 +111,6 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Check uniqueness for email and username
     if (email && (await isEmailTaken(email, id))) {
       return res.status(400).json({ message: "Email already in use." });
     }
@@ -132,15 +118,6 @@ const updateUser = async (req, res) => {
       return res.status(400).json({ message: "Username already in use." });
     }
 
-    // Validate password if provided
-    if (password) {
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.valid) {
-        return res.status(400).json({ message: passwordValidation.message });
-      }
-    }
-
-    // Build update data
     const updateData = {};
     if (username) updateData.username = username;
     if (firstname) updateData.firstname = firstname;
@@ -148,10 +125,6 @@ const updateUser = async (req, res) => {
     if (email) updateData.email = email;
     if (password) updateData.password = await hashPassword(password);
     if (role) updateData.role = role;
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: "No fields to update." });
-    }
 
     const updatedUser = await prisma.user.update({
       where: { id },
