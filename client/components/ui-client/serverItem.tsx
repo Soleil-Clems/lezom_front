@@ -1,14 +1,17 @@
 "use client"
 
+import Link from "next/link"
+
 type Props = {
+  id: string       
   name: string
   image?: string
   active?: boolean
 }
 
-export function ServerItem({ name, image, active }: Props) {
+export function ServerItem({ id, name, image, active }: Props) {
   return (
-    <div className="flex items-center gap-3 w-full group cursor-pointer px-4 md:px-0">
+    <Link href={`/servers/${id}`} className="flex items-center gap-3 w-full group cursor-pointer px-4 md:px-0">
       
       <div
         className={`
@@ -19,7 +22,10 @@ export function ServerItem({ name, image, active }: Props) {
           bg-muted
           overflow-hidden
           transition-all duration-200
-          ${active ? 'rounded-[16px] bg-primary text-white' : 'hover:rounded-[16px] hover:bg-primary hover:text-white'}
+          ${active 
+            ? 'rounded-[16px] bg-primary text-white' 
+            : 'hover:rounded-[16px] hover:bg-primary hover:text-white'
+          }
         `}
       >
         {image ? (
@@ -38,11 +44,11 @@ export function ServerItem({ name, image, active }: Props) {
       <span className={`
         block md:hidden 
         font-bold truncate
-        ${active ? 'text-white' : 'text-zinc-400 hover:text-white'}
+        ${active ? 'text-white' : 'text-zinc-400 group-hover:text-white'}
       `}>
         {name}
       </span>
       
-    </div>
+    </Link>
   )
 }
