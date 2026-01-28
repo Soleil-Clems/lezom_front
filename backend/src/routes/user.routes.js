@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { getMe, updateMe, deleteMe } = require("../controllers/user.controller");
 const { verifyToken } = require("../middleware/auth");
+const validate = require("../middleware/validate");
+const { updateMeSchema } = require("../validators/user.validator");
 
 /**
  * @swagger
@@ -94,7 +96,7 @@ router.get("/me", verifyToken, getMe);
  *       500:
  *         description: Internal server error
  */
-router.put("/me", verifyToken, updateMe);
+router.put("/me", verifyToken, validate(updateMeSchema), updateMe);
 
 /**
  * @swagger
