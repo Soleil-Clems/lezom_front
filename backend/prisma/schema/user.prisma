@@ -1,22 +1,28 @@
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique @db.VarChar(32)
-  firstname String   @db.VarChar(50)
-  lastname  String   @db.VarChar(50)
-  email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
-  status    String   @default("offline") @db.VarChar(20)
+  id        String    @id @default(uuid())
+  username  String    @unique @db.VarChar(32)
+  firstname String    @db.VarChar(50)
+  lastname  String    @db.VarChar(50)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  role      UserRole  @default(MEMBER)
+  status    String    @default("offline") @db.VarChar(20)
   lastSeen  DateTime? @map("last_seen")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
-  ownedServers       Server[]        @relation("ServerOwner")
+  ownedServers       Server[]       @relation("ServerOwner")
   memberships        ServerMember[]
-  createdInvitations Invitation[]    @relation("InvitationCreator")
-  bansReceived       Ban[]           @relation("BannedUser")
-  bansGiven          Ban[]           @relation("BanningUser")
+  createdInvitations Invitation[]   @relation("InvitationCreator")
+  bansReceived       Ban[]          @relation("BannedUser")
+  bansGiven          Ban[]          @relation("BanningUser")
 
   @@index([email])
   @@index([username])
   @@map("users")
+}
+
+enum UserRole {
+  MEMBER
+  ADMIN
 }
