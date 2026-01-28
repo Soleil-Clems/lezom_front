@@ -58,6 +58,7 @@ const register = async (req, res) => {
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -98,6 +99,7 @@ const login = async (req, res) => {
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
+        role: user.role,
       },
     });
   } catch (error) {

@@ -17,6 +17,7 @@ const getMe = async (req, res) => {
         username: true,
         firstname: true,
         lastname: true,
+        role: true,
         status: true,
         createdAt: true,
       },
@@ -46,7 +47,6 @@ const updateMe = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Check if password change is requested
     if (password) {
       if (!currentPassword) {
         return res.status(400).json({
@@ -68,7 +68,6 @@ const updateMe = async (req, res) => {
       }
     }
 
-    // Check uniqueness for email and username if they are being changed
     if (email && (await isEmailTaken(email, req.user.id))) {
       return res.status(400).json({ message: "Email already in use." });
     }
@@ -76,7 +75,6 @@ const updateMe = async (req, res) => {
       return res.status(400).json({ message: "Username already in use." });
     }
 
-    // Build update data
     const updateData = {};
     if (username) updateData.username = username;
     if (firstname) updateData.firstname = firstname;
@@ -97,6 +95,7 @@ const updateMe = async (req, res) => {
         username: true,
         firstname: true,
         lastname: true,
+        role: true,
         status: true,
         createdAt: true,
       },
