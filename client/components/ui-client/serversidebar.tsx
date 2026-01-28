@@ -36,7 +36,7 @@ export function ServerSidebar({ children }: ServerSidebarProps) {
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] bg-[#313338] text-green-500 transition-all duration-200 group-hover:rounded-[16px] group-hover:bg-green-500 group-hover:text-white">
               <Plus size={25} />
             </div>
-            <span className="block md:hidden font-bold text-zinc-400 group-hover:text-white">
+            <span className="block md:hidden font-bold text-zinc-400 hover:text-white">
               Ajouter un serveur
             </span>
           </button>
@@ -48,12 +48,10 @@ export function ServerSidebar({ children }: ServerSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="h-12 w-full md:w-12 p-0 hover:bg-transparent">
               <a href="/profil" className="group flex items-center gap-3 w-full md:justify-center">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition-all duration-200 group-hover:rounded-[16px]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition-all duration-200 hover:rounded-[16px]">
                   <User size={24} />
                 </div>
-                <span className="block md:hidden font-bold text-zinc-400 group-hover:text-white">
-                  Mon Profil
-                </span>
+        
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
