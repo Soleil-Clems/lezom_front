@@ -1,17 +1,12 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter } from "next/font/google"
 import "./globals.css"
 
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { ServerSidebar } from "@/components/ui-client/serversidebar"
+import { ServerItem } from "@/components/ui-client/serverItem"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
 })
 
@@ -26,15 +21,26 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="fr" className="dark"> 
+      <body className={`${inter.className} antialiased`}>
         <SidebarProvider>
-          <ServerSidebar {children} />
+          <ServerSidebar>
+            <ServerItem name="RTC" />
+            <ServerItem name="DEV" />
+            <ServerItem name="DESIGN" />
+          </ServerSidebar>
 
           <SidebarInset>
-            {children}
+            
+            <header className="flex h-12 items-center px-4 md:hidden border-b">
+              <SidebarTrigger />
+              <span className="ml-4 font-bold text-sm">Lezom</span>
+            </header>
+
+            
+            <main className="flex-1 p-4">
+              {children}
+            </main>
           </SidebarInset>
         </SidebarProvider>
       </body>
