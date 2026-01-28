@@ -1,6 +1,5 @@
 const { prisma } = require("../config/database");
 const {
-  validatePassword,
   hashPassword,
   comparePassword,
   isEmailTaken,
@@ -48,23 +47,12 @@ const updateMe = async (req, res) => {
     }
 
     if (password) {
-      if (!currentPassword) {
-        return res.status(400).json({
-          message: "Current password is required to change password.",
-        });
-      }
-
       const isValidPassword = await comparePassword(
         currentPassword,
         currentUser.password
       );
       if (!isValidPassword) {
         return res.status(401).json({ message: "Current password is incorrect." });
-      }
-
-      const passwordValidation = validatePassword(password);
-      if (!passwordValidation.valid) {
-        return res.status(400).json({ message: passwordValidation.message });
       }
     }
 
@@ -81,10 +69,6 @@ const updateMe = async (req, res) => {
     if (lastname) updateData.lastname = lastname;
     if (email) updateData.email = email;
     if (password) updateData.password = await hashPassword(password);
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ message: "No fields to update." });
-    }
 
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },

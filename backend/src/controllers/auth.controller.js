@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const { prisma } = require("../config/database");
 const { secret, options, cookieOptions } = require("../config/jwt");
 const {
-  validatePassword,
   hashPassword,
   comparePassword,
   isEmailTaken,
@@ -13,25 +12,11 @@ const register = async (req, res) => {
   try {
     const { email, password, username, firstname, lastname } = req.body;
 
-    if (!email || !password || !username || !firstname || !lastname) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "All fields are required (email, password, username, firstname, lastname).",
-        });
-    }
-
     if (await isEmailTaken(email)) {
       return res.status(400).json({ message: "Email already in use." });
     }
     if (await isUsernameTaken(username)) {
       return res.status(400).json({ message: "Username already in use." });
-    }
-
-    const passwordValidation = validatePassword(password);
-    if (!passwordValidation.valid) {
-      return res.status(400).json({ message: passwordValidation.message });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -70,12 +55,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required." });
-    }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
