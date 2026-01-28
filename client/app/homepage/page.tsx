@@ -1,13 +1,30 @@
 import { ServerSidebar } from "@/components/ui-client/serversidebar"
+import { ChannelSidebar } from "@/components/ui-client/chanelsidebar" 
 import { ServerItem } from "@/components/ui-client/serverItem"
-
+import { MOCK_SERVERS } from "@/lib/mock-data"
 
 export default function HomePage() {
+  
+  
+  
   return (
-    <ServerSidebar>
-      <ServerItem name="RTC" />
-      <ServerItem name="DEV" />
-      <ServerItem name="DESIGN" />
-    </ServerSidebar>
+    <>
+      <main className="flex flex-col  h-full overflow-y-auto">
+      <ServerSidebar>
+        {MOCK_SERVERS.map((server) => (
+          <ServerItem 
+            key={server.id} 
+            id={server.id} 
+            name={server.name} 
+            image={server.image} 
+          />
+        ))}
+      </ServerSidebar>
+      <ChannelSidebar/>
+      
+      </main>
+    </>
   )
+
+  
 }
