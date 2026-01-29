@@ -2,6 +2,7 @@ import { ServerSidebar } from "@/components/ui-client/serversidebar"
 import { ChannelSidebar } from "@/components/ui-client/chanelsidebar" 
 import { ServerItem } from "@/components/ui-client/serverItem"
 import { MOCK_SERVERS } from "@/lib/mock-data"
+import MessageLayout from "@/components/ui-client/MessageLayout"
 
 export default function HomePage() {
   
@@ -9,7 +10,7 @@ export default function HomePage() {
   
   return (
     <>
-      <main className="flex flex-col  h-full overflow-y-auto">
+      {/* <main className="flex flex-col  h-full overflow-y-auto"> */}
       <ServerSidebar>
         {MOCK_SERVERS.map((server) => (
           <ServerItem 
@@ -21,8 +22,9 @@ export default function HomePage() {
         ))}
       </ServerSidebar>
       <ChannelSidebar/>
+      <MessageLayout/>
       
-      </main>
+      {/* </main> */}
     </>
   )
 
