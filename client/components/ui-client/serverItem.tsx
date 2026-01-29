@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useSidebar } from "@/components/ui/sidebar"
+
 
 type Props = {
   id: string       
@@ -10,8 +12,14 @@ type Props = {
 }
 
 export function ServerItem({ id, name, image, active }: Props) {
+  const {openMobile, setOpenMobile} = useSidebar()
+  
+
   return (
-    <Link href={`/servers/${id}`} className="flex items-center gap-3 w-full group cursor-pointer px-4 md:px-0">
+    <Link
+    onClick={()=>setOpenMobile(false)}
+     href={`/servers/${id}`}
+      className="flex items-center gap-3 w-full group cursor-pointer px-4 md:px-0">
       
       <div
         className={`
@@ -24,7 +32,7 @@ export function ServerItem({ id, name, image, active }: Props) {
           transition-all duration-200
           ${active 
             ? 'rounded-[16px] bg-primary text-white' 
-            : 'hover:rounded-[16px] hover:bg-primary hover:text-white'
+            : 'hover:rounded-[16px] hover:bg-primary hover:text-red-500'
           }
         `}
       >

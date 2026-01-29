@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import { Hash, Volume2 } from "lucide-react"; // Import des icônes Discord-style
 import { MOCK_CHANNELS } from "@/lib/mock-data";
@@ -9,6 +10,7 @@ type ChannelSidebarProps = {
 
 export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
   // 1. Si pas de serverId, on affiche le message vide
+  
   if (!serverId) {
     return (
       <div className="w-60 h-full bg-[#2B2D31] flex flex-col items-center justify-center p-4 text-zinc-500 text-center">
@@ -19,6 +21,7 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
 
   // 2. On récupère la liste des salons pour ce serveur spécifique
   const channels = MOCK_CHANNELS[serverId] || [];
+  
 
   return (
     <div className="w-full md:w-60 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
