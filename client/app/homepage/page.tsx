@@ -4,10 +4,11 @@ import { ServerItem } from "@/components/ui-client/serverItem";
 import { ServerSidebar } from "@/components/ui-client/serversidebar";
 import { MOCK_SERVERS } from "@/lib/mock-data";
 
-// app/homepage/page.tsx
+
 export default function HomePage() {
+  console.log(MOCK_SERVERS);
+  
   return (
-    // Le parent DOIT être flex pour aligner les colonnes
     <div className="flex h-screen w-full overflow-hidden">
       
       <ServerSidebar>
@@ -21,10 +22,8 @@ export default function HomePage() {
         ))}
       </ServerSidebar>
 
-      {/* On peut maintenant l'appeler sans serverId car on l'a rendu optionnel */}
       <ChannelSidebar />
       
-      {/* Zone de chat vide ou message de bienvenue */}
       <div className="flex-1">
         <MessageLayout />
       </div>
