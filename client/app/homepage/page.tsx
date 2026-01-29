@@ -1,16 +1,15 @@
-import { ServerSidebar } from "@/components/ui-client/serversidebar"
-import { ChannelSidebar } from "@/components/ui-client/chanelsidebar" 
-import { ServerItem } from "@/components/ui-client/serverItem"
-import { MOCK_SERVERS } from "@/lib/mock-data"
-import MessageLayout from "@/components/ui-client/MessageLayout"
+import { ChannelSidebar } from "@/components/ui-client/chanelsidebar";
+import MessageLayout from "@/components/ui-client/MessageLayout";
+import { ServerItem } from "@/components/ui-client/serverItem";
+import { ServerSidebar } from "@/components/ui-client/serversidebar";
+import { MOCK_SERVERS } from "@/lib/mock-data";
 
+// app/homepage/page.tsx
 export default function HomePage() {
-  
-  
-  
   return (
-    <>
-      {/* <main className="flex flex-col  h-full overflow-y-auto"> */}
+    // Le parent DOIT être flex pour aligner les colonnes
+    <div className="flex h-screen w-full overflow-hidden">
+      
       <ServerSidebar>
         {MOCK_SERVERS.map((server) => (
           <ServerItem 
@@ -21,12 +20,15 @@ export default function HomePage() {
           />
         ))}
       </ServerSidebar>
-      <ChannelSidebar/>
-      <MessageLayout/>
-      
-      {/* </main> */}
-    </>
-  )
 
-  
+      {/* On peut maintenant l'appeler sans serverId car on l'a rendu optionnel */}
+      <ChannelSidebar />
+      
+      {/* Zone de chat vide ou message de bienvenue */}
+      <div className="flex-1">
+        <MessageLayout />
+      </div>
+      
+    </div>
+  )
 }
