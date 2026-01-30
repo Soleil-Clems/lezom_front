@@ -9,7 +9,6 @@ export default async function ServerChannelsPage({ params }: { params: Promise<{
   if (!server) return notFound();
 
   return (
-    // ON SUPPRIME la ChannelSidebar d'ici car elle est déjà dans le layout !
     <main className="flex-1 flex items-center justify-center bg-[#313338] text-zinc-500">
       <div className="text-center">
         <h1 className="text-xl font-bold text-white mb-2">Bienvenue sur {server.name}</h1>
