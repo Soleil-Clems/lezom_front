@@ -1,4 +1,4 @@
-import Message from "@/components/ui-client/MessageComponent";
+import Message from "@/components/ui-client/messageComponent";
 import MessageScreenComponent from "@/components/ui-client/MessageScreenComponent";
 
 export default function Page() {
