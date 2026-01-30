@@ -1,15 +1,14 @@
 "use client"
 import Link from "next/link";
-import { Hash, Volume2 } from "lucide-react"; // Import des icônes Discord-style
+import { Hash, UserPlus, Volume2 } from "lucide-react"; 
 import { MOCK_CHANNELS } from "@/lib/mock-data";
-
+import { SidebarMenuButton } from "../ui/sidebar";
 type ChannelSidebarProps = {
   serverId?: string; 
   channelId?: string;
 }
 
 export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
-  // 1. Si pas de serverId, on affiche le message vide
   
   if (!serverId) {
     return (
@@ -19,20 +18,18 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
     );
   }
 
-  // 2. On récupère la liste des salons pour ce serveur spécifique
   const channels = MOCK_CHANNELS[serverId] || [];
   
 
   return (
     <div className="w-full md:w-60 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
-      {/* Header : On pourrait aussi chercher le nom du serveur ici */}
       <div className="h-12 px-4 flex items-center shadow-sm border-b border-black/20 font-bold text-white shrink-0">
         Salons
       </div>
       
+      
       <div className="flex-1 overflow-y-auto p-2 space-y-[2px]">
         {channels.map((channel) => {
-          // Déterminer si le salon est celui actuellement sélectionné
           const isActive = channel.id === channelId;
 
           return (
@@ -46,7 +43,6 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
                   : "text-zinc-400 hover:bg-zinc-700/30 hover:text-zinc-200"}
               `}
             >
-              {/* Icône dynamique selon le type de salon */}
               {channel.type === "text" ? (
                 <Hash className="w-5 h-5 text-zinc-500 shrink-0" />
               ) : (
