@@ -11,7 +11,7 @@ type Props = {
 
 export function ServerItem({ id, name, image, active }: Props) {
   return (
-    <Link href={`/servers/${id}`} className="flex items-center gap-3 w-full group cursor-pointer px-4 md:px-0">
+    <Link href={`/app/(root)/servers/${id}`} className="flex items-center gap-3 w-full group cursor-pointer px-4 md:px-0">
       
       <div
         className={`

@@ -1,6 +1,6 @@
 import React from 'react'
 import MessageScreenComponent from './MessageScreenComponent'
-import Message from './MessageComponent'
+import Message from '@/components/ui-client/messageComponent'
 
 export default function MessageLayout() {
   return (
