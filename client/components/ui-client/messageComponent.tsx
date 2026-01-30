@@ -2,13 +2,21 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Send } from "lucide-react";
+import { Plus, Send, UserPlus } from "lucide-react";
+import { SidebarMenuButton } from "../ui/sidebar";
 
 export default function Message() {
     return (
+        
     <div className="w-full bottom-0 px-4 pb-4">
+        <SidebarMenuButton asChild className="h-12 w-full md:w-12 p-0 hover:bg-transparent fixed top-4 right-4">
+                <a href="/users" className="group flex items-center gap-3 w-full md:justify-center">
+                  <div className="flex h-6 w-8 shrink-0 items-center justify-center text-white transition-all duration-200 hover:rounded-[16px]">
+                    <UserPlus size={24} />
+                  </div>
+                </a>
+                </SidebarMenuButton>
         <div className="flex items-end gap-2 rounded-2xl bg-[#1E1F22] p-2 shadow-lg">
-        {/* Textarea + bouton + */}
         <div className="relative flex-1">
             <Button
             type="button"
