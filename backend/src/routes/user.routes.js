@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getMe, updateMe, deleteMe } = require("../controllers/user.controller");
+const { getMe, getUser, updateMe, deleteMe } = require("../controllers/user.controller");
 const { verifyToken } = require("../middleware/auth");
 const validate = require("../middleware/validate");
 const { updateMeSchema } = require("../validators/user.validator");
@@ -125,5 +125,50 @@ router.put("/me", verifyToken, validate(updateMeSchema), updateMe);
  *         description: Internal server error
  */
 router.delete("/me", verifyToken, deleteMe);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get user profile by ID
+ *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     firstname:
+ *                       type: string
+ *                     lastname:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ */
+router.get("/:id", verifyToken, getUser);
 
 module.exports = router;
