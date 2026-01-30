@@ -1,0 +1,1 @@
+export const apiUrl = process.env.ApiUrl || 'http://localhost:8080/'

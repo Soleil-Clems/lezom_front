@@ -1,5 +1,5 @@
-import type {Metadata} from "next";
-import {Geist, Geist_Mono} from "next/font/google";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import ReactQueryProvider from "@/providers/ReactQueryProvider"
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner"
@@ -20,19 +20,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <ReactQueryProvider>
             <html lang="en">
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
-            {children}
-            <Toaster  position="top-center"/>
-            </body>
+                <body
+                    className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                >
+                    {children}
+                    <Toaster position="top-center" />
+                </body>
             </html>
         </ReactQueryProvider>
     );

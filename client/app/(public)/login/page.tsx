@@ -1,26 +1,50 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Field,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {LoginSchema} from "@/schemas/auth.dto";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {Controller, useForm} from "react-hook-form";
+import {z} from "zod";
+import {useLogin} from "@/hooks/mutations/useLogin";
+import useAuthStore from "@/store/authStore";
+
 
 export default function Page() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const {setToken} = useAuthStore()
+  const form = useForm<z.infer<typeof LoginSchema>>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "test@gmail.com",
+      password: "testtest"
+    }
+  })
+ const loginMutation = useLogin();
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    console.log({ email, password });
+  const onSubmit = (formValues: z.infer<typeof LoginSchema>) => {
+   loginMutation.mutate(formValues, {
+      onSuccess: (data) => {
+        console.log(data.access_token);
+        setToken(data.access_token);
+        // router.replace("/profile")
+
+      }
+    })
+    // console.log(formValues)
+
   }
 
   return (
@@ -35,44 +59,69 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
 
-        <form onSubmit={onSubmit}>
+        <form id="loginform" onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                <Controller
+                    name="email"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                          <FieldLabel htmlFor='email'>Email <span className='text-sm flex items-start text-gray-500'>*</span></FieldLabel>
+                          <Input
+                              {...field}
+                              id="email"
+                              aria-invalid={fieldState.invalid}
+                              placeholder='johndoe@gmail.com'
+                              autoComplete='off'
+                              type='email'
+                          />
+                          {fieldState.invalid && (
+                              <FieldError errors={([fieldState.error])} />
+                          )}
+                        </Field>
+                    )}
                 />
               </div>
 
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Mot de passe</Label>
+                  <Controller
+                      name="password"
+                      control={form.control}
+                      render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor='password'>Mot de passe<span className='text-sm flex items-start  text-gray-500'>*</span></FieldLabel>
+                            <Input
+                                {...field}
+                                id="password"
+                                type="password"
+                                aria-invalid={fieldState.invalid}
+                                placeholder='**********'
+                                autoComplete='off'
+                                className='flex items-center'
+                            />
+                            {fieldState.invalid && (
+                                <FieldError errors={([fieldState.error])} />
+                            )}
+                          </Field>
+                      )}
+                  />
+                </div>
                   <a
                     href="#"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Mot de passe oublié?
                   </a>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+
               </div>
             </div>
           </CardContent>
 
           <CardFooter className="flex-col gap-2 mt-5">
-            <Button type="submit" className="w-full bg-purple-discord text-white hover:bg-gray-400 hover:text-white" >
+            <Button form="loginform" type="submit" className="w-full bg-purple-discord text-white hover:bg-gray-400 hover:text-white" >
               Connexion
             </Button>
           </CardFooter>

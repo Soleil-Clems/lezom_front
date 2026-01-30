@@ -13,7 +13,7 @@ type Props = {
 
 export function ServerItem({ id, name, image, active }: Props) {
   const {openMobile, setOpenMobile} = useSidebar()
-  
+
 
   return (
     <Link
