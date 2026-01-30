@@ -1,34 +1,21 @@
 // app/servers/[serverId]/page.tsx
-import { ChannelSidebar } from "@/components/ui-client/chanelsidebar"
 import { MOCK_SERVERS } from "@/lib/mock-data"
 import { notFound } from "next/navigation"
 
-// 1. On précise que params est une Promise
-export default async function ServerChannelsPage({ 
-  params 
-}: { 
-  params: Promise<{ serverId: string }> 
-}) {
-  
-  // 2. On "déballe" les params avec await
+export default async function ServerChannelsPage({ params }: { params: Promise<{ serverId: string }> }) {
   const { serverId } = await params;
-
-  // 3. Maintenant on peut utiliser serverId normalement
   const server = MOCK_SERVERS.find(s => s.id === serverId);
 
-  if (!server) {
-    return notFound();
-  }
+  if (!server) return notFound();
 
   return (
-    <div className="flex h-screen w-full bg-[#313338]">
-      <div className="w-full md:w-60 h-full">
-         <ChannelSidebar serverId={server.id} />
+    // ON SUPPRIME la ChannelSidebar d'ici car elle est déjà dans le layout !
+    <main className="flex-1 flex items-center justify-center bg-[#313338] text-zinc-500">
+      <div className="text-center">
+        <h1 className="text-xl font-bold text-white mb-2">Bienvenue sur {server.name}</h1>
+        <p>Sélectionnez un salon dans la barre latérale pour commencer à discuter.</p>
       </div>
-
-      <main className="hidden md:flex flex-1 items-center justify-center text-zinc-500">
-        Sélectionnez un salon pour commencer à discuter
-      </main>
-    </div>
+    </main>
   )
 }
+
