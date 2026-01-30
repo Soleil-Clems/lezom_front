@@ -17,7 +17,6 @@ export default function ProfilePage() {
 
   return (
     <div className="flex-1 bg-[#313338] h-full overflow-y-auto">
-      {/* Banner / Header */}
       <div className="h-32 w-full bg-indigo-600 relative">
         <div className="absolute -bottom-12 left-8 p-1 bg-[#313338] rounded-full">
           <Avatar className="h-24 w-24 border-4 border-[#313338]">
@@ -28,7 +27,6 @@ export default function ProfilePage() {
       </div>
 
       <div className="mt-16 px-8 pb-8 space-y-6">
-        {/* User Info Section */}
         <section>
           <div className="flex items-center justify-between">
             <div>
@@ -48,9 +46,7 @@ export default function ProfilePage() {
 
         <hr className="border-zinc-700" />
 
-        {/* Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Main Info */}
           <div className="md:col-span-2 space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
               <CardHeader className="text-white font-semibold">À propos de moi</CardHeader>
@@ -67,7 +63,6 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          {/* Sidebar Info */}
           <div className="space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
               <CardHeader className="text-white font-semibold">Informations</CardHeader>
