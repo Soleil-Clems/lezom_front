@@ -1,33 +1,25 @@
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { prisma } = require("../config/database");
 const { secret, options, cookieOptions } = require("../config/jwt");
+const {
+  hashPassword,
+  comparePassword,
+  isEmailTaken,
+  isUsernameTaken,
+} = require("../utils/user.utils");
 
 const register = async (req, res) => {
   try {
     const { email, password, username, firstname, lastname } = req.body;
 
-    if (!email || !password || !username || !firstname || !lastname) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "All fields are required (email, password, username, firstname, lastname).",
-        });
+    if (await isEmailTaken(email)) {
+      return res.status(400).json({ message: "Email already in use." });
+    }
+    if (await isUsernameTaken(username)) {
+      return res.status(400).json({ message: "Username already in use." });
     }
 
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
-    });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User with this email or username already exists." });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
 
     const user = await prisma.user.create({
       data: {
@@ -51,6 +43,7 @@ const register = async (req, res) => {
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -63,18 +56,12 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required." });
-    }
-
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await comparePassword(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
@@ -91,6 +78,7 @@ const login = async (req, res) => {
         username: user.username,
         firstname: user.firstname,
         lastname: user.lastname,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -108,30 +96,4 @@ const logout = (req, res) => {
   res.json({ message: "Logged out successfully." });
 };
 
-const me = async (req, res) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        firstname: true,
-        lastname: true,
-        status: true,
-        createdAt: true,
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    res.json({ user });
-  } catch (error) {
-    console.error("Me error:", error);
-    res.status(500).json({ message: "Internal server error." });
-  }
-};
-
-module.exports = { register, login, logout, me };
+module.exports = { register, login, logout };
