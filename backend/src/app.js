@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
 const serverRoutes = require("./routes/server.routes");
+const channelRoutes = require("./routes/channel.routes");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/servers", serverRoutes);
+app.use("/api/channels", channelRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
