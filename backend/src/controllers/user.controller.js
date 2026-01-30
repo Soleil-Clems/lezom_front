@@ -95,6 +95,33 @@ const updateMe = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        firstname: true,
+        lastname: true,
+        status: true,
+        createdAt: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error("GetUser error:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 const deleteMe = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
@@ -122,4 +149,4 @@ const deleteMe = async (req, res) => {
   }
 };
 
-module.exports = { getMe, updateMe, deleteMe };
+module.exports = { getMe, getUser, updateMe, deleteMe };
