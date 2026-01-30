@@ -30,6 +30,7 @@ const EVENTS = {
   CHANNEL_UPDATED: "channel:updated",
   CHANNEL_DELETED: "channel:deleted",
   MESSAGE_CREATED: "message:created",
+  MESSAGE_UPDATED: "message:updated",
   MESSAGE_DELETED: "message:deleted",
   USER_TYPING: "user:typing",
 };
