@@ -4,10 +4,10 @@ import { ServerItem } from "@/components/ui-client/serverItem";
 import { ServerSidebar } from "@/components/ui-client/serversidebar";
 import { MOCK_SERVERS } from "@/lib/mock-data";
 
-// app/homepage/page.tsx
+
 export default function HomePage() {
   return (
-    // Le parent DOIT être flex pour aligner les colonnes
+
     <div className="flex h-screen w-full overflow-hidden">
       
       <ServerSidebar>

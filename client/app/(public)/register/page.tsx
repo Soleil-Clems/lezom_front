@@ -3,7 +3,7 @@
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { registerSchema, registerType } from "@/schema/register.dto"
+import { registerSchema, registerType } from "@/schemas/register.dto"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
