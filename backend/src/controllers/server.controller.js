@@ -1,5 +1,6 @@
 const { prisma } = require("../config/database");
 const crypto = require("crypto");
+const { emitToServer, emitToUser, EVENTS } = require("../utils/socketEvents");
 
 const createServer = async (req, res) => {
   try {
@@ -121,6 +122,8 @@ const updateServer = async (req, res) => {
       },
     });
 
+    emitToServer(id, EVENTS.SERVER_UPDATED, { server });
+
     res.json({
       message: "Server updated successfully.",
       server,
@@ -138,6 +141,8 @@ const deleteServer = async (req, res) => {
     if (req.member.role !== "OWNER") {
       return res.status(403).json({ message: "Only the owner can delete the server." });
     }
+
+    emitToServer(id, EVENTS.SERVER_DELETED, { serverId: id });
 
     await prisma.server.delete({ where: { id } });
 
@@ -166,7 +171,7 @@ const getMembers = async (req, res) => {
         },
       },
       orderBy: [
-        { role: "asc" }, // OWNER first, then ADMIN, then MEMBER
+        { role: "asc" },
         { joinedAt: "asc" },
       ],
     });
@@ -236,6 +241,13 @@ const updateMemberRole = async (req, res) => {
       },
     });
 
+    emitToServer(id, EVENTS.MEMBER_ROLE_CHANGED, {
+      serverId: id,
+      userId: updated.user.id,
+      username: updated.user.username,
+      role: updated.role,
+    });
+
     res.json({
       message: "Member role updated successfully.",
       member: {
@@ -288,6 +300,17 @@ const kickMember = async (req, res) => {
       },
     });
 
+    emitToServer(id, EVENTS.MEMBER_KICKED, {
+      serverId: id,
+      userId,
+      kickedBy: req.user.id,
+    });
+
+    emitToUser(userId, EVENTS.MEMBER_KICKED, {
+      serverId: id,
+      kickedBy: req.user.id,
+    });
+
     res.json({ message: "Member kicked successfully." });
   } catch (error) {
     console.error("KickMember error:", error);
@@ -312,6 +335,11 @@ const leaveServer = async (req, res) => {
           serverId: id,
         },
       },
+    });
+
+    emitToServer(id, EVENTS.MEMBER_LEFT, {
+      serverId: id,
+      userId: req.user.id,
     });
 
     res.json({ message: "You have left the server." });
@@ -370,6 +398,12 @@ const transferOwnership = async (req, res) => {
         data: { ownerId: userId },
       }),
     ]);
+
+    emitToServer(id, EVENTS.SERVER_OWNER_CHANGED, {
+      serverId: id,
+      newOwnerId: userId,
+      previousOwnerId: req.user.id,
+    });
 
     res.json({ message: "Ownership transferred successfully." });
   } catch (error) {
@@ -534,6 +568,14 @@ const joinServer = async (req, res) => {
         ownerId: true,
         createdAt: true,
       },
+    });
+
+    emitToServer(invitation.serverId, EVENTS.MEMBER_JOINED, {
+      serverId: invitation.serverId,
+      userId: req.user.id,
+      username: req.user.username,
+      role: "MEMBER",
+      joinedAt: new Date(),
     });
 
     res.status(201).json({
