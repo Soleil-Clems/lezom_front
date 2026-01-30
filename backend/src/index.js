@@ -1,29 +1,23 @@
 require("dotenv").config();
 
-const express = require("express");
-const cookieParser = require("cookie-parser");
+const http = require("http");
+const app = require("./app");
 const { connectMongoDB, connectPrisma } = require("./config/database");
-const authRoutes = require("./routes/auth.routes");
+const { initSocket } = require("./config/socket");
 
-const app = express();
 const PORT = process.env.PORT || 3001;
-
-app.use(express.json());
-app.use(cookieParser());
-
-app.use("/api/auth", authRoutes);
-
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
 
 const start = async () => {
   try {
     await connectMongoDB();
     await connectPrisma();
 
-    app.listen(PORT, () => {
+    const httpServer = http.createServer(app);
+    initSocket(httpServer);
+
+    httpServer.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      console.log(`WebSocket ready`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
