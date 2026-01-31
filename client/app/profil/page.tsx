@@ -1,10 +1,24 @@
-import { User, Mail, Shield, Calendar, MapPin } from "lucide-react";
+"use client"
+import { User, Mail, Shield, Calendar} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {useAuthUser} from "@/hooks/queries/useAuthUser";
+import Loading from "@/components/ui-client/Loading";
+import Error from "@/components/ui-client/Error";
 
 export default function ProfilePage() {
+  const {data, isLoading, isError} = useAuthUser();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <Error/>;
+  }
+  console.log(data)
   const user = {
     name: "Utilisateur",
     tag: "#0001",
@@ -16,7 +30,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex-1 bg-[#313338] h-full overflow-y-auto">
+    <div className="flex-1 bg-own-dark h-full overflow-y-auto">
       <div className="h-32 w-full bg-indigo-600 relative">
         <div className="absolute -bottom-12 left-8 p-1 bg-[#313338] rounded-full">
           <Avatar className="h-24 w-24 border-4 border-[#313338]">
