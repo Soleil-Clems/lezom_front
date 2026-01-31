@@ -28,7 +28,7 @@ export default function RootLayout({
         <ReactQueryProvider>
             <html lang="en">
                 <body
-                    className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+                    className={`${geistSans.variable} ${geistMono.variable} antialiased bg-own-dark`}
                 >
                     {children}
                     <Toaster position="top-center" />
