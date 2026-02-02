@@ -23,10 +23,8 @@ export default function HomePage() {
         ))}
       </ServerSidebar>
 
-      {/* On peut maintenant l'appeler sans serverId car on l'a rendu optionnel */}
       <ChannelSidebar />
       
-      {/* Zone de chat vide ou message de bienvenue */}
       <div className="flex-1">
         <MessageLayout />
       </div>

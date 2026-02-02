@@ -12,7 +12,6 @@ export default function Message() {
         <SidebarMenuButton asChild className="h-12 w-full md:w-12 p-0 hover:bg-transparent fixed top-4 right-4">
                 <a href="/users" className="group flex items-center gap-3 w-full md:justify-center">
                   <div className="flex h-6 w-8 shrink-0 items-center justify-center text-white transition-all duration-200 hover:rounded-[16px]">
-                    <UserPlus size={24} />
                   </div>
                 </a>
                 </SidebarMenuButton>
