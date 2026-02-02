@@ -38,17 +38,6 @@ export function ChannelSidebar({serverId, channelId}: ChannelSidebarProps) {
     const channels: channelType[] = data[0].channels || [];
 
     return (
-        <div className="w-full md:w-60 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
-            <div
-                className="h-12 px-4 flex items-center shadow-sm border-b border-black/20 font-bold text-white shrink-0">
-                Salons
-            </div>
-
-  const channels = MOCK_CHANNELS[serverId] || [];
-  
-  console.log()
-
-  return (
     <div className="w-full md:w-60 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
     <div className="h-12 px-4 flex items-center justify-between shadow-sm border-b border-black/20 font-bold text-white shrink-0">
         Salons
@@ -60,7 +49,7 @@ export function ChannelSidebar({serverId, channelId}: ChannelSidebarProps) {
       
       <div className="flex-1 overflow-y-auto p-2 space-y-[2px]">
         {channels.map((channel) => {
-          const isActive = channel.id === channelId;
+          const isActive = channel.id.toString() === channelId;
           
 
           return (
