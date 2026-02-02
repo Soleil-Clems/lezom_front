@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "Lezom RTC",
     description: "Application de communication en temps réel",
+    icons:{
+        icon: "/lezom.svg",
+        shortcut:"/lezom.svg",
+        apple:"lezom.svg"
+    }
 };
 
 export default function RootLayout({

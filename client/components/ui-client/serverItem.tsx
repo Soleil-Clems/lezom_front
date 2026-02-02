@@ -7,7 +7,7 @@ import {serversType} from "@/schemas/server.dto";
 
 type Props = serversType &{
   active?: boolean;
-  key?: number;
+  key?: string;
 }
 
 export function ServerItem({ id, name, image, active }: Props) {

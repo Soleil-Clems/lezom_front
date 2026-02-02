@@ -51,9 +51,9 @@ export function ServerSidebar() {
                 <SidebarContent>
                     <SidebarGroup className="flex flex-col items-start md:items-center gap-3 px-3">
 
-                        {servers.map((server: serversType) => (
+                        {servers.map((server: serversType, index: number) => (
                             <ServerItem
-                                key={server.id}
+                                key={`${server.id}-${index}`}
                                 id={server.id}
                                 name={server.name}
                                 image={""}

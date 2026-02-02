@@ -6,7 +6,6 @@ import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 
 export default function MessageLayout({channelId}: { channelId?: string }) {
-    console.log("Message Layout Channel ID:", channelId);
     if (!channelId) {
         return
     }
@@ -29,7 +28,7 @@ export default function MessageLayout({channelId}: { channelId?: string }) {
             </div>
 
             <div className="shrink-0">
-                <Message/>
+                <Message channelId={channelId}/>
             </div>
 
         </div>
