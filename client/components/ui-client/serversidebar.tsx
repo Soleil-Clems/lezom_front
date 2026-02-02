@@ -30,14 +30,12 @@ interface ServerSidebarProps {
 export function ServerSidebar() {
     const {data: servers, isError, isLoading} = useGetAllServers();
 
-
     if (isLoading) {
         return <Loading/>
     }
     if (isError) {
         return <Error/>
     }
-    console.log(servers)
     return (
         <TooltipProvider>
             <Sidebar
