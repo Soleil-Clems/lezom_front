@@ -35,7 +35,7 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
           return (
             <Link 
               key={channel.id}
-              href={`/app/(root)/servers/${serverId}/${channel.id}`}
+              href={`/servers/${serverId}/${channel.id}`}
               className={`
                 flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors group
                 ${isActive 
