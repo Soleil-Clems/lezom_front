@@ -5,8 +5,11 @@ import {useGetAllMessagesOfAChannel} from "@/hooks/queries/useGetAllMessagesOfAC
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 
-export default function MessageLayout({channelId}: { channelId: string }) {
+export default function MessageLayout({channelId}: { channelId?: string }) {
     console.log("Message Layout Channel ID:", channelId);
+    if (!channelId) {
+        return
+    }
     const {data: messages, isLoading, isError} = useGetAllMessagesOfAChannel(channelId);
 
     if (isLoading) {
