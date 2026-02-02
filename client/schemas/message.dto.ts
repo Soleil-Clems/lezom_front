@@ -11,4 +11,11 @@ export const messageSchema = z.object({
     author: userSchema,
 })
 
+export const sendMessageSchema = z.object({
+    content: z.string(),
+    type: MessageTypeEnum,
+    channelId: z.number(),
+})
+
 export type messageType = z.infer<typeof messageSchema>
+export type sendMessageType = z.infer<typeof sendMessageSchema>

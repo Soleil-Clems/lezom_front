@@ -27,6 +27,16 @@ class CustomFetch {
             ...rest,
         });
 
+        if (res.status === 401) {
+            useAuthStore.getState().logout();
+
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+            }
+
+            throw new Error("Session expirée. Veuillez vous reconnecter.");
+        }
+
         if (!res.ok) {
 
             const errorData = await res.json();
