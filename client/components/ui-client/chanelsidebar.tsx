@@ -42,7 +42,7 @@ export function ChannelSidebar({serverId, channelId}: ChannelSidebarProps) {
     <div className="h-12 px-4 flex items-center justify-between shadow-sm border-b border-black/20 font-bold text-white shrink-0">
         Salons
         <div className="flex items-center">
-          <ServerSettingsDropdown />
+          <ServerSettingsDropdown serverId={serverId} />
         </div>
       </div>
       
