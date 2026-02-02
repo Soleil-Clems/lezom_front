@@ -14,10 +14,21 @@ const useAuthStore = create<AuthState>()(
 
             setToken: (token: string) => {
                 set({ token });
+                if (typeof window !== 'undefined') {
+                    document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
+                }
             },
 
             logout: () => {
                 set({ token: null });
+
+                if (typeof window !== 'undefined') {
+                    document.cookie = "auth-token=; path=/; max-age=0; SameSite=Lax";
+                }
+
+                if (typeof window !== 'undefined') {
+                    localStorage.removeItem("auth-token");
+                }
             },
         }),
         {
