@@ -25,7 +25,7 @@ export const getAllChannelsOfAServerRequest = async (serverId: number | string) 
 
 export const updateServerNameRequest = async (serverId: string | number, name: string) => {
     try {
-        const response = await customfetch.put(`servers/${serverId}`, { name });
+        const response = await customfetch.patch(`servers/${serverId}`, { name });
         return response;
     } catch (error) {
         throw error;
@@ -44,7 +44,7 @@ export const deleteServerRequest = async (serverId: string | number) => {
 
 export const updateChannelNameRequest = async (channelId: string | number, name: string) => {
     try {
-        const response = await customfetch.put(`channels/${channelId}`, { name });
+        const response = await customfetch.patch(`channels/${channelId}`, { name });
         return response;
     } catch (error) {
         throw error;
