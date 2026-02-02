@@ -2,13 +2,12 @@
 
 import Link from "next/link"
 import { useSidebar } from "@/components/ui/sidebar"
+import {serversType} from "@/schemas/server.dto";
 
 
-type Props = {
-  id: string       
-  name: string
-  image?: string
-  active?: boolean
+type Props = serversType &{
+  active?: boolean;
+  key?: number;
 }
 
 export function ServerItem({ id, name, image, active }: Props) {

@@ -1,23 +1,48 @@
 "use client"
 import Link from "next/link";
-import { Hash, UserPlus, Volume2 } from "lucide-react"; 
-import { MOCK_CHANNELS } from "@/lib/mock-data";
-import { SidebarMenuButton } from "../ui/sidebar";
+import {Hash, UserPlus, Volume2} from "lucide-react";
+import {MOCK_CHANNELS} from "@/lib/mock-data";
+import {SidebarMenuButton} from "../ui/sidebar";
+import Error from "@/components/ui-client/Error";
+import Loading from "@/components/ui-client/Loading";
+import {useGetAllChannelsOfAServer} from "@/hooks/queries/useGetAllChannelsOfAServer";
+import {channelType} from "@/schemas/channel.dto";
 import { ServerSettingsDropdown } from "./dropdownMenu";
+
+
 type ChannelSidebarProps = {
-  serverId?: string; 
-  channelId?: string;
+    serverId?: string;
+    channelId?: string;
 }
 
-export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
-  
-  if (!serverId) {
+export function ChannelSidebar({serverId, channelId}: ChannelSidebarProps) {
+
+    if (!serverId) {
+        return (
+            <div
+                className="w-60 h-full bg-[#2B2D31] flex flex-col items-center justify-center p-4 text-zinc-500 text-center">
+                <p>Sélectionnez un serveur pour voir les salons</p>
+            </div>
+        );
+    }
+
+    const {data, isLoading, isError} = useGetAllChannelsOfAServer(serverId);
+
+    if (isLoading) {
+        return <Loading/>
+    }
+    if (isError) {
+        return <Error/>
+    }
+
+    const channels: channelType[] = data[0].channels || [];
+
     return (
-      <div className="w-60 h-full bg-[#2B2D31] flex flex-col items-center justify-center p-4 text-zinc-500 text-center">
-        <p>Sélectionnez un serveur pour voir les salons</p>
-      </div>
-    );
-  }
+        <div className="w-full md:w-60 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
+            <div
+                className="h-12 px-4 flex items-center shadow-sm border-b border-black/20 font-bold text-white shrink-0">
+                Salons
+            </div>
 
   const channels = MOCK_CHANNELS[serverId] || [];
   
@@ -28,8 +53,8 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
     <div className="h-12 px-4 flex items-center justify-between shadow-sm border-b border-black/20 font-bold text-white shrink-0">
         Salons
         <div className="flex items-center">
-        <ServerSettingsDropdown />
-      </div>
+          <ServerSettingsDropdown />
+        </div>
       </div>
       
       
@@ -63,10 +88,10 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
           );
         })}
 
-        {channels.length === 0 && (
-          <p className="text-xs text-zinc-500 text-center mt-4">Aucun salon trouvé</p>
-        )}
-      </div>
-    </div>
-  )
+                {channels.length === 0 && (
+                    <p className="text-xs text-zinc-500 text-center mt-4">Aucun salon trouvé</p>
+                )}
+            </div>
+        </div>
+    )
 }
