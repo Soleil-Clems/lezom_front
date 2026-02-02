@@ -12,7 +12,7 @@ export const messageSchema = z.object({
 })
 
 export const sendMessageSchema = z.object({
-    content: z.string(),
+    content: z.string().min(1, "Le message ne peut pas être vide"),
     type: MessageTypeEnum,
     channelId: z.number(),
 })
