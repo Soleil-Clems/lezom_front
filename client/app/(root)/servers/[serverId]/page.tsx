@@ -1,9 +1,9 @@
-// app/servers/[serverId]/page.tsx
 import { MOCK_SERVERS } from "@/lib/mock-data"
 import { notFound } from "next/navigation"
 
 export default async function ServerChannelsPage({ params }: { params: Promise<{ serverId: string }> }) {
   const { serverId } = await params;
+
   const server = MOCK_SERVERS.find(s => s.id === serverId);
 
   if (!server) return notFound();

@@ -1,6 +1,5 @@
 import { ChannelSidebar } from "@/components/ui-client/chanelsidebar"
 
-
 export default async function ServerLayout({ 
   children, 
   params 
@@ -9,7 +8,6 @@ export default async function ServerLayout({
   params: Promise<{ serverId: string, channelId?: string }> 
 }) {
   const { serverId, channelId } = await params;
-
   return (
     <div className="flex h-full w-full">
       
