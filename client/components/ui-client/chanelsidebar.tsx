@@ -27,7 +27,7 @@ export function ChannelSidebar({serverId, channelId}: ChannelSidebarProps) {
     }
 
     const {data, isLoading, isError} = useGetAllChannelsOfAServer(serverId);
-    console.log(data);
+/*    console.log(data);*/
     if (isLoading) {
         return <Loading/>
     }

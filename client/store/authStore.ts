@@ -29,6 +29,7 @@ const useAuthStore = create<AuthState>()(
                 if (typeof window !== 'undefined') {
                     localStorage.removeItem("auth-token");
                 }
+                window.location.reload();
             },
         }),
         {

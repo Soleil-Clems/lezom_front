@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import {useAuthUser} from "@/hooks/queries/useAuthUser";
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
+import useAuthStore from "@/store/authStore";
 
 export default function ProfilePage() {
   const {data, isLoading, isError} = useAuthUser();
+  const {logout} = useAuthStore()
 
   if (isLoading) {
     return <Loading />;
@@ -93,6 +95,12 @@ export default function ProfilePage() {
                   <Shield size={18} className="text-zinc-400" />
                   <span className="text-indigo-400 font-medium">Badge Certifié</span>
                 </div>
+                <Button
+                    className="bg-black hover:bg-red-600 text-white"
+                    onClick={() => logout()}
+                >
+                  Se deconnecter
+                </Button>
               </CardContent>
             </Card>
           </div>
