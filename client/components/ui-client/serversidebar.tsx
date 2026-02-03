@@ -22,6 +22,7 @@ import {serversType} from "@/schemas/server.dto";
 import {ServerItem} from "@/components/ui-client/serverItem";
 import Error from "@/components/ui-client/Error";
 import Loading from "@/components/ui-client/Loading";
+import {useSocketServers} from "@/hooks/websocket/useSocketServers";
 
 interface ServerSidebarProps {
     children: React.ReactNode;
@@ -29,13 +30,24 @@ interface ServerSidebarProps {
 
 export function ServerSidebar() {
     const {data: servers, isError, isLoading} = useGetAllServers();
-
-    if (isLoading) {
+    const { servers: s, loading: slo, error: srer, } = useSocketServers();
+    if (isLoading ) {
         return <Loading/>
     }
     if (isError) {
         return <Error/>
     }
+
+    if (slo){
+        console.log("soket loading")
+    }
+
+    if (srer){
+        console.log("socket error", srer)
+    }
+    console.log(servers)
+
+    console.log(s)
     return (
         <TooltipProvider>
             <Sidebar
