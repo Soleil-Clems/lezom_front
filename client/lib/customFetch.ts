@@ -29,7 +29,10 @@ class CustomFetch {
         });
 
         if (res.status === 401) {
-            if (isRetry || endpoint.includes('auth/')) {
+            const skipRefreshEndpoints = ['auth/login', 'auth/register', 'auth/refresh', 'auth/logout'];
+            const shouldSkipRefresh = skipRefreshEndpoints.some(e => endpoint.includes(e));
+
+            if (isRetry || shouldSkipRefresh) {
                 this.handleAuthFailure();
                 throw new Error("Session expirée. Veuillez vous reconnecter.");
             }
