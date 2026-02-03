@@ -29,25 +29,15 @@ interface ServerSidebarProps {
 }
 
 export function ServerSidebar() {
-    const {data: servers, isError, isLoading} = useGetAllServers();
-    const { servers: s, loading: slo, error: srer, } = useSocketServers();
-    if (isLoading ) {
+
+    const { servers, loading, error} = useSocketServers();
+    if (loading ) {
         return <Loading/>
     }
-    if (isError) {
+    if (error) {
         return <Error/>
     }
 
-    if (slo){
-        console.log("soket loading")
-    }
-
-    if (srer){
-        console.log("socket error", srer)
-    }
-    console.log(servers)
-
-    console.log(s)
     return (
         <TooltipProvider>
             <Sidebar
