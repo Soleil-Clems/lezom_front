@@ -1,46 +1,59 @@
 "use client"
 
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { OnlineFriendItem } from './onlinefrienditem'
-import { Loader2, Users } from 'lucide-react'
-// Importe ta requête API ici (ex: getAllFriendsRequest)
+import { useGetAllServers } from '@/hooks/queries/useGetAllServers'
+import { Loader2 } from 'lucide-react'
+import { OnlineFriendItem } from './onlinefrienditem';
 
 export function OnlineFriendsList() {
-  // Remplace par ton vrai hook quand ton backend sera prêt
-  const { data: friends, isLoading } = useQuery({
-    queryKey: ['friends-online'],
-    queryFn: async () => {
-      // Simuler un appel API pour le moment
-      return [
-        { id: 1, username: "TheRipper", status: "online", activity: "Visual Studio Code" },
-        { id: 2, username: "Lezom", status: "dnd", activity: "League of Legends" },
-        { id: 3, username: "Stapine", status: "idle" },
-      ]
-    }
-  })
+  const { data: serversData, isLoading, isError } = useGetAllServers();
 
-  if (isLoading) return <Loader2 className="animate-spin text-zinc-500 m-4" />
+  if (isLoading) return (
+    <div className="flex-1 flex items-center justify-center">
+      <Loader2 className="animate-spin text-zinc-500 w-6 h-6" />
+    </div>
+  );
 
-  const onlineCount = friends?.filter(f => f.status !== 'offline').length || 0;
+  if (isError) return <div className="p-4 text-xs text-rose-500 text-center">Erreur de chargement</div>;
+
+  const servers = Array.isArray(serversData) ? serversData : serversData?.data || [];
+  
+  const allMembersMap = new Map();
+
+  servers.forEach((server: any) => {
+    const members = server.users || server.members || []; 
+    members.forEach((member: any) => {
+      if (!allMembersMap.has(member.id)) {
+        allMembersMap.set(member.id, member);
+      }
+    });
+  });
+
+  const allMembers = Array.from(allMembersMap.values());
 
   return (
-    <div className="w-60 bg-[#2B2D31] h-full flex flex-col border-l border-white/5">
-      <div className="p-4 flex items-center gap-2 text-zinc-400">
-        <Users size={18} />
-        <span className="text-xs font-bold uppercase tracking-wider">
-          Amis en ligne — {onlineCount}
-        </span>
+    <div className="flex flex-col h-full bg-[#2B2D31]">
+      <div className="p-4 border-b border-black/20 shrink-0">
+        <h2 className="text-white font-bold text-[11px] uppercase tracking-widest opacity-60">
+          Membres — {allMembers.length}
+        </h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2">
-        {friends?.map((friend: any) => (
-          <OnlineFriendItem 
-            key={friend.id}
-            username={friend.username}
-            status={friend.status}
-          />
-        ))}
+      <div className="flex-1 overflow-y-auto p-2 space-y-0.5 custom-scrollbar">
+        {allMembers.length > 0 ? (
+          allMembers.map((member: any) => (
+            <OnlineFriendItem 
+              key={member.id}
+              username={member.username}
+              avatarUrl={member.avatarUrl}
+              status={member.status || 'offline'} 
+            />
+          ))
+        ) : (
+          <p className="text-zinc-500 text-[11px] italic text-center mt-10">
+            Aucun membre trouvé.
+          </p>
+        )}
       </div>
     </div>
   )

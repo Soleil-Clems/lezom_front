@@ -36,6 +36,7 @@ export function ServerSidebar() {
     if (isError) {
         return <Error/>
     }
+    
     return (
         <TooltipProvider>
             <Sidebar
