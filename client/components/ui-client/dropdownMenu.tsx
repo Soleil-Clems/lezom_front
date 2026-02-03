@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Settings, LogOut, UserPlus, PlusCircle, Settings2 } from "lucide-react"
 import {
@@ -11,7 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Dialog } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
+import { InvitationModalContent } from "./invitationModal"
 
 type ServerSettingsDropdownProps = {
   serverId: string | number;
@@ -19,47 +22,60 @@ type ServerSettingsDropdownProps = {
 
 export function ServerSettingsDropdown({ serverId }: ServerSettingsDropdownProps) {
   const router = useRouter();
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
-          <Settings size={20} />
-        </Button>
-      </DropdownMenuTrigger>
-      
-      <DropdownMenuContent className="w-56 bg-[#111214] border-none text-zinc-400">
-        <DropdownMenuLabel className="text-zinc-500 text-xs uppercase">
-          Options du serveur
-        </DropdownMenuLabel>
-        
-        <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer hover:bg-indigo-500 hover:text-white">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            <span>Créer un channel</span>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
+            <Settings size={20} />
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="w-56 bg-[#111214] border-none text-zinc-400">
+          <DropdownMenuLabel className="text-zinc-500 text-xs uppercase">
+            Options du serveur
+          </DropdownMenuLabel>
+
+          <DropdownMenuGroup>
+            <DropdownMenuItem className="cursor-pointer hover:bg-indigo-500 hover:text-white">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>Créer un channel</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer hover:bg-indigo-500 hover:text-white"
+              onClick={() => router.push(`/settings/${serverId}`)}
+            >
+              <Settings2 className="mr-2 h-4 w-4" />
+              <span>Paramètres serveur</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer hover:bg-indigo-500 hover:text-white"
+              onSelect={(e) => {
+                e.preventDefault();
+                setInviteModalOpen(true);
+              }}
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              <span>Inviter sur le serveur</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator className="bg-zinc-800" />
+
+          <DropdownMenuItem className="text-rose-500 cursor-pointer hover:bg-rose-500 hover:text-white">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Quitter le serveur</span>
           </DropdownMenuItem>
-          
-          <DropdownMenuItem 
-            className="cursor-pointer hover:bg-indigo-500 hover:text-white" 
-            onClick={() => router.push(`/settings/${serverId}`)}
-          >
-            <Settings2 className="mr-2 h-4 w-4" />
-            <span>Paramètres serveur</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem className="cursor-pointer hover:bg-indigo-500 hover:text-white">
-            <UserPlus className="mr-2 h-4 w-4" />
-            <span>Inviter un utilisateur</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        
-        <DropdownMenuSeparator className="bg-zinc-800" />
-        
-        <DropdownMenuItem className="text-rose-500 cursor-pointer hover:bg-rose-500 hover:text-white">
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Quitter le serveur</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
+        <InvitationModalContent serverId={serverId} open={inviteModalOpen} onOpenChange={setInviteModalOpen} />
+      </Dialog>
+    </>
   )
 }
