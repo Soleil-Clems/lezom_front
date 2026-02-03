@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Settings, LogOut, UserPlus, PlusCircle, Settings2 } from "lucide-react"
 import {
@@ -9,8 +11,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation"
 
-export function ServerSettingsDropdown() {
+type ServerSettingsDropdownProps = {
+  serverId: string | number;
+}
+
+export function ServerSettingsDropdown({ serverId }: ServerSettingsDropdownProps) {
+  const router = useRouter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,7 +39,10 @@ export function ServerSettingsDropdown() {
             <span>Créer un channel</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem className="cursor-pointer hover:bg-indigo-500 hover:text-white">
+          <DropdownMenuItem 
+            className="cursor-pointer hover:bg-indigo-500 hover:text-white" 
+            onClick={() => router.push(`/settings/${serverId}`)}
+          >
             <Settings2 className="mr-2 h-4 w-4" />
             <span>Paramètres serveur</span>
           </DropdownMenuItem>

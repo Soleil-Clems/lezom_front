@@ -40,17 +40,21 @@ export default function Message({channelId}: { channelId?: string }) {
     }
 
     return (
-        <div className="w-full bottom-0 px-4 pb-4">
-            <SidebarMenuButton asChild className="h-12 w-full md:w-12 p-0 hover:bg-transparent fixed top-4 right-4">
+        
+    <div className="w-full bottom-0 px-4 pb-4">
+        {/* <SidebarMenuButton asChild className="h-12 w-full md:w-12 p-0 hover:bg-transparent fixed top-4 right-4">
                 <a href="/users" className="group flex items-center gap-3 w-full md:justify-center">
                     <div className="flex h-6 w-8 shrink-0 items-center justify-center text-white transition-all duration-200 hover:rounded-[16px]">
                     </div>
                 </a>
-            </SidebarMenuButton>
-
-            <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex items-end gap-2 rounded-2xl bg-[#1E1F22] p-2 shadow-lg"
+                </SidebarMenuButton> */}
+        <div className="flex items-end gap-2 rounded-2xl bg-[#1E1F22] p-2 shadow-lg">
+        <div className="relative flex-1">
+            <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="absolute left-2 bottom-2 h-8 w-8 rounded-full"
             >
                 <div className="relative flex-1">
                     <Button
