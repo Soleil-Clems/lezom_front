@@ -77,6 +77,14 @@ class SocketManager {
     getSocket() {
         return this.socket;
     }
+
+    reconnectWithNewToken() {
+        if (this.socket) {
+            this.socket.disconnect();
+            this.socket = null;
+        }
+        return this.connect();
+    }
 }
 
 export const socketManager = new SocketManager();
