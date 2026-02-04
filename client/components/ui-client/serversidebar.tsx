@@ -31,12 +31,15 @@ interface ServerSidebarProps {
 export function ServerSidebar() {
 
     const { servers, loading, error} = useSocketServers();
+
+    console.log(servers);
     if (loading ) {
         return <Loading/>
     }
     if (error) {
         return <Error/>
     }
+
 
     return (
         <TooltipProvider>
