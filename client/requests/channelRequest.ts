@@ -1,4 +1,6 @@
 import customfetch from "@/lib/customFetch";
+import { channelSchema } from "@/schemas/channel.dto";
+import z from "zod";
 
 //
 // export const getAllServersRequest = async () => {
@@ -9,6 +11,15 @@ import customfetch from "@/lib/customFetch";
 //         throw error
 //     }
 // }
+
+export const channelRequest = async (body: z.infer<typeof channelSchema>) => {
+    try {
+        const response = await customfetch.post("channels", body)
+        return response
+    } catch (error) {
+        throw error
+    }
+}
 
 export const getAllMessagesOfAChannelRequest = async (channelId:number|string) => {
     try {
