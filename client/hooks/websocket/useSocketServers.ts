@@ -7,18 +7,32 @@ export const useSocketServers = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        console.log("J’émet findAllServers");
+        const socket = socketManager.connect();
 
-
-        socketManager.emit('findAllServers', {}, (response: any) => {
-            if (response?.error) {
-                setError(response.error);
-            } else {
-                console.log("Données reçues du socket:", response);
-                setServers(response);
-            }
+        if (!socket) {
+            setError('Socket non disponible' as any);
             setLoading(false);
-        });
+            return;
+        }
+
+        const emitFindServers = () => {
+            console.log("J'émet findAllServers");
+            socketManager.emit('findAllServers', {}, (response: any) => {
+                if (response?.error) {
+                    setError(response.error);
+                } else {
+                    console.log("Données reçues du socket:", response);
+                    setServers(response);
+                }
+                setLoading(false);
+            });
+        };
+
+        if (socket.connected) {
+            emitFindServers();
+        } else {
+            socket.once('connect', emitFindServers);
+        }
     }, []);
 
     return { servers, loading, error };

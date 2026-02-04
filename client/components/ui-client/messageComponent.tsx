@@ -8,8 +8,19 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Field, FieldError} from "@/components/ui/field";
 import {sendMessageSchema, sendMessageType} from "@/schemas/message.dto";
 import {useSendMessage} from "@/hooks/mutations/useSendMessage";
+import {socketManager} from "@/lib/socket";
 
-export default function Message({channelId}: { channelId?: string }) {
+export default function Message({channelId}: { channelId: string }) {
+    const socket = socketManager.getSocket();
+
+    const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const content = e.target.value;
+        socket?.emit('typing', {
+            channelId: parseInt(channelId),
+            isTyping: content.length > 0
+        });
+    };
+
     const form = useForm<sendMessageType>({
         resolver: zodResolver(sendMessageSchema),
         defaultValues: {
@@ -21,13 +32,14 @@ export default function Message({channelId}: { channelId?: string }) {
 
     const sendMessageMutation = useSendMessage();
 
+    console.log(channelId);
     const onSubmit = (formValues: sendMessageType) => {
         sendMessageMutation.mutate(formValues);
 
         form.reset({
             content: "",
             type: "text",
-            channelId: channelId ? parseInt(channelId) : 0,
+            channelId: parseInt(channelId),
         });
     };
 
@@ -54,6 +66,10 @@ export default function Message({channelId}: { channelId?: string }) {
                                 <Field data-invalid={fieldState.invalid}>
                                     <Textarea
                                         {...field}
+                                        onChange={(e) => {
+                                            field.onChange(e); // Important pour React Hook Form
+                                            handleTyping(e);   // Ton action Socket
+                                        }}
                                         placeholder="Écris ton message..."
                                         className="min-h-[44px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0"
                                         onKeyDown={(e) => {

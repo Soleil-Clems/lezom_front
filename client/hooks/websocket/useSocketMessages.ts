@@ -1,43 +1,49 @@
-// hooks/websocket/useSocketMessages.ts
-import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useSocket } from './useSocket';
+import { useEffect, useState } from 'react';
+import { socketManager } from '@/lib/socket';
 import { messageType } from '@/schemas/message.dto';
 
 export function useSocketMessages(channelId?: string) {
-    const { isConnected, on, off } = useSocket();
-    const queryClient = useQueryClient();
+    const [messages, setMessages] = useState<messageType[]>([]);
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(!!channelId);
 
     useEffect(() => {
-        if (!isConnected || !channelId) return;
+        if (!channelId) return;
 
-        const handleNewMessage = (message: messageType) => {
-            // Invalider le cache TanStack Query pour recharger les messages
-            queryClient.invalidateQueries({
-                queryKey: ['messages', channelId]
+        const socket = socketManager.getSocket();
+        if (!socket) return;
+
+        socket.emit('joinChannel', parseInt(channelId), (history: messageType[]) => {
+            setMessages(history);
+            setIsLoading(false);
+        });
+
+        const handleNewMessage = (newMessage: messageType) => {
+            setMessages((prev) => {
+                if (prev.find(m => m.id === newMessage.id)) return prev;
+                return [...prev, newMessage];
             });
+        };
 
-            // OU mettre à jour directement le cache (optimistic update)
-            queryClient.setQueryData<messageType[]>(
-                ['messages', channelId],
-                (old) => old ? [...old, message] : [message]
+        const handleUserTyping = ({ firstname, isTyping }: { firstname: string, isTyping: boolean }) => {
+            setTypingUsers((prev) =>
+                isTyping
+                    ? (prev.includes(firstname) ? prev : [...prev, firstname])
+                    : prev.filter((u) => u !== firstname)
             );
         };
 
-        const handleMessageDeleted = (messageId: number) => {
-            queryClient.setQueryData<messageType[]>(
-                ['messages', channelId],
-                (old) => old?.filter((msg) => msg.id !== messageId) || []
-            );
-        };
-
-        // Écouter les événements
-        on('newMessage', handleNewMessage);
-        on('messageDeleted', handleMessageDeleted);
+        socket.on('newMessage', handleNewMessage);
+        socket.on('userTyping', handleUserTyping);
 
         return () => {
-            off('newMessage', handleNewMessage);
-            off('messageDeleted', handleMessageDeleted);
+            socket.off('newMessage', handleNewMessage);
+            socket.off('userTyping', handleUserTyping);
+            setMessages([]);
+            setTypingUsers([]);
+            setIsLoading(true);
         };
-    }, [isConnected, channelId, on, off, queryClient]);
+    }, [channelId]);
+
+    return { messages, isLoading, typingUsers };
 }
