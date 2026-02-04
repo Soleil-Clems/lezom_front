@@ -5,6 +5,8 @@ import { Hash, Volume2 } from "lucide-react";
 import Error from "@/components/ui-client/Error";
 import Loading from "@/components/ui-client/Loading";
 import { useGetAllChannelsOfAServer } from "@/hooks/queries/useGetAllChannelsOfAServer";
+import { useAuthUser } from "@/hooks/queries/useAuthUser";
+import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
 import { channelType } from "@/schemas/channel.dto";
 import { ServerSettingsDropdown } from "./dropdownMenu";
 
@@ -14,6 +16,9 @@ type ChannelSidebarProps = {
 };
 
 export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
+    const { data: user } = useAuthUser();
+    const { data: allServersData } = useGetAllServers();
+
     if (!serverId) {
         return (
             <div className="w-60 h-full bg-[#2B2D31] flex flex-col items-center justify-center p-4 text-zinc-500 text-center">
@@ -23,6 +28,11 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
     }
 
     const { data, isLoading, isError } = useGetAllChannelsOfAServer(serverId);
+
+    const servers = Array.isArray(allServersData) ? allServersData : (allServersData as any)?.data || [];
+    const currentServer = servers.find((s: any) => s.id.toString() === serverId);
+    const userMembership = currentServer?.memberships?.find((m: any) => m.members?.id === user?.id);
+    const userRole = userMembership?.role;
 
     if (isLoading) return <Loading />;
     if (isError) return <Error />;
@@ -34,7 +44,7 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
             {/* HEADER */}
             <div className="h-12 px-4 flex items-center justify-between shadow-sm border-b border-black/20 font-bold text-white shrink-0">
                 Salons
-                <ServerSettingsDropdown serverId={serverId} />
+                <ServerSettingsDropdown serverId={serverId} userRole={userRole} />
             </div>
 
             {/* CHANNELS */}
