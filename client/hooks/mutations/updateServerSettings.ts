@@ -40,7 +40,7 @@ export function useUpdateChannel() {
     return useMutation({
         mutationFn: ({ id, name }: { id: string | number, name: string }) => updateChannelNameRequest(id, name),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["server-channels"] }); // Assure-toi que c'est la clé utilisée dans ton useQuery
+            queryClient.invalidateQueries({ queryKey: ["server"] });
             toast.success("Salon mis à jour");
         },
         onError: (error: any) => toast.error(error.message)
@@ -53,7 +53,7 @@ export function useDeleteChannel() {
     return useMutation({
         mutationFn: (id: string | number) => deleteChannelRequest(id),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["server-channels"] });
+            queryClient.invalidateQueries({ queryKey: ["server"] });
             toast.success("Salon supprimé");
         },
         onError: (error: any) => toast.error(error.message)
