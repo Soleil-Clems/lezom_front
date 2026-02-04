@@ -33,12 +33,14 @@ interface ServerSidebarProps {
 export function ServerSidebar() {
 
     const { servers, loading, error} = useSocketServers();
+
     if (loading ) {
         return <Loading/>
     }
     if (error) {
         return <Error/>
     }
+
 
     return (
         <TooltipProvider>
