@@ -1,11 +1,12 @@
 "use client"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { 
-  updateServerNameRequest, 
-  deleteServerRequest, 
-  updateChannelNameRequest, 
-  deleteChannelRequest 
+import {
+  updateServerNameRequest,
+  deleteServerRequest,
+  updateChannelNameRequest,
+  deleteChannelRequest,
+  updateMemberRoleRequest
 } from "@/requests/serverRequest";
 
 // 1. Update Serveur
@@ -55,6 +56,26 @@ export function useDeleteChannel() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["server"] });
             toast.success("Salon supprimé");
+        },
+        onError: (error: any) => toast.error(error.message)
+    });
+}
+
+export function useUpdateMemberRole() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({
+            serverId,
+            memberId,
+            role
+        }: {
+            serverId: string | number;
+            memberId: string | number;
+            role: "server_member" | "server_admin" | "server_owner";
+        }) => updateMemberRoleRequest(serverId, memberId, role),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["allservers"] });
+            toast.success("Rôle mis à jour");
         },
         onError: (error: any) => toast.error(error.message)
     });
