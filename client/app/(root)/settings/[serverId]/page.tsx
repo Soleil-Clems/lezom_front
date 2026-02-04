@@ -1,20 +1,28 @@
 "use client"
-import React from 'react'
+import React, { useState } from 'react'
 import { useRouter } from "next/navigation"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2, Settings2, Server, Hash, ArrowLeft } from "lucide-react"
+import { Dialog } from "@/components/ui/dialog"
+import { Loader2, Settings2, Server, Hash, ArrowLeft, UserX } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ManagementCard } from "@/components/ui-client/managementcard" 
+import { ManagementCard } from "@/components/ui-client/managementcard"
+import { BannedUserCard } from "@/components/ui-client/bannedUserCard"
+import { MemberCard } from "@/components/ui-client/memberCard"
+import { BanModalContent } from "@/components/ui-client/banModal"
 
-import { useAuthUser } from '@/hooks/queries/useAuthUser' 
-import { useGetAllServers } from '@/hooks/queries/useGetAllServers' 
+import { useAuthUser } from '@/hooks/queries/useAuthUser'
+import { useGetAllServers } from '@/hooks/queries/useGetAllServers'
 import { useGetAllChannelsOfAServer } from '@/hooks/queries/useGetAllChannelsOfAServer'
+import { useGetBannedUsers } from '@/hooks/queries/useGetBannedUsers'
 
 import { useUpdateServer, useDeleteServer, useUpdateChannel, useDeleteChannel } from "@/hooks/mutations/updateServerSettings"
+import { useBanUser, useUnbanUser } from "@/hooks/mutations/useBanManagement"
+import { BanType } from "@/schemas/ban.dto"
 
 function ServerChannelsList({ serverId }: { serverId: string | number }) {
-const { data: serverData, isLoading } = useGetAllChannelsOfAServer(String(serverId));  const updateChannel = useUpdateChannel();
+  const { data: serverData, isLoading } = useGetAllChannelsOfAServer(String(serverId));
+  const updateChannel = useUpdateChannel();
   const deleteChannel = useDeleteChannel();
 
   if (isLoading) return <div className="p-4 text-xs text-zinc-500 italic">Chargement...</div>;
@@ -24,15 +32,91 @@ const { data: serverData, isLoading } = useGetAllChannelsOfAServer(String(server
   return (
     <div className="space-y-3 p-4">
       {channels.map((channel: any) => (
-        <ManagementCard 
+        <ManagementCard
           key={channel.id}
           id={channel.id}
           label="Nom du salon"
-          initialValue={channel.name} 
+          initialValue={channel.name}
           type="channel"
           onSave={(newName: string) => updateChannel.mutate({ id: channel.id, name: newName })}
           onDelete={() => deleteChannel.mutate(channel.id)}
           isPending={updateChannel.isPending || deleteChannel.isPending}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ServerBannedUsersList({ serverId }: { serverId: string | number }) {
+  const { data: bannedUsers, isLoading } = useGetBannedUsers(serverId);
+  const unbanUser = useUnbanUser();
+
+  if (isLoading) return <div className="p-4 text-xs text-zinc-500 italic">Chargement...</div>;
+
+  const bans: BanType[] = Array.isArray(bannedUsers) ? bannedUsers : [];
+
+  if (bans.length === 0) {
+    return (
+      <div className="p-4 text-center text-zinc-500 text-sm">
+        Aucun utilisateur banni
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 p-4">
+      {bans.map((ban: BanType) => (
+        <BannedUserCard
+          key={ban.id}
+          ban={ban}
+          onUnban={() => unbanUser.mutate({ serverId, userId: ban.user.id })}
+          isPending={unbanUser.isPending}
+        />
+      ))}
+    </div>
+  );
+}
+
+type MemberToban = {
+  id: number;
+  username: string;
+} | null;
+
+function ServerMembersList({
+  serverId,
+  members,
+  currentUserId,
+  onOpenBanModal
+}: {
+  serverId: string | number;
+  members: any[];
+  currentUserId: number;
+  onOpenBanModal: (member: { id: number; username: string }) => void;
+}) {
+  const banUser = useBanUser();
+
+  const filteredMembers = members.filter((m: any) => m.members?.id !== currentUserId);
+
+  if (filteredMembers.length === 0) {
+    return (
+      <div className="p-4 text-center text-zinc-500 text-sm">
+        Aucun autre membre sur ce serveur
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3 p-4">
+      {filteredMembers.map((membership: any) => (
+        <MemberCard
+          key={membership.id}
+          member={{
+            id: membership.members?.id,
+            username: membership.members?.username,
+            role: membership.role,
+          }}
+          onBan={() => onOpenBanModal({ id: membership.members?.id, username: membership.members?.username })}
+          isPending={banUser.isPending}
         />
       ))}
     </div>
@@ -46,6 +130,11 @@ export default function SettingsPage() {
 
   const updateServer = useUpdateServer();
   const deleteServer = useDeleteServer();
+  const banUser = useBanUser();
+
+  const [banModalOpen, setBanModalOpen] = useState(false);
+  const [memberToBan, setMemberToBan] = useState<MemberToban>(null);
+  const [currentServerId, setCurrentServerId] = useState<string | number | null>(null);
 
   if (authLoading || serversLoading) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#313338]">
@@ -54,6 +143,33 @@ export default function SettingsPage() {
   );
 
   const myServers = Array.isArray(allServersData) ? allServersData : (allServersData as any)?.data || [];
+
+  const handleOpenBanModal = (serverId: string | number, member: { id: number; username: string }) => {
+    setCurrentServerId(serverId);
+    setMemberToBan(member);
+    setBanModalOpen(true);
+  };
+
+  const handleConfirmBan = (reason?: string) => {
+    if (memberToBan && currentServerId) {
+      banUser.mutate(
+        { serverId: currentServerId, userId: memberToBan.id, reason },
+        {
+          onSuccess: () => {
+            setBanModalOpen(false);
+            setMemberToBan(null);
+            setCurrentServerId(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleCancelBan = () => {
+    setBanModalOpen(false);
+    setMemberToBan(null);
+    setCurrentServerId(null);
+  };
 
   return (
     <div className="flex-1 bg-[#313338] h-full overflow-y-auto">
@@ -72,6 +188,7 @@ export default function SettingsPage() {
           <TabsList className="bg-[#1E1F22] mb-6">
             <TabsTrigger value="servers" className="px-10">Serveurs</TabsTrigger>
             <TabsTrigger value="channels" className="px-10">Salons</TabsTrigger>
+            <TabsTrigger value="bans" className="px-10">Bannis</TabsTrigger>
           </TabsList>
 
           <TabsContent value="servers" className="space-y-4 outline-none">
@@ -100,7 +217,60 @@ export default function SettingsPage() {
               </div>
             ))}
           </TabsContent>
+
+          <TabsContent value="bans" className="space-y-8 outline-none">
+            {/* Section Membres du serveur */}
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Server size={18} className="text-indigo-400" />
+                Membres du serveur
+              </h2>
+              {myServers.map((server: any) => (
+                <div key={server.id} className="bg-[#2B2D31] rounded-xl border border-white/5 overflow-hidden mb-4">
+                  <div className="bg-[#1E1F22] px-4 py-3 flex items-center gap-2 border-b border-white/5">
+                    <Server size={14} className="text-indigo-400" />
+                    <span className="text-xs font-bold uppercase text-zinc-300 tracking-wider">{server.name}</span>
+                  </div>
+                  <ServerMembersList
+                    serverId={server.id}
+                    members={server.memberships || []}
+                    currentUserId={user?.id}
+                    onOpenBanModal={(member) => handleOpenBanModal(server.id, member)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Section Utilisateurs bannis */}
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <UserX size={18} className="text-rose-400" />
+                Utilisateurs bannis
+              </h2>
+              {myServers.map((server: any) => (
+                <div key={server.id} className="bg-[#2B2D31] rounded-xl border border-white/5 overflow-hidden mb-4">
+                  <div className="bg-[#1E1F22] px-4 py-3 flex items-center gap-2 border-b border-white/5">
+                    <Server size={14} className="text-indigo-400" />
+                    <span className="text-xs font-bold uppercase text-zinc-300 tracking-wider">{server.name}</span>
+                  </div>
+                  <ServerBannedUsersList serverId={server.id} />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
         </Tabs>
+
+        {/* Modal de bannissement */}
+        <Dialog open={banModalOpen} onOpenChange={setBanModalOpen}>
+          {memberToBan && (
+            <BanModalContent
+              username={memberToBan.username}
+              onConfirm={handleConfirmBan}
+              onCancel={handleCancelBan}
+              isPending={banUser.isPending}
+            />
+          )}
+        </Dialog>
       </div>
     </div>
   )
