@@ -1,5 +1,17 @@
 import customfetch from "@/lib/customFetch";
+import { channelSchema } from "@/schemas/channel.dto";
+import { serversSchema } from "@/schemas/server.dto";
+import z from "zod";
+import { CreateServerDto } from "@/schemas/create-server.dto";
 
+export const serverRequest = async (body: CreateServerDto) => {
+    try {
+        const response = await customfetch.post("servers", body);
+        return response;
+    } catch (error) {
+        throw error; //
+    }
+};
 
 export const getAllServersRequest = async () => {
     try {
@@ -13,7 +25,7 @@ export const getAllServersRequest = async () => {
 export const getAllChannelsOfAServerRequest = async (serverId: number | string) => {
     try {
         const url = `channels/server/${serverId}`;
-        console.log("Appel API vers :", url); // <--- Vérifie l'ID dans ta console
+        console.log("Appel API vers :", url); 
         const response = await customfetch.get(url);
         return response;
     } catch (error) {
