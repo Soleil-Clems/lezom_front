@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { apiUrl } from "@/lib/apiurl";
 
 type AuthState = {
     token: string | null;
@@ -20,6 +21,11 @@ const useAuthStore = create<AuthState>()(
             },
 
             logout: () => {
+                fetch(`${apiUrl}auth/logout`, {
+                    method: "POST",
+                    credentials: "include",
+                }).catch(() => {});
+
                 set({ token: null });
 
                 if (typeof window !== 'undefined') {
