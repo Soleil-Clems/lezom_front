@@ -20,7 +20,7 @@ import { useUpdateServer, useDeleteServer, useUpdateChannel, useDeleteChannel } 
 import { useBanUser, useUnbanUser } from "@/hooks/mutations/useBanManagement"
 import { BanType } from "@/schemas/ban.dto"
 
-function ServerChannelsList({ serverId }: { serverId: string | number }) {
+function ServerChannelsList({ serverId, isOwner }: { serverId: string | number; isOwner: boolean }) {
   const { data: serverData, isLoading } = useGetAllChannelsOfAServer(String(serverId));
   const updateChannel = useUpdateChannel();
   const deleteChannel = useDeleteChannel();
@@ -41,6 +41,7 @@ function ServerChannelsList({ serverId }: { serverId: string | number }) {
           onSave={(newName: string) => updateChannel.mutate({ id: channel.id, name: newName })}
           onDelete={() => deleteChannel.mutate(channel.id)}
           isPending={updateChannel.isPending || deleteChannel.isPending}
+          isOwner={isOwner}
         />
       ))}
     </div>
@@ -192,30 +193,41 @@ export default function SettingsPage() {
           </TabsList>
 
           <TabsContent value="servers" className="space-y-4 outline-none">
-            {myServers.map((server: any) => (
-              <ManagementCard 
-                key={server.id}
-                id={server.id}
-                label="Nom du serveur"
-                initialValue={server.name}
-                type="server"
-                onSave={(newName: string) => updateServer.mutate({ id: server.id, name: newName })}
-                onDelete={() => deleteServer.mutate(server.id)}
-                isPending={updateServer.isPending || deleteServer.isPending}
-              />
-            ))}
+            {myServers.map((server: any) => {
+              const isOwner = server.memberships?.some(
+                (m: any) => m.members?.id === user?.id && m.role === "server_owner"
+              );
+              return (
+                <ManagementCard
+                  key={server.id}
+                  id={server.id}
+                  label="Nom du serveur"
+                  initialValue={server.name}
+                  type="server"
+                  onSave={(newName: string) => updateServer.mutate({ id: server.id, name: newName })}
+                  onDelete={() => deleteServer.mutate(server.id)}
+                  isPending={updateServer.isPending || deleteServer.isPending}
+                  isOwner={isOwner}
+                />
+              );
+            })}
           </TabsContent>
 
           <TabsContent value="channels" className="space-y-8 outline-none">
-            {myServers.map((server: any) => (
-              <div key={server.id} className="bg-[#2B2D31] rounded-xl border border-white/5 overflow-hidden">
-                <div className="bg-[#1E1F22] px-4 py-3 flex items-center gap-2 border-b border-white/5">
-                   <Server size={14} className="text-indigo-400" />
-                   <span className="text-xs font-bold uppercase text-zinc-300 tracking-wider">{server.name}</span>
+            {myServers.map((server: any) => {
+              const isOwner = server.memberships?.some(
+                (m: any) => m.members?.id === user?.id && m.role === "server_owner"
+              );
+              return (
+                <div key={server.id} className="bg-[#2B2D31] rounded-xl border border-white/5 overflow-hidden">
+                  <div className="bg-[#1E1F22] px-4 py-3 flex items-center gap-2 border-b border-white/5">
+                    <Server size={14} className="text-indigo-400" />
+                    <span className="text-xs font-bold uppercase text-zinc-300 tracking-wider">{server.name}</span>
+                  </div>
+                  <ServerChannelsList serverId={server.id} isOwner={isOwner} />
                 </div>
-                <ServerChannelsList serverId={server.id} />
-              </div>
-            ))}
+              );
+            })}
           </TabsContent>
 
           <TabsContent value="bans" className="space-y-8 outline-none">
