@@ -7,14 +7,14 @@ export const useSocketServers = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        console.log("J’émet findAllServers");
+        // console.log("J’émet findAllServers");
 
 
         socketManager.emit('findAllServers', {}, (response: any) => {
             if (response?.error) {
                 setError(response.error);
             } else {
-                console.log("Données reçues du socket:", response);
+                // console.log("Données reçues du socket:", response);
                 setServers(response);
             }
             setLoading(false);
