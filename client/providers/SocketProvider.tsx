@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { socketManager } from '@/lib/socket';
 import useAuthStore from '@/store/authStore';
+import { refreshAccessToken } from '@/lib/tokenRefresh';
 
 export default function SocketProvider({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((state) => state.token);
@@ -17,10 +18,13 @@ export default function SocketProvider({ children }: { children: React.ReactNode
         const socket = socketManager.connect();
 
         if (!socket) return;
-        // Gérer les erreurs d'authentification
-        socket.on('error', (error: any) => {
+        // Gérer les erreurs d'authentification avec refresh
+        socket.on('error', async (error: any) => {
             if (error.message === 'Unauthorized') {
-                logout();
+                const newToken = await refreshAccessToken();
+                if (!newToken) {
+                    logout();
+                }
             }
         });
 

@@ -10,7 +10,7 @@ import {
     SidebarMenuItem,
     SidebarMenuButton,
 } from "@/components/ui/sidebar"
-import {Plus, User} from "lucide-react"
+import {MessageSquare, Plus, User} from "lucide-react"
 import {
     Tooltip,
     TooltipContent,
@@ -23,6 +23,8 @@ import {ServerItem} from "@/components/ui-client/serverItem";
 import Error from "@/components/ui-client/Error";
 import Loading from "@/components/ui-client/Loading";
 import {useSocketServers} from "@/hooks/websocket/useSocketServers";
+import {Separator} from "@/components/ui/separator";
+import Link from "next/link";
 
 interface ServerSidebarProps {
     children: React.ReactNode;
@@ -54,6 +56,25 @@ export function ServerSidebar() {
 
                 <SidebarContent>
                     <SidebarGroup className="flex flex-col items-start md:items-center gap-3 px-3">
+
+                        <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                                <Link href="/messages" className="group flex items-center gap-3 w-full outline-none">
+                                    <div
+                                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] bg-[#313338] text-indigo-400 transition-all duration-200 hover:rounded-[16px] hover:bg-indigo-500 hover:text-white">
+                                        <MessageSquare size={25}/>
+                                    </div>
+                                    <span className="block md:hidden font-bold text-zinc-400 hover:text-white">
+                                        Messages privés
+                                    </span>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="hidden md:block">
+                                <p>Messages privés</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Separator className="w-8 bg-zinc-600" />
 
                         {servers.map((server: serversType, index: number) => (
                             <ServerItem
