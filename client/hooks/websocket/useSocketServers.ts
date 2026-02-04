@@ -4,13 +4,14 @@ import { socketManager } from '@/lib/socket';
 export const useSocketServers = () => {
     const [servers, setServers] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<null|string>(null);
 
     useEffect(() => {
         const socket = socketManager.connect();
 
         if (!socket) {
-            setError('Socket non disponible' as any);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setError('Socket non disponible');
             setLoading(false);
             return;
         }
