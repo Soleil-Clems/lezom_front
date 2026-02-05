@@ -4,7 +4,7 @@ import {userSchema} from "@/schemas/user.dto";
 
 
 export const messageSchema = z.object({
-    id: z.number(),
+    id: z.string() || z.number(),
     content: z.string(),
     type: MessageTypeEnum,
     createdAt: z.date().optional(),
@@ -14,7 +14,7 @@ export const messageSchema = z.object({
 export const sendMessageSchema = z.object({
     content: z.string().min(1, "Le message ne peut pas être vide"),
     type: MessageTypeEnum,
-    channelId: z.number(),
+    channelId: z.string() || z.number(),
 })
 
 export type messageType = z.infer<typeof messageSchema>

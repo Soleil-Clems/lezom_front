@@ -28,7 +28,7 @@ export function useSendMessage() {
             });
         },
         onSuccess: (newMessage: any) => {
-            // On invalide le cache pour rafraîchir la liste des messages
+            // On invalide le cache pour rafraîchir la liste des (messages)
             // newMessage.channelId doit correspondre à la clé utilisée dans ton fetch
             queryClient.invalidateQueries({
                 queryKey: ["messages", newMessage.channelId?.toString()]

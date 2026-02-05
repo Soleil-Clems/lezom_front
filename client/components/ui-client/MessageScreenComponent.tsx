@@ -63,7 +63,7 @@ export default function MessageScreenComponent({
   const handleSendMessage = async (userId: number) => {
     try {
       const conversation = await createConversation.mutateAsync({ userId });
-      router.push(`/messages/${conversation.id}`);
+      router.push(`/conversation/${conversation.id}`);
     } catch (error) {
     }
   };

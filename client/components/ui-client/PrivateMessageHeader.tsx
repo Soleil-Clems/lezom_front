@@ -14,7 +14,7 @@ export default function PrivateMessageHeader({ otherUser }: PrivateMessageHeader
 
     return (
         <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-700 bg-[#313338]">
-            <Link href="/messages" className="md:hidden">
+            <Link href="/" className="md:hidden">
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                     <ArrowLeft className="h-5 w-5 text-zinc-400" />
                 </Button>
