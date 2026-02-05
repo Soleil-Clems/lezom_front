@@ -13,4 +13,13 @@ export const channelSchema = z.object({
     server: serversSchema.optional(),
 })
 
+
+export const createChannelSchema = z.object({
+    name: z.string(),
+    type: ChannelTypeEnum,
+    serverId: z.number(),
+})
+
+
 export type channelType = z.infer<typeof channelSchema>
+export type createChannelType = z.infer<typeof createChannelSchema>

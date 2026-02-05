@@ -13,7 +13,6 @@ export function OnlineFriendItem({ username, avatarUrl, status }: any) {
           </AvatarFallback>
         </Avatar>
 
-        {/* Le point de statut */}
         <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-[3px] border-[#2B2D31] 
           ${status === 'online' ? 'bg-green-500' : 
             status === 'dnd' ? 'bg-red-500' : 
