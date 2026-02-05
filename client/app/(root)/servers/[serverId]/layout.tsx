@@ -1,5 +1,5 @@
 import { ChannelSidebar } from "@/components/ui-client/chanelsidebar"
-
+import { OnlineFriendsList } from "@/components/ui-client/onlinefriendlist";
 export default async function ServerLayout({ 
   children, 
   params 
@@ -8,16 +8,18 @@ export default async function ServerLayout({
   params: Promise<{ serverId: string, channelId?: string }> 
 }) {
   const { serverId, channelId } = await params;
+
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-full w-full overflow-hidden bg-[#313338]">
       
-      <aside className={`${channelId ? 'hidden' : 'flex'} md:flex shrink-0`}>
         <ChannelSidebar serverId={serverId} channelId={channelId} />
-      </aside>
 
       <main className="flex-1 flex min-w-0 overflow-hidden">
         {children}
       </main>
+
+    
+      
     </div>
   )
 }

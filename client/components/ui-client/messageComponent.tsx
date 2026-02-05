@@ -157,7 +157,7 @@ export default function Message({ channelId }: { channelId: string }) {
                                     <Textarea
                                         {...field}
                                         placeholder="Écris ton message..."
-                                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0"
+                                        className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0 overflow-y-auto"
                                         onChange={(e) => {
                                             field.onChange(e);
                                             handleTyping(e.target.value);
