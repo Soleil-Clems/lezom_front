@@ -16,13 +16,11 @@ export default function HomePage() {
       <main className="flex-1 flex min-w-0">
         
         <div className="flex-1 h-full overflow-hidden">
-           <MessageLayout />
+           <MessageLayout channelId={''} />
         </div>
 
         
-        <aside className="hidden xl:flex w-60 bg-[#2B2D31] flex-col shrink-0 border-l border-black/20">
-          <OnlineFriendsList />
-        </aside>
+        
         
       </main>
     </div>

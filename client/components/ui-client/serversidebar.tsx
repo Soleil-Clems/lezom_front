@@ -1,5 +1,5 @@
 "use client";
-
+import {useState} from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -26,12 +26,15 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ModalServerContent } from "./modalserver";
+import {useGetAllServers} from "@/hooks/queries/useGetAllServers";
 
 export function ServerSidebar() {
-  const { servers, loading, error } = useSocketServers();
+  const { data:servers, isError, isLoading } = useGetAllServers();
+  const [open, setOpen] = useState(false);
 
-  if (loading) return <Loading />;
-  if (error) return <Error />;
+
+  if (isLoading) return <Loading />;
+  if (isError) return <Error />;
 
   return (
     <TooltipProvider>
@@ -71,7 +74,7 @@ export function ServerSidebar() {
               />
             ))}
 
-            <Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
               <Tooltip delayDuration={0}>
                 <DialogTrigger asChild>
                   <TooltipTrigger asChild>
@@ -89,7 +92,7 @@ export function ServerSidebar() {
                   <p>Ajouter un serveur</p>
                 </TooltipContent>
               </Tooltip>
-              <ModalServerContent />
+              <ModalServerContent onSuccess={() => setOpen(false)}/>
             </Dialog>
           </SidebarGroup>
         </SidebarContent>

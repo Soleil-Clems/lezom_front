@@ -9,7 +9,7 @@ import {
   updateMemberRoleRequest
 } from "@/requests/serverRequest";
 
-// 1. Update Serveur
+
 export function useUpdateServer() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -22,7 +22,6 @@ export function useUpdateServer() {
     });
 }
 
-// 2. Delete Serveur
 export function useDeleteServer() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -35,7 +34,7 @@ export function useDeleteServer() {
     });
 }
 
-// 3. Update Channel
+
 export function useUpdateChannel() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -48,7 +47,7 @@ export function useUpdateChannel() {
     });
 }
 
-// 4. Delete Channel
+
 export function useDeleteChannel() {
     const queryClient = useQueryClient();
     return useMutation({

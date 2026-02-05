@@ -68,64 +68,118 @@ export default function MessageScreenComponent({
     });
   };
 
+  const AuthorName = ({ message, isMyMessage }: { message: messageType; isMyMessage: boolean }) => {
+    if (isMyMessage) {
+      return <span className="text-xs font-bold text-emerald-400">Moi</span>;
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer transition-colors">
+            {message.author.username}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="bg-zinc-800 border-zinc-700">
+          <DropdownMenuItem
+            onClick={() => handleSendMessage(message.author.id)}
+            className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
+          >
+            <MessageSquare className="size-4" />
+            Envoyer un message
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/profil/${message.author.id}`)}
+            className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
+          >
+            <User className="size-4" />
+            Voir le profil
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   return (
     <div className="w-full p-4 space-y-4 min-h-full">
-      {messages.map((message) => {
-        if (message.type === "system") {
-          return <SystemMessage key={message.id} content={message.content} date={message.createdAt} />;
-        }
+      {messages.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
+          <div className="text-6xl mb-4">💬</div>
+          <h3 className="text-xl font-semibold text-zinc-300 mb-2">
+            Aucun message pour le moment
+          </h3>
+          <p className="text-sm text-zinc-500 max-w-md">
+            Soyez le premier à lancer la conversation ! Envoyez un message pour
+            commencer à discuter.
+          </p>
+        </div>
+      ) : (
+        <>
+          {messages.map((message) => {
+            if (message.type === "system") {
+              return (
+                <SystemMessage
+                  key={message.id}
+                  content={message.content}
+                  date={message.createdAt}
+                />
+              );
+            }
 
-        const isMyMessage = message.author.id === user?.id;
+            const isMyMessage = message.author.id === user?.id;
 
-        return (
-          <div
-            key={message.id}
-            className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
-          >
-            <div className="flex items-center gap-2">
-              {isMyMessage ? (
-                <span className="text-xs font-bold text-emerald-400">Moi</span>
-              ) : (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer transition-colors">
-                      {message.author.username}
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-zinc-800 border-zinc-700">
-                    <DropdownMenuItem
-                      onClick={() => handleSendMessage(message.author.id)}
-                      className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
-                    >
-                      <MessageSquare className="size-4" />
-                      Envoyer un message
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => router.push(`/profil/${message.author.id}`)}
-                      className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
-                    >
-                      <User className="size-4" />
-                      Voir le profil
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              <span className="text-xs text-zinc-500">
-                {formatDate(message.createdAt)}
-              </span>
-            </div>
-            <div
-              className={`p-3 max-w-[80%] break-words ${
-                isMyMessage
-                  ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
-                  : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
-              }`}
-            >
-              {message.content}
-            </div>
-          </div>
-        );
-      })}
+            if (message.type === "gif") {
+              return (
+                <div
+                  key={message.id}
+                  className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <AuthorName message={message} isMyMessage={isMyMessage} />
+                    <span className="text-xs text-zinc-500">
+                      {formatDate(message.createdAt)}
+                    </span>
+                  </div>
+                  <div className="relative group">
+                    <img
+                      src={message.content}
+                      alt="GIF"
+                      className="max-w-[300px] max-h-[300px] rounded-xl object-cover shadow-lg"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                      GIF
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div
+                key={message.id}
+                className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
+              >
+                <div className="flex items-center gap-2">
+                  <AuthorName message={message} isMyMessage={isMyMessage} />
+                  <span className="text-xs text-zinc-500">
+                    {formatDate(message.createdAt)}
+                  </span>
+                </div>
+                <div
+                  className={`p-3 max-w-[80%] break-words ${
+                    isMyMessage
+                      ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
+                      : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
+                  }`}
+                >
+                  {message.content}
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {typingUsers.length > 0 && (
         <div className="flex items-center gap-2 text-xs text-zinc-400 italic animate-pulse">
