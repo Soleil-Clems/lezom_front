@@ -15,16 +15,19 @@ class CustomFetch {
     }
 
     private async request(endpoint: string, options: RequestOptions & RequestInit = {}, isRetry = false): Promise<any> {
-        const { headers, ...rest } = options;
+        const { headers, body, ...rest } = options;
         const token = useAuthStore.getState().token;
+
+        const isFormData = body instanceof FormData;
 
         const res = await fetch(`${this.baseURL}${endpoint}`, {
             credentials: "include",
             headers: {
                 "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json",
+                ...(isFormData ? {} : { "Content-Type": "application/json" }),
                 ...(headers || {}),
             },
+                body: isFormData ? body : body ? JSON.stringify(body) : undefined,
             ...rest,
         });
 
@@ -67,26 +70,26 @@ class CustomFetch {
         return this.request(endpoint, { method: "GET", ...options });
     }
 
-    post(endpoint: string, body?: BodyData, options: RequestOptions = {}) {
+    post(endpoint: string, body?: BodyData| FormData, options: RequestOptions = {}) {
         return this.request(endpoint, {
             method: "POST",
-            body: JSON.stringify(body),
+            body,
             ...options
         });
     }
 
-    put(endpoint: string, body?: BodyData, options: RequestOptions = {}) {
+    put(endpoint: string, body?: BodyData| FormData, options: RequestOptions = {}) {
         return this.request(endpoint, {
             method: "PUT",
-            body: JSON.stringify(body),
+            body,
             ...options
         });
     }
 
-    patch(endpoint: string, body?: BodyData, options: RequestOptions = {}) {
+    patch(endpoint: string, body?: BodyData | FormData, options: RequestOptions = {}) {
         return this.request(endpoint, {
             method: "PATCH",
-            body: JSON.stringify(body),
+            body,
             ...options
         });
     }
