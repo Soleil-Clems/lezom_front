@@ -60,18 +60,18 @@ export default function ConversationList() {
             <div className="flex-1 overflow-y-auto">
                 {conversations?.length === 0 ? (
                     <div className="p-4 text-center text-zinc-400">
-                        <p>Vous n'avez aucune conversation</p>
+                        <p>Vous n&apos;avez aucune conversation</p>
                     </div>
                 ) : (
                     <div className="py-2">
                         {conversations?.map((conversation: conversationType) => {
                             const otherUser = getOtherUser(conversation);
-                            const isActive = pathname === `/messages/${conversation.id}`;
+                            const isActive = pathname === `/conversation/${conversation.id}`;
 
                             return (
                                 <Link
                                     key={conversation.id}
-                                    href={`/messages/${conversation.id}`}
+                                    href={`/conversation/${conversation.id}`}
                                     className={cn(
                                         "flex items-center gap-3 px-4 py-3 hover:bg-zinc-700/50 transition-colors",
                                         isActive && "bg-zinc-700"

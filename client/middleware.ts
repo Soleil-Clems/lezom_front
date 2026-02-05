@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
 
     const isAuthRoute = path.startsWith("/login") || path.startsWith("/register");
 
-    const protectedRoutes = ["/profil", "/servers", "/homepage"];
+    const protectedRoutes = ["/profil", "/servers", "/(homepage)"];
     const isProtectedRoute =
         path === "/" ||
         protectedRoutes.some(route => path.startsWith(route));
@@ -19,9 +19,9 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Rediriger vers homepage si déjà connecté et sur la page login
+    // Rediriger vers (homepage) si déjà connecté et sur la page login
     if (token && (path === "/login" || path === "/register")) {
-        return NextResponse.redirect(new URL("/homepage", request.url));
+        return NextResponse.redirect(new URL("/(homepage)", request.url));
     }
 
     return NextResponse.next();
@@ -31,7 +31,7 @@ export const config = {
     matcher: [
         "/profil/:path*",
         "/servers/:path*",
-        "/homepage/:path*",
+        "/(homepage)/:path*",
         "/",
         "/login/:path*",
         "/register/:path*",

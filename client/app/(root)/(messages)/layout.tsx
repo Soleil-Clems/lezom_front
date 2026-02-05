@@ -9,7 +9,7 @@ export default function MessagesLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const isConversationOpen = pathname !== "/messages";
+    const isConversationOpen = pathname !== "/(messages)";
 
     return (
         <div className="flex h-full w-full">
