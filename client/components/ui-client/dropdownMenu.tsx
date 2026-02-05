@@ -34,10 +34,11 @@ export function ServerSettingsDropdown({
 }: ServerSettingsDropdownProps) {
   const canAccessSettings = userRole === "server_owner" || userRole === "admin";
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [chanelModalOpen, setChannelModalOpen] = useState(false);
 
   return (
     <>
-      <Dialog>
+      <Dialog  open={chanelModalOpen} onOpenChange={setChannelModalOpen}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -104,7 +105,7 @@ export function ServerSettingsDropdown({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <ModalChanelContent />
+        <ModalChanelContent onSuccess={() => setChannelModalOpen(false)}  />
       </Dialog>
 
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>

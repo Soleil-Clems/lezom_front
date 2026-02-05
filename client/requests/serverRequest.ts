@@ -9,7 +9,7 @@ export const serverRequest = async (body: CreateServerDto) => {
         const response = await customfetch.post("servers", body);
         return response;
     } catch (error) {
-        throw error; //
+        throw error;
     }
 };
 
