@@ -46,6 +46,21 @@ export function useSocketPrivateMessages(conversationId?: string) {
             });
         };
 
+        const handlePrivateMessageUpdated = (updatedMessage: any) => {
+            queryClient.setQueryData<MessagesResponse>(
+                ["conversationMessages", conversationId],
+                (old) => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        messages: old.messages.map((msg) =>
+                            msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg
+                        ),
+                    };
+                }
+            );
+        };
+
         const handlePrivateMessageDeleted = (messageId: number) => {
             queryClient.setQueryData<MessagesResponse>(
                 ["conversationMessages", conversationId],
@@ -61,10 +76,12 @@ export function useSocketPrivateMessages(conversationId?: string) {
         };
 
         on("newPrivateMessage", handleNewPrivateMessage);
+        on("privateMessageUpdated", handlePrivateMessageUpdated);
         on("privateMessageDeleted", handlePrivateMessageDeleted);
 
         return () => {
             off("newPrivateMessage", handleNewPrivateMessage);
+            off("privateMessageUpdated", handlePrivateMessageUpdated);
             off("privateMessageDeleted", handlePrivateMessageDeleted);
         };
     }, [isConnected, conversationId, on, off, queryClient]);

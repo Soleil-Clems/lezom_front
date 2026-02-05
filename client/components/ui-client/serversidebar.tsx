@@ -97,18 +97,12 @@ export function ServerSidebar() {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="py-4 px-3 md:px-0">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild className="h-12 w-full md:w-12 p-0 hover:bg-transparent">
-                <a href="/profil" className="group flex items-center gap-3 w-full md:justify-center">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition-all duration-200 hover:rounded-[16px]">
-                    <User size={24} />
-                  </div>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+        <SidebarFooter className="py-4 px-3 flex flex-col items-start md:items-center">
+          <a href="/profil" className="group flex items-center gap-3 outline-none">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition-all duration-200 hover:rounded-[16px]">
+              <User size={24} />
+            </div>
+          </a>
         </SidebarFooter>
       </Sidebar>
     </TooltipProvider>

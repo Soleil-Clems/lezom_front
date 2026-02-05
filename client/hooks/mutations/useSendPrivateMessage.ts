@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { socketManager } from "@/lib/socket";
 
-type MessageType = "text" | "img" | "file" | "pdf";
+type MessageType = "text" | "img" | "file" | "pdf" | "gif" | "system" | "voice";
 
 export function useSendPrivateMessage(conversationId: string | undefined) {
     const queryClient = useQueryClient();

@@ -1,12 +1,18 @@
-import React, { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { MessageSquare, User } from "lucide-react";
 import { messageType } from "@/schemas/message.dto";
 import { useAuthUser } from "@/hooks/queries/useAuthUser";
 import { useCreateConversation } from "@/hooks/mutations/useCreateConversation";
+import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
+import { useUpdateChannelMessage } from "@/hooks/mutations/useUpdateChannelMessage";
+import { useDeleteChannelMessage } from "@/hooks/mutations/useDeleteChannelMessage";
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 import SystemMessage from "@/components/ui-client/SystemMessage";
+import MessageActions from "@/components/ui-client/MessageActions";
+import EditMessageDialog from "@/components/ui-client/EditMessageDialog";
+import DeleteMessageDialog from "@/components/ui-client/DeleteMessageDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,22 +23,81 @@ import {
 interface Props {
   messages: messageType[];
   typingUsers?: string[];
+  channelId?: string;
+  onUpdateMessage?: (messageId: number, content: string) => void;
+  onRemoveMessage?: (messageId: number) => void;
 }
 
 export default function MessageScreenComponent({
   messages,
   typingUsers = [],
+  channelId,
+  onUpdateMessage,
+  onRemoveMessage,
 }: Props) {
   const { data: user, isLoading, isError } = useAuthUser();
+  const { data: allServersData } = useGetAllServers();
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const params = useParams();
   const createConversation = useCreateConversation();
+
+  const currentChannelId = channelId || (params.channelId as string);
+  const serverId = params.serverId as string;
+
+  const updateMessage = useUpdateChannelMessage(currentChannelId);
+  const deleteMessage = useDeleteChannelMessage(currentChannelId);
+
+  const [editingMessage, setEditingMessage] = useState<messageType | null>(null);
+  const [deletingMessage, setDeletingMessage] = useState<messageType | null>(null);
+
+  const allServers = Array.isArray(allServersData) ? allServersData : (allServersData as any)?.data || [];
+  const currentServer = allServers.find((s: any) => s.id.toString() === serverId);
+  const currentUserMembership = currentServer?.memberships?.find(
+    (m: any) => m.members?.id === user?.id
+  );
+  const currentUserRole = currentUserMembership?.role;
+  const isServerOwner = currentUserRole === "server_owner";
+  const isServerAdmin = currentUserRole === "server_admin";
 
   const handleSendMessage = async (userId: number) => {
     try {
       const conversation = await createConversation.mutateAsync({ userId });
       router.push(`/messages/${conversation.id}`);
     } catch (error) {
+    }
+  };
+
+  const canEditMessage = (message: messageType) => {
+    return message.author.id === user?.id && message.type === "text";
+  };
+
+  const canDeleteMessage = (message: messageType) => {
+    return message.author.id === user?.id || isServerOwner || isServerAdmin;
+  };
+
+  const handleEditMessage = (content: string) => {
+    if (editingMessage) {
+      updateMessage.mutate(
+        { messageId: editingMessage.id, content },
+        {
+          onSuccess: () => {
+            onUpdateMessage?.(editingMessage.id, content);
+            setEditingMessage(null);
+          },
+        }
+      );
+    }
+  };
+
+  const handleDeleteMessage = () => {
+    if (deletingMessage) {
+      deleteMessage.mutate(deletingMessage.id, {
+        onSuccess: () => {
+          onRemoveMessage?.(deletingMessage.id);
+          setDeletingMessage(null);
+        },
+      });
     }
   };
 
@@ -154,10 +219,13 @@ export default function MessageScreenComponent({
               );
             }
 
+            const canEdit = canEditMessage(message);
+            const canDelete = canDeleteMessage(message);
+
             return (
               <div
                 key={message.id}
-                className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
+                className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
               >
                 <div className="flex items-center gap-2">
                   <AuthorName message={message} isMyMessage={isMyMessage} />
@@ -166,12 +234,22 @@ export default function MessageScreenComponent({
                   </span>
                 </div>
                 <div
-                  className={`p-3 max-w-[80%] break-words ${
+                  className={`relative p-3 max-w-[80%] break-words ${
                     isMyMessage
                       ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
                       : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
                   }`}
                 >
+                  {(canEdit || canDelete) && (
+                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
+                      <MessageActions
+                        canEdit={canEdit}
+                        canDelete={canDelete}
+                        onEdit={() => setEditingMessage(message)}
+                        onDelete={() => setDeletingMessage(message)}
+                      />
+                    </div>
+                  )}
                   {message.content}
                 </div>
               </div>
@@ -193,6 +271,21 @@ export default function MessageScreenComponent({
       )}
 
       <div ref={scrollRef} />
+
+      <EditMessageDialog
+        open={!!editingMessage}
+        onOpenChange={(open) => !open && setEditingMessage(null)}
+        initialContent={editingMessage?.content || ""}
+        onSave={handleEditMessage}
+        isLoading={updateMessage.isPending}
+      />
+
+      <DeleteMessageDialog
+        open={!!deletingMessage}
+        onOpenChange={(open) => !open && setDeletingMessage(null)}
+        onConfirm={handleDeleteMessage}
+        isLoading={deleteMessage.isPending}
+      />
     </div>
   );
 }
