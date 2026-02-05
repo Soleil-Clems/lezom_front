@@ -4,10 +4,14 @@ import { useEffect } from 'react';
 import { socketManager } from '@/lib/socket';
 import useAuthStore from '@/store/authStore';
 import { refreshAccessToken } from '@/lib/tokenRefresh';
+import { useSocketPresence } from '@/hooks/websocket/useSocketPresence';
 
 export default function SocketProvider({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((state) => state.token);
     const logout = useAuthStore((state) => state.logout);
+
+    // Initialiser le suivi de présence en ligne
+    useSocketPresence();
 
     useEffect(() => {
         if (!token) {

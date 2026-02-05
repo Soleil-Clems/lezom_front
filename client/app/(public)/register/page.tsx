@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRegister } from "@/hooks/mutations/useRegister"
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 
 
@@ -157,9 +158,12 @@ export default function RegisterPage() {
             {isSubmitting ? "Chargement..." : "Continuer"}
           </Button>
 
-          <Button variant="outline" className="w-full bg-purple-discord text-white hover:bg-gray-400 hover:text-white">
-            Se connecter
-          </Button>
+          <p className="text-sm text-gray-500 text-center mt-4">
+            Déjà un compte ?{" "}
+            <Link href="/login" className="text-purple-discord hover:underline">
+              Se connecter
+            </Link>
+          </p>
         </form>
       </div>
     </main>
