@@ -2,16 +2,17 @@
 
 import React from 'react'
 import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers"
+import { useOnlineUserIds } from "@/hooks/queries/useOnlineUserIds"
 import { Users, X } from 'lucide-react'
 import { OnlineFriendItem } from './onlinefrienditem'
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar"
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger, 
-  SheetTitle, 
-  SheetHeader, 
-  SheetClose 
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetHeader,
+  SheetClose
 } from "@/components/ui/sheet"
 
 const ListContent = ({ memberships, online, offline, showClose = false }: any) => (
@@ -53,14 +54,15 @@ const ListContent = ({ memberships, online, offline, showClose = false }: any) =
 
 export function OnlineFriendsList({ serverId }: { serverId: string | number }) {
   const { data, isLoading } = useGetServerMembers(serverId, { limit: 100 });
+  const { data: onlineUserIds = [] } = useOnlineUserIds();
 
   if (isLoading || !data) return null;
 
-  const memberships = data.data || []; //
-  
-  // Tri par statut isActive présent dans l'objet "members"
-  const online = memberships.filter((m: any) => m.members?.isActive);
-  const offline = memberships.filter((m: any) => !m.members?.isActive);
+  const memberships = data.data || [];
+
+  // Filtrer avec les données temps réel du cache WebSocket
+  const online = memberships.filter((m: any) => onlineUserIds.includes(m.members?.id));
+  const offline = memberships.filter((m: any) => !onlineUserIds.includes(m.members?.id));
 
   return (
     <>
