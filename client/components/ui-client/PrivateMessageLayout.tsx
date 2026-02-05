@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useGetConversationMessages } from "@/hooks/queries/useGetConversationMessages";
 import { useSocketPrivateMessages } from "@/hooks/websocket/useSocketPrivateMessages";
 import PrivateMessageScreen from "@/components/ui-client/PrivateMessageScreen";
-import PrivateMessageInput from "@/components/ui-client/PrivateMessageInput";
+import Message from "@/components/ui-client/messageComponent";
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 
@@ -48,11 +48,11 @@ export default function PrivateMessageLayout({ conversationId }: PrivateMessageL
     return (
         <div className="flex flex-col h-full">
             <div className="flex-1 overflow-y-auto">
-                <PrivateMessageScreen messages={messages || []} />
+                <PrivateMessageScreen messages={messages || []} conversationId={conversationId} />
                 <div ref={messagesEndRef} />
             </div>
 
-            <PrivateMessageInput conversationId={conversationId} />
+            <Message conversationId={conversationId} />
         </div>
     );
 }

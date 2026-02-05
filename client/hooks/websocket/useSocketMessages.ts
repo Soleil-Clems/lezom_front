@@ -25,6 +25,16 @@ export function useSocketMessages(channelId?: string) {
             });
         };
 
+        const handleMessageUpdated = (updatedMessage: messageType) => {
+            setMessages((prev) =>
+                prev.map((m) => (m.id === updatedMessage.id ? updatedMessage : m))
+            );
+        };
+
+        const handleMessageDeleted = (messageId: number) => {
+            setMessages((prev) => prev.filter((m) => m.id !== messageId));
+        };
+
         const handleUserTyping = ({ firstname, isTyping }: { firstname: string, isTyping: boolean }) => {
             setTypingUsers((prev) =>
                 isTyping
@@ -34,10 +44,14 @@ export function useSocketMessages(channelId?: string) {
         };
 
         socket.on('newMessage', handleNewMessage);
+        socket.on('messageUpdated', handleMessageUpdated);
+        socket.on('messageDeleted', handleMessageDeleted);
         socket.on('userTyping', handleUserTyping);
 
         return () => {
             socket.off('newMessage', handleNewMessage);
+            socket.off('messageUpdated', handleMessageUpdated);
+            socket.off('messageDeleted', handleMessageDeleted);
             socket.off('userTyping', handleUserTyping);
             setMessages([]);
             setTypingUsers([]);
@@ -45,5 +59,15 @@ export function useSocketMessages(channelId?: string) {
         };
     }, [channelId]);
 
-    return { messages, isLoading, typingUsers };
+    const updateMessage = (messageId: number, content: string) => {
+        setMessages((prev) =>
+            prev.map((m) => (m.id === messageId ? { ...m, content } : m))
+        );
+    };
+
+    const removeMessage = (messageId: number) => {
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+    };
+
+    return { messages, isLoading, typingUsers, updateMessage, removeMessage };
 }

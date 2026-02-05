@@ -3,11 +3,10 @@ import MessageScreenComponent from './MessageScreenComponent'
 import Message from '@/components/ui-client/messageComponent'
 import Loading from "@/components/ui-client/Loading";
 import { useSocketMessages } from "@/hooks/websocket/useSocketMessages";
-// Importation de ta nouvelle liste de membres
 import { OnlineFriendsList } from "@/components/ui-client/onlinefriendlist";
 
 export default function MessageLayout({channelId}: { channelId: string }) {
-    const {messages, isLoading, typingUsers} = useSocketMessages(channelId);
+    const {messages, isLoading, typingUsers, updateMessage, removeMessage} = useSocketMessages(channelId);
 
     if (isLoading) return <Loading/>;
 
@@ -19,6 +18,9 @@ export default function MessageLayout({channelId}: { channelId: string }) {
                     <MessageScreenComponent
                         messages={messages}
                         typingUsers={typingUsers}
+                        channelId={channelId}
+                        onUpdateMessage={updateMessage}
+                        onRemoveMessage={removeMessage}
                     />
                 </div>
                 <div className="shrink-0">
