@@ -22,19 +22,41 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ModalChanelContent } from "./modalchanel";
 import { InvitationModalContent } from "./invitationModal";
+import { LeaveServerModal } from "./LeaveServerModal";
+import { TransferOwnershipModal } from "./TransferOwnershipModal";
+import { useLeaveServer } from "@/hooks/mutations/useLeaveServer";
 
 interface ServerSettingsDropdownProps {
   serverId: string | number;
   userRole?: string;
+  serverName: string;
+  currentUserId: number;
 }
 
 export function ServerSettingsDropdown({
   serverId,
   userRole,
+  serverName,
+  currentUserId,
 }: ServerSettingsDropdownProps) {
   const canAccessSettings = userRole === "server_owner" || userRole === "server_admin";
+  const isOwner = userRole === "server_owner";
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [chanelModalOpen, setChannelModalOpen] = useState(false);
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+
+  const leaveServer = useLeaveServer();
+
+  const handleLeaveServer = (newOwnerId?: number) => {
+    leaveServer.mutate(
+      { serverId, newOwnerId },
+      {
+        onSuccess: () => {
+          setLeaveModalOpen(false);
+        },
+      }
+    );
+  };
 
   return (
     <>
@@ -98,7 +120,13 @@ export function ServerSettingsDropdown({
 
             <DropdownMenuSeparator className="bg-zinc-800 my-1" />
 
-            <DropdownMenuItem className="text-rose-500 cursor-pointer hover:bg-rose-500 hover:text-white focus:bg-rose-500 focus:text-white rounded-sm">
+            <DropdownMenuItem
+              className="text-rose-500 cursor-pointer hover:bg-rose-500 hover:text-white focus:bg-rose-500 focus:text-white rounded-sm"
+              onSelect={(e) => {
+                e.preventDefault();
+                setLeaveModalOpen(true);
+              }}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               <span className="text-sm font-medium">Quitter le serveur</span>
             </DropdownMenuItem>
@@ -115,6 +143,26 @@ export function ServerSettingsDropdown({
           onOpenChange={setInviteModalOpen}
         />
       </Dialog>
+
+      {isOwner ? (
+        <TransferOwnershipModal
+          isOpen={leaveModalOpen}
+          onClose={() => setLeaveModalOpen(false)}
+          onConfirm={(newOwnerId) => handleLeaveServer(newOwnerId)}
+          serverId={serverId}
+          serverName={serverName}
+          currentUserId={currentUserId}
+          isPending={leaveServer.isPending}
+        />
+      ) : (
+        <LeaveServerModal
+          isOpen={leaveModalOpen}
+          onClose={() => setLeaveModalOpen(false)}
+          onConfirm={() => handleLeaveServer()}
+          serverName={serverName}
+          isPending={leaveServer.isPending}
+        />
+      )}
     </>
   );
 }
