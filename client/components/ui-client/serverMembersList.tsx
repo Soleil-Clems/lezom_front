@@ -8,6 +8,7 @@ import { MemberCard } from "@/components/ui-client/memberCard";
 import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
 import { useUpdateMemberRole } from "@/hooks/mutations/updateServerSettings";
 import { useBanUser } from "@/hooks/mutations/useBanManagement";
+import { useTransferOwnership } from "@/hooks/mutations/useTransferOwnership";
 
 type MemberRole = "server_member" | "server_admin" | "server_owner";
 
@@ -32,6 +33,7 @@ export function ServerMembersList({
     const { data, isLoading } = useGetServerMembers(serverId, { page, limit, search });
     const banUser = useBanUser();
     const updateMemberRole = useUpdateMemberRole();
+    const transferOwnership = useTransferOwnership();
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,7 +42,11 @@ export function ServerMembersList({
     };
 
     const handleRoleChange = (memberId: number, newRole: MemberRole) => {
-        updateMemberRole.mutate({ serverId, memberId, role: newRole });
+        if (newRole === "server_owner") {
+            transferOwnership.mutate({ serverId, newOwnerId: memberId });
+        } else {
+            updateMemberRole.mutate({ serverId, memberId, role: newRole });
+        }
     };
 
     if (isLoading) {
@@ -106,7 +112,7 @@ export function ServerMembersList({
                                 })}
                                 onRoleChange={(newRole) => handleRoleChange(membership.members?.id, newRole)}
                                 isPending={banUser.isPending}
-                                isRoleChangePending={updateMemberRole.isPending}
+                                isRoleChangePending={updateMemberRole.isPending || transferOwnership.isPending}
                             />
                         );
                     })}

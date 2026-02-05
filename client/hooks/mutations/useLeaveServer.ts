@@ -18,6 +18,7 @@ export function useLeaveServer() {
             leaveServerRequest(serverId, newOwnerId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["allservers"] });
+            queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
             toast.success("Vous avez quitté le serveur");
             router.push("/");
         },
