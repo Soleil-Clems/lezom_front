@@ -96,6 +96,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                     const isMyMessage = message.sender.id === user?.id;
                     const canEdit = canEditMessage(message);
                     const canDelete = canDeleteMessage(message);
+                    const isGif = message.type === "gif";
 
                     return (
                         <div
@@ -116,25 +117,51 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                                     {formatDate(message.createdAt)}
                                 </span>
                             </div>
-                            <div
-                                className={`relative p-3 max-w-[80%] break-words ${
-                                    isMyMessage
-                                        ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
-                                        : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
-                                }`}
-                            >
-                                {(canEdit || canDelete) && (
-                                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
-                                        <MessageActions
-                                            canEdit={canEdit}
-                                            canDelete={canDelete}
-                                            onEdit={() => setEditingMessage(message)}
-                                            onDelete={() => setDeletingMessage(message)}
-                                        />
+
+                            {isGif ? (
+                                <div className="relative group">
+                                    {canDelete && (
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
+                                            <MessageActions
+                                                canEdit={false}
+                                                canDelete={canDelete}
+                                                onDelete={() => setDeletingMessage(message)}
+                                            />
+                                        </div>
+                                    )}
+                                    <img
+                                        src={message.content}
+                                        alt="GIF"
+                                        className="max-w-[300px] max-h-[300px] rounded-xl object-cover shadow-lg"
+                                        loading="lazy"
+                                    />
+                                    {/* Badge GIF optionnel */}
+                                    <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                        GIF
                                     </div>
-                                )}
-                                {message.content}
-                            </div>
+                                </div>
+                            ) : (
+                                // ✅ Affichage texte normal
+                                <div
+                                    className={`relative p-3 max-w-[80%] break-words ${
+                                        isMyMessage
+                                            ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
+                                            : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
+                                    }`}
+                                >
+                                    {(canEdit || canDelete) && (
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
+                                            <MessageActions
+                                                canEdit={canEdit}
+                                                canDelete={canDelete}
+                                                onEdit={() => setEditingMessage(message)}
+                                                onDelete={() => setDeletingMessage(message)}
+                                            />
+                                        </div>
+                                    )}
+                                    {message.content}
+                                </div>
+                            )}
                         </div>
                     );
                 })

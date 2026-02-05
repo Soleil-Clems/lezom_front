@@ -18,16 +18,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError } from "@/components/ui/field";
 import { sendMessageSchema, sendMessageType } from "@/schemas/message.dto";
 import { useSendMessage } from "@/hooks/mutations/useSendMessage";
+import { useSendPrivateMessage } from "@/hooks/mutations/useSendPrivateMessage";
 import { socketManager } from "@/lib/socket";
+import { useSocketTyping } from "@/hooks/websocket/useSocketTyping";
 import { useState, useRef, useEffect } from "react";
-import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
+import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
 import { gifApiKey, gifClientKey } from "@/lib/constants";
-import { Theme } from "@/types/theme";
 
 const TENOR_API_KEY = gifApiKey;
 const TENOR_CLIENT_KEY = gifClientKey;
-const theme: Theme = "dark";
 
 interface TenorGif {
   id: string;
@@ -37,8 +37,14 @@ interface TenorGif {
   };
 }
 
-export default function Message({ channelId }: { channelId: string }) {
+interface MessageProps {
+  channelId?: string;
+  conversationId?: string;
+}
+
+export default function Message({ channelId, conversationId }: MessageProps) {
   const socket = socketManager.getSocket();
+  const isPrivateMessage = !!conversationId;
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
@@ -53,39 +59,59 @@ export default function Message({ channelId }: { channelId: string }) {
   const attachMenuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const privateTyping = useSocketTyping(conversationId);
+  const sendPrivateMessageMutation = useSendPrivateMessage(conversationId);
+  const sendChannelMessageMutation = useSendMessage();
+
   const form = useForm<sendMessageType>({
     resolver: zodResolver(sendMessageSchema),
     defaultValues: {
       content: "",
       type: "text",
-      channelId: parseInt(channelId),
+      channelId: channelId ? parseInt(channelId) : 0,
     },
   });
 
-  const sendMessageMutation = useSendMessage();
-
   const handleTyping = (value: string) => {
-    socket?.emit("typing", {
-      channelId: parseInt(channelId),
-      isTyping: value.length > 0,
-    });
+    if (isPrivateMessage) {
+      privateTyping.startTyping();
+    } else {
+      socket?.emit("typing", {
+        channelId: parseInt(channelId!),
+        isTyping: value.length > 0,
+      });
+    }
+  };
+
+  const stopTyping = () => {
+    if (isPrivateMessage) {
+      privateTyping.stopTyping();
+    } else {
+      socket?.emit("typing", {
+        channelId: parseInt(channelId!),
+        isTyping: false,
+      });
+    }
   };
 
   const onSubmit = (values: sendMessageType) => {
-    sendMessageMutation.mutate(values);
+    if (isPrivateMessage) {
+      sendPrivateMessageMutation.mutate({
+        content: values.content,
+        type: values.type,
+      });
+    } else {
+      sendChannelMessageMutation.mutate(values);
+    }
 
     form.reset({
       content: "",
       type: "text",
-      channelId: parseInt(channelId),
+      channelId: channelId ? parseInt(channelId) : 0,
     });
 
     setSelectedFiles([]);
-
-    socket?.emit("typing", {
-      channelId: parseInt(channelId),
-      isTyping: false,
-    });
+    stopTyping();
   };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
@@ -101,7 +127,7 @@ export default function Message({ channelId }: { channelId: string }) {
           query === "trending"
               ? `https://tenor.googleapis.com/v2/featured?key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`
               : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(
-                  query
+                  query,
               )}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`;
 
       const res = await fetch(endpoint);
@@ -133,7 +159,7 @@ export default function Message({ channelId }: { channelId: string }) {
     form.handleSubmit(onSubmit)();
   };
 
-  // Gestion des fichiers
+  // File handling
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setSelectedFiles((prev) => [...prev, ...files]);
@@ -144,18 +170,17 @@ export default function Message({ channelId }: { channelId: string }) {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Capture d'écran
+  // Screen capture
   const handleScreenCapture = async () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { mediaSource: "screen" },
+        video: { mediaSource: "screen" } as any,
       });
 
       const video = document.createElement("video");
       video.srcObject = stream;
       video.play();
 
-      // Attendre que la vidéo soit prête
       await new Promise((resolve) => {
         video.onloadedmetadata = resolve;
       });
@@ -166,10 +191,8 @@ export default function Message({ channelId }: { channelId: string }) {
       const ctx = canvas.getContext("2d");
       ctx?.drawImage(video, 0, 0);
 
-      // Arrêter le stream
       stream.getTracks().forEach((track) => track.stop());
 
-      // Convertir en blob
       canvas.toBlob((blob) => {
         if (blob) {
           const file = new File([blob], `screenshot-${Date.now()}.png`, {
@@ -213,10 +236,21 @@ export default function Message({ channelId }: { channelId: string }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!channelId) return null;
+  if (!channelId && !conversationId) return null;
+
+  const isPending = isPrivateMessage
+      ? sendPrivateMessageMutation.isPending
+      : sendChannelMessageMutation.isPending;
 
   return (
       <div className="w-full px-4 pb-4">
+        {isPrivateMessage && privateTyping.isAnyoneTyping && (
+            <div className="px-2 py-1 text-xs text-zinc-400 italic">
+              {privateTyping.typingUsers.length === 1
+                  ? `${privateTyping.typingUsers[0].username} est en train d'écrire...`
+                  : `${privateTyping.typingUsers.length} personnes sont en train d'écrire...`}
+            </div>
+        )}
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* Preview des fichiers sélectionnés */}
           {selectedFiles.length > 0 && (
@@ -333,6 +367,12 @@ export default function Message({ channelId }: { channelId: string }) {
                               field.onChange(e);
                               handleTyping(e.target.value);
                             }}
+                            onBlur={() => {
+                              field.onBlur();
+                              if (isPrivateMessage) {
+                                privateTyping.stopTyping();
+                              }
+                            }}
                             onKeyDown={(e) => {
                               if (e.key === "Enter" && !e.shiftKey) {
                                 e.preventDefault();
@@ -370,7 +410,7 @@ export default function Message({ channelId }: { channelId: string }) {
                   <div className="absolute bottom-12 right-0 z-50">
                     <EmojiPicker
                         onEmojiClick={onEmojiClick}
-                        theme={theme}
+                        theme={Theme.DARK}
                         width={350}
                         height={400}
                     />
@@ -449,7 +489,7 @@ export default function Message({ channelId }: { channelId: string }) {
                 type="submit"
                 size="icon"
                 className="h-10 w-10 rounded-xl bg-purple-discord text-white"
-                disabled={sendMessageMutation.isPending}
+                disabled={isPending}
             >
               <Send className="h-5 w-5" />
             </Button>
