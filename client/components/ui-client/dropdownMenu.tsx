@@ -32,7 +32,7 @@ export function ServerSettingsDropdown({
   serverId,
   userRole,
 }: ServerSettingsDropdownProps) {
-  const canAccessSettings = userRole === "server_owner" || userRole === "admin";
+  const canAccessSettings = userRole === "server_owner" || userRole === "server_admin";
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [chanelModalOpen, setChannelModalOpen] = useState(false);
 
