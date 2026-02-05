@@ -233,22 +233,24 @@ export default function MessageScreenComponent({
                   <span className="text-xs text-zinc-500">
                     {formatDate(message.createdAt)}
                   </span>
-                  {(canEdit || canDelete) && (
-                    <MessageActions
-                      canEdit={canEdit}
-                      canDelete={canDelete}
-                      onEdit={() => setEditingMessage(message)}
-                      onDelete={() => setDeletingMessage(message)}
-                    />
-                  )}
                 </div>
                 <div
-                  className={`p-3 max-w-[80%] break-words ${
+                  className={`relative p-3 max-w-[80%] break-words ${
                     isMyMessage
                       ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
                       : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
                   }`}
                 >
+                  {(canEdit || canDelete) && (
+                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}>
+                      <MessageActions
+                        canEdit={canEdit}
+                        canDelete={canDelete}
+                        onEdit={() => setEditingMessage(message)}
+                        onDelete={() => setDeletingMessage(message)}
+                      />
+                    </div>
+                  )}
                   {message.content}
                 </div>
               </div>
