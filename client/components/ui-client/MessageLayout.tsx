@@ -6,10 +6,10 @@ import { useSocketMessages } from "@/hooks/websocket/useSocketMessages";
 // Importation de ta nouvelle liste de membres
 import { OnlineFriendsList } from "@/components/ui-client/onlinefriendlist";
 
-export default function MessageLayout({ channelId }: { channelId: string }) {
-    const { messages, isLoading, typingUsers } = useSocketMessages(channelId);
+export default function MessageLayout({channelId}: { channelId: string }) {
+    const {messages, isLoading, typingUsers} = useSocketMessages(channelId);
 
-    if (isLoading) return <Loading />;
+    if (isLoading) return <Loading/>;
 
     return (
         <div className='flex flex-row w-full h-full overflow-hidden bg-[#313338]'>
