@@ -7,6 +7,8 @@ import { registerSchema, registerType } from "@/schemas/register.dto"
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useRegister } from "@/hooks/mutations/useRegister"
+import {useRouter} from "next/navigation";
 
 
 
@@ -18,16 +20,26 @@ export default function RegisterPage() {
   } = useForm<registerType>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
-      email: "",
-      password: "",
+      firstname: "Test",
+      lastname: "Test",
+      username:"RER",
+      email:"rer@gmail.com",
+      password: "testtest",
       birthdate: new Date().toISOString().slice(0, 10),
     },
   })
-
-  const onSubmit = async (data: registerType) => {
-    console.log("FORM DATA", data)
-  }
+  const router = useRouter();
+  const registerMutation = useRegister();
+  
+      const onSubmit = (formValues: registerType) => {
+          registerMutation.mutate(formValues, {
+              onSuccess: (data) => {
+                  router.replace("/login")
+  
+              }
+          })
+  
+      }
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4 bg-own-dark">
@@ -49,10 +61,39 @@ export default function RegisterPage() {
         >
           <Controller
             control={control}
+            name="firstname"
+            render={({ field }) => (
+              <>
+                <Input placeholder="Firstname" {...field} />
+                {errors.username && (
+                  <p className="text-red-500 text-sm bg-grey-purple hover:bg-destructive">
+                    {errors.username.message}
+                  </p>
+                )}
+              </>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="lastname"
+            render={({ field }) => (
+              <>
+                <Input placeholder="Lastname" {...field} />
+                {errors.username && (
+                  <p className="text-red-500 text-sm bg-grey-purple hover:bg-destructive">
+                    {errors.username.message}
+                  </p>
+                )}
+              </>
+            )}
+          />
+          <Controller
+            control={control}
             name="username"
             render={({ field }) => (
               <>
-                <Input placeholder="Pseudo" {...field} />
+                <Input placeholder="Username" {...field} />
                 {errors.username && (
                   <p className="text-red-500 text-sm bg-grey-purple hover:bg-destructive">
                     {errors.username.message}
