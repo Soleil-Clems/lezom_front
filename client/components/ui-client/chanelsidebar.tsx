@@ -44,7 +44,12 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
             {/* HEADER */}
             <div className="h-12 px-4 flex items-center justify-between shadow-sm border-b border-black/20 font-bold text-white shrink-0">
                 Salons
-                <ServerSettingsDropdown serverId={serverId} userRole={userRole} />
+                <ServerSettingsDropdown
+                  serverId={serverId}
+                  userRole={userRole}
+                  serverName={currentServer?.name || ""}
+                  currentUserId={user?.id || 0}
+                />
             </div>
 
             {/* CHANNELS */}

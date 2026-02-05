@@ -1,14 +1,13 @@
 "use client";
 
 import React from "react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface MessageActionsProps {
     canEdit: boolean;
@@ -26,40 +25,39 @@ export default function MessageActions({
     if (!canEdit && !canDelete) return null;
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-800 hover:bg-zinc-700"
-                >
-                    <MoreHorizontal className="size-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-                align="end"
-                className="bg-zinc-800 border-zinc-700"
-            >
+        <TooltipProvider delayDuration={200}>
+            <div className="flex items-center gap-0.5 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg p-0.5">
                 {canEdit && (
-                    <DropdownMenuItem
-                        onClick={onEdit}
-                        className="cursor-pointer text-zinc-200 focus:bg-indigo-600 focus:text-white"
-                    >
-                        <Pencil className="size-4" />
-                        Modifier
-                    </DropdownMenuItem>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={onEdit}
+                                className="p-1.5 rounded hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+                            >
+                                <Pencil className="size-3.5" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="bg-zinc-900 text-xs">
+                            Modifier
+                        </TooltipContent>
+                    </Tooltip>
                 )}
                 {canDelete && (
-                    <DropdownMenuItem
-                        onClick={onDelete}
-                        variant="destructive"
-                        className="cursor-pointer"
-                    >
-                        <Trash2 className="size-4" />
-                        Supprimer
-                    </DropdownMenuItem>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={onDelete}
+                                className="p-1.5 rounded hover:bg-rose-500/20 text-zinc-400 hover:text-rose-400 transition-colors"
+                            >
+                                <Trash2 className="size-3.5" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="bg-zinc-900 text-xs">
+                            Supprimer
+                        </TooltipContent>
+                    </Tooltip>
                 )}
-            </DropdownMenuContent>
-        </DropdownMenu>
+            </div>
+        </TooltipProvider>
     );
 }
