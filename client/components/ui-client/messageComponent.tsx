@@ -2,7 +2,7 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Send, Smile, Image as ImageIcon, Search } from "lucide-react";
+import {Plus, Send, Smile, Search, Sticker} from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field, FieldError } from "@/components/ui/field";
@@ -12,9 +12,12 @@ import { socketManager } from "@/lib/socket";
 import { useState, useRef, useEffect } from "react";
 import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
+import {gifApiKey, gifClientKey} from "@/lib/constants";
+import {Theme} from "@/types/theme";
 
-const TENOR_API_KEY = "AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ";
-const TENOR_CLIENT_KEY = "my_test_app";
+const TENOR_API_KEY = gifApiKey;
+const TENOR_CLIENT_KEY = gifClientKey;
+const theme : Theme = "dark";
 
 interface TenorGif {
     id: string;
@@ -195,7 +198,7 @@ export default function Message({ channelId }: { channelId: string }) {
                             <div className="absolute bottom-12 right-0 z-50">
                                 <EmojiPicker
                                     onEmojiClick={onEmojiClick}
-                                    theme="dark"
+                                    theme={theme}
                                     width={350}
                                     height={400}
                                 />
@@ -214,7 +217,7 @@ export default function Message({ channelId }: { channelId: string }) {
                                 setShowEmojiPicker(false);
                             }}
                         >
-                            <ImageIcon className="h-5 w-5 text-gray-300" />
+                            <Sticker className="h-5 w-5 text-gray-300" />
                         </Button>
 
                         {showGifPicker && (
