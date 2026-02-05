@@ -30,7 +30,7 @@ export default function ProfilePage() {
   if (isLoading) return <Loading />;
   if (isError || !user) return <Error />;
 
-  // console.log(user)
+   console.log(user)
   const joinedDate = new Date(user.createdAt).toLocaleDateString('fr-FR', {
     month: 'long',
     year: 'numeric'
