@@ -1,9 +1,18 @@
 import React, { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { MessageSquare, User } from "lucide-react";
 import { messageType } from "@/schemas/message.dto";
 import { useAuthUser } from "@/hooks/queries/useAuthUser";
+import { useCreateConversation } from "@/hooks/mutations/useCreateConversation";
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 import SystemMessage from "@/components/ui-client/SystemMessage";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
   messages: messageType[];
@@ -16,6 +25,17 @@ export default function MessageScreenComponent({
 }: Props) {
   const { data: user, isLoading, isError } = useAuthUser();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const createConversation = useCreateConversation();
+
+  const handleSendMessage = async (userId: number) => {
+    try {
+      const conversation = await createConversation.mutateAsync({ userId });
+      router.push(`/messages/${conversation.id}`);
+    } catch (error) {
+      // Error is handled by the mutation's onError
+    }
+  };
 
   const scrollToBottom = () => {
     if (scrollRef.current) {
@@ -63,13 +83,33 @@ export default function MessageScreenComponent({
             className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
           >
             <div className="flex items-center gap-2">
-              <span
-                className={`text-xs font-bold ${isMyMessage ? "text-emerald-400" : "text-indigo-400"}`}
-              >
-                {isMyMessage
-                  ? "Moi"
-                  : `${message.author.firstname} ${message.author.lastname}`}
-              </span>
+              {isMyMessage ? (
+                <span className="text-xs font-bold text-emerald-400">Moi</span>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:underline cursor-pointer transition-colors">
+                      {message.author.username}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="bg-zinc-800 border-zinc-700">
+                    <DropdownMenuItem
+                      onClick={() => handleSendMessage(message.author.id)}
+                      className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
+                    >
+                      <MessageSquare className="size-4" />
+                      Envoyer un message
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push(`/profil/${message.author.id}`)}
+                      className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
+                    >
+                      <User className="size-4" />
+                      Voir le profil
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               <span className="text-xs text-zinc-500">
                 {formatDate(message.createdAt)}
               </span>
