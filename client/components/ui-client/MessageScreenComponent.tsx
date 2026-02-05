@@ -33,7 +33,6 @@ export default function MessageScreenComponent({
       const conversation = await createConversation.mutateAsync({ userId });
       router.push(`/messages/${conversation.id}`);
     } catch (error) {
-      // Error is handled by the mutation's onError
     }
   };
 

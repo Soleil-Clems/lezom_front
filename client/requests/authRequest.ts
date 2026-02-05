@@ -17,7 +17,7 @@ export const loginRequest = async (body: z.infer<typeof LoginSchema>) => {
 export const registerRequest = async (body: z.infer<typeof registerSchema>) => {
     try {
 
-        const response = await customfetch.post("register", body)
+        const response = await customfetch.post("users", body)
 
         return response
     } catch (error) {
