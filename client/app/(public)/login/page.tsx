@@ -39,7 +39,7 @@ export default function Page() {
     const onSubmit = (formValues: z.infer<typeof LoginSchema>) => {
         loginMutation.mutate(formValues, {
             onSuccess: (data) => {
-                console.log(data.access_token);
+                console.log(data);
                 setToken(data.access_token);
                 router.replace("/profil")
 
