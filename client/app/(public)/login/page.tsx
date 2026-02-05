@@ -22,6 +22,7 @@ import {z} from "zod";
 import {useLogin} from "@/hooks/mutations/useLogin";
 import useAuthStore from "@/store/authStore";
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
     const router = useRouter();
@@ -127,6 +128,12 @@ export default function Page() {
                                 className="w-full bg-purple-discord text-white hover:bg-gray-400 hover:text-white">
                             Connexion
                         </Button>
+                        <p className="text-sm text-gray-500 mt-4">
+                            Pas encore de compte ?{" "}
+                            <Link href="/register" className="text-purple-discord hover:underline">
+                                S'inscrire
+                            </Link>
+                        </p>
                     </CardFooter>
                 </form>
             </Card>
