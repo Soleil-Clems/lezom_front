@@ -3,12 +3,26 @@ process.env.NODE_ENV = "test";
 
 jest.mock("../src/config/jwt", () => ({
   secret: "test-secret-key-for-testing",
-  options: { expiresIn: "7d" },
-  cookieOptions: {
+  accessOptions: { expiresIn: "15m" },
+  refreshOptions: { expiresIn: "7d" },
+  accessCookieOptions: {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
+    maxAge: 15 * 60 * 1000,
+  },
+  refreshCookieOptions: {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/api/auth",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+  },
+  get options() {
+    return this.accessOptions;
+  },
+  get cookieOptions() {
+    return this.accessCookieOptions;
   },
 }));
 
@@ -30,6 +44,7 @@ jest.mock("../src/config/database", () => ({
     },
     channel: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
@@ -37,10 +52,12 @@ jest.mock("../src/config/database", () => ({
     },
     serverMember: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       findMany: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
     },
     channelMember: {
       findUnique: jest.fn(),
@@ -58,6 +75,21 @@ jest.mock("../src/config/database", () => ({
     },
     ban: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      delete: jest.fn(),
+    },
+    refreshToken: {
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+    },
+    conversation: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
     },
     $transaction: jest.fn((callbacks) => Promise.all(callbacks)),
   },
@@ -65,6 +97,7 @@ jest.mock("../src/config/database", () => ({
 
 jest.mock("../src/utils/socketEvents", () => ({
   emitToServer: jest.fn(),
+  emitToChannel: jest.fn(),
   emitToUser: jest.fn(),
   EVENTS: {
     SERVER_UPDATED: "server:updated",
@@ -73,6 +106,8 @@ jest.mock("../src/utils/socketEvents", () => ({
     MEMBER_JOINED: "member:joined",
     MEMBER_LEFT: "member:left",
     MEMBER_KICKED: "member:kicked",
+    MEMBER_BANNED: "member:banned",
+    MEMBER_UNBANNED: "member:unbanned",
     MEMBER_ROLE_CHANGED: "member:roleChanged",
     CHANNEL_CREATED: "channel:created",
     CHANNEL_UPDATED: "channel:updated",
@@ -80,6 +115,12 @@ jest.mock("../src/utils/socketEvents", () => ({
     MESSAGE_CREATED: "message:created",
     MESSAGE_UPDATED: "message:updated",
     MESSAGE_DELETED: "message:deleted",
+    USER_TYPING: "user:typing",
+    DM_MESSAGE_CREATED: "dm:messageCreated",
+    DM_MESSAGE_UPDATED: "dm:messageUpdated",
+    DM_MESSAGE_DELETED: "dm:messageDeleted",
+    DM_TYPING: "dm:typing",
+    DM_STOP_TYPING: "dm:stopTyping",
   },
 }));
 
@@ -92,6 +133,28 @@ jest.mock("../src/models/Message", () => ({
   })),
   findById: jest.fn(),
   findByIdAndDelete: jest.fn(),
+}));
+
+jest.mock("../src/models/PrivateMessage", () => ({
+  create: jest.fn(),
+  find: jest.fn(() => ({
+    sort: jest.fn(() => ({
+      skip: jest.fn(() => ({
+        limit: jest.fn(() => ({
+          lean: jest.fn(),
+        })),
+      })),
+    })),
+  })),
+  findById: jest.fn(),
+  findByIdAndDelete: jest.fn(),
+  countDocuments: jest.fn(),
+}));
+
+jest.mock("../src/utils/storage", () => ({
+  isConfigured: jest.fn(() => false),
+  uploadFile: jest.fn(),
+  deleteFile: jest.fn(),
 }));
 
 afterEach(() => {

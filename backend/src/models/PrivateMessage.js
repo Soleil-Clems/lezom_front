@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 
-const messageSchema = new mongoose.Schema(
+const privateMessageSchema = new mongoose.Schema(
   {
     _id: {
       type: String,
       default: () => crypto.randomUUID(),
     },
-    channel_id: {
+    conversation_id: {
       type: String,
       required: true,
       index: true,
     },
-    author_id: {
+    sender_id: {
       type: String,
       required: true,
       index: true,
@@ -36,8 +36,8 @@ const messageSchema = new mongoose.Schema(
   }
 );
 
-messageSchema.index({ channel_id: 1, created_at: -1 });
+privateMessageSchema.index({ conversation_id: 1, created_at: -1 });
 
-const Message = mongoose.model('Message', messageSchema);
+const PrivateMessage = mongoose.model('PrivateMessage', privateMessageSchema);
 
-module.exports = Message;
+module.exports = PrivateMessage;

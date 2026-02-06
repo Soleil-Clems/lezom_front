@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { register, login, logout } = require("../controllers/auth.controller");
+const { register, login, refresh, logout, logoutAll } = require("../controllers/auth.controller");
 const { verifyToken } = require("../middleware/auth");
 const validate = require("../middleware/validate");
 const { registerSchema, loginSchema } = require("../validators/auth.validator");
@@ -113,6 +113,20 @@ router.post("/login", validate(loginSchema), login);
 
 /**
  * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *       401:
+ *         description: Invalid or expired refresh token
+ */
+router.post("/refresh", refresh);
+
+/**
+ * @swagger
  * /api/auth/logout:
  *   post:
  *     summary: Logout user
@@ -134,5 +148,21 @@ router.post("/login", validate(loginSchema), login);
  *         description: Unauthorized - no token provided
  */
 router.post("/logout", verifyToken, logout);
+
+/**
+ * @swagger
+ * /api/auth/logout-all:
+ *   post:
+ *     summary: Logout all sessions
+ *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: All sessions logged out successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.post("/logout-all", verifyToken, logoutAll);
 
 module.exports = router;

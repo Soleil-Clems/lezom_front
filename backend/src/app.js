@@ -8,6 +8,7 @@ const adminRoutes = require("./routes/admin.routes");
 const serverRoutes = require("./routes/server.routes");
 const channelRoutes = require("./routes/channel.routes");
 const messageRoutes = require("./routes/message.routes");
+const conversationRoutes = require("./routes/conversation.routes");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/servers", serverRoutes);
 app.use("/api/channels", channelRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
