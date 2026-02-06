@@ -43,7 +43,7 @@ const ListContent = ({ memberships, online, offline, showClose = false }: any) =
           <p className="uppercase text-[11px] font-bold text-zinc-500 mb-2 px-2">Hors ligne — {offline.length}</p>
           <div className="flex flex-col gap-[2px] opacity-60 grayscale-[0.3]">
             {offline.map((m: any) => (
-              <OnlineFriendItem key={m.id} member={m.members} />
+              <OnlineFriendItem key={m.id} member={m.members} status={false}/>
             ))}
           </div>
         </div>
@@ -60,11 +60,21 @@ export function OnlineFriendsList({ serverId }: { serverId: string | number }) {
 
   const memberships = data.data || [];
 
-  // Filtrer avec les données temps réel du cache WebSocket
-  const online = memberships.filter((m: any) => onlineUserIds.includes(m.members?.id));
-  const offline = memberships.filter((m: any) => !onlineUserIds.includes(m.members?.id));
 
-  return (
+    const online = memberships.filter(
+        (m: any) =>
+            m.members?.isActive === true &&
+            onlineUserIds.includes(m.members?.id)
+    );
+
+    const offline = memberships.filter(
+        (m: any) =>
+            m.members?.isActive === false ||
+            !onlineUserIds.includes(m.members?.id)
+    );
+
+
+    return (
     <>
       <Sidebar side="right" collapsible="none" className="hidden xl:flex w-60 border-l border-black/20 shrink-0">
         <SidebarContent className="bg-[#2B2D31]">

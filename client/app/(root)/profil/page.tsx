@@ -30,7 +30,6 @@ export default function ProfilePage() {
   if (isLoading) return <Loading />;
   if (isError || !user) return <Error />;
 
-   console.log(user)
   const joinedDate = new Date(user.createdAt).toLocaleDateString('fr-FR', {
     month: 'long',
     year: 'numeric'
@@ -43,7 +42,6 @@ export default function ProfilePage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log("Fichier sélectionné :", file);
       editPictureMutation.mutate(file, {
         onSuccess: (data) => {
           console.log("Image de profil mise à jour avec succès !", data);

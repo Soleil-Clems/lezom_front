@@ -23,7 +23,6 @@ export const getAllServersRequest = async () => {
 export const getAllChannelsOfAServerRequest = async (serverId: number | string) => {
     try {
         const url = `channels/server/${serverId}`;
-        console.log("Appel API vers :", url); 
         const response = await customfetch.get(url);
         return response;
     } catch (error) {
