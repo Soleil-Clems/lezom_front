@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
-import { socketManager } from '@/lib/socket';
+import { useSocket } from './useSocket';
 import { messageType } from '@/schemas/message.dto';
 
 export function useSocketMessages(channelId?: string) {
     const [messages, setMessages] = useState<messageType[]>([]);
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(!!channelId);
+    const { isConnected, socket } = useSocket();
 
     useEffect(() => {
-        if (!channelId) return;
+        setMessages([]);
+        setTypingUsers([]);
+        setIsLoading(!!channelId);
+    }, [channelId]);
 
-        const socket = socketManager.getSocket();
-        if (!socket) return;
+    useEffect(() => {
+        if (!channelId || !isConnected || !socket) return;
 
         socket.emit('joinChannel', parseInt(channelId), (history: messageType[]) => {
             setMessages(history);
@@ -53,11 +57,8 @@ export function useSocketMessages(channelId?: string) {
             socket.off('messageUpdated', handleMessageUpdated);
             socket.off('messageDeleted', handleMessageDeleted);
             socket.off('userTyping', handleUserTyping);
-            setMessages([]);
-            setTypingUsers([]);
-            setIsLoading(true);
         };
-    }, [channelId]);
+    }, [channelId, isConnected, socket]);
 
     const updateMessage = (messageId: number, content: string) => {
         setMessages((prev) =>
