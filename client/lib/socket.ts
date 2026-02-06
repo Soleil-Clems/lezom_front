@@ -13,7 +13,7 @@ class SocketManager {
             return;
         }
 
-        if (this.socket?.connected) return this.socket;
+        if (this.socket) return this.socket;
 
         this.socket = io('http://localhost:8080', {
             auth: { token },
