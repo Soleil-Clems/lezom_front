@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserX, Loader2 } from "lucide-react";
@@ -8,11 +7,11 @@ import { BanType } from "@/schemas/ban.dto";
 
 type BannedUserCardProps = {
     ban: BanType;
-    onUnban: () => void;
     isPending: boolean;
+    onOpenUnbanModal: (ban: BanType) => void;
 };
 
-export function BannedUserCard({ ban, onUnban, isPending }: BannedUserCardProps) {
+export function BannedUserCard({ ban, isPending, onOpenUnbanModal }: BannedUserCardProps) {
     const formattedDate = new Date(ban.bannedAt).toLocaleDateString("fr-FR", {
         day: "numeric",
         month: "long",
@@ -41,11 +40,7 @@ export function BannedUserCard({ ban, onUnban, isPending }: BannedUserCardProps)
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                        if (confirm(`Voulez-vous vraiment débannir ${ban.user.username} ?`)) {
-                            onUnban();
-                        }
-                    }}
+                    onClick={() => onOpenUnbanModal(ban)}
                     disabled={isPending}
                     className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300"
                 >
