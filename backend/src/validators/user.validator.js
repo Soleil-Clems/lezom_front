@@ -14,6 +14,12 @@ const updateMeSchema = Joi.object({
   email: Joi.string().email().messages({
     "string.email": "Invalid email format.",
   }),
+  description: Joi.string().max(500).allow("", null).messages({
+    "string.max": "Description must be at most 500 characters.",
+  }),
+  img: Joi.string().max(500).allow("", null).messages({
+    "string.max": "Image URL must be at most 500 characters.",
+  }),
   password: passwordSchema,
   currentPassword: Joi.string().when("password", {
     is: Joi.exist(),
