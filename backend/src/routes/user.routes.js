@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { getMe, getUser, updateMe, deleteMe } = require("../controllers/user.controller");
+const { getMe, getUser, updateMe, deleteMe, updatePicture } = require("../controllers/user.controller");
 const { verifyToken } = require("../middleware/auth");
 const validate = require("../middleware/validate");
 const { updateMeSchema } = require("../validators/user.validator");
+const { imageUpload, handleMulterError } = require("../middleware/upload");
 
 /**
  * @swagger
@@ -15,7 +16,7 @@ const { updateMeSchema } = require("../validators/user.validator");
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: User profile retrieved successfully
+ *         description: Current user profile
  *         content:
  *           application/json:
  *             schema:
@@ -24,11 +25,9 @@ const { updateMeSchema } = require("../validators/user.validator");
  *                 user:
  *                   $ref: '#/components/schemas/User'
  *       401:
- *         description: Unauthorized - no token provided
+ *         description: Unauthorized
  *       404:
  *         description: User not found
- *       500:
- *         description: Internal server error
  */
 router.get("/me", verifyToken, getMe);
 
@@ -49,7 +48,7 @@ router.get("/me", verifyToken, getMe);
  *             properties:
  *               username:
  *                 type: string
- *                 example: newusername
+ *                 example: johndoe
  *               firstname:
  *                 type: string
  *                 example: John
@@ -59,42 +58,25 @@ router.get("/me", verifyToken, getMe);
  *               email:
  *                 type: string
  *                 format: email
- *                 example: newemail@example.com
+ *                 example: john@example.com
+ *               description:
+ *                 type: string
+ *                 example: Hello world
  *               password:
  *                 type: string
  *                 format: password
- *                 description: New password (requires currentPassword)
- *                 example: newpassword123
  *               currentPassword:
  *                 type: string
  *                 format: password
- *                 description: Required when changing password
- *                 example: oldpassword123
  *     responses:
  *       200:
  *         description: Profile updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Profile updated successfully.
- *                 user:
- *                   $ref: '#/components/schemas/User'
  *       400:
- *         description: No fields to update, email/username already in use, or missing currentPassword
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *         description: Validation error or email/username taken
  *       401:
  *         description: Unauthorized or incorrect current password
  *       404:
  *         description: User not found
- *       500:
- *         description: Internal server error
  */
 router.put("/me", verifyToken, validate(updateMeSchema), updateMe);
 
@@ -109,20 +91,10 @@ router.put("/me", verifyToken, validate(updateMeSchema), updateMe);
  *     responses:
  *       200:
  *         description: Account deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Account deleted successfully.
  *       401:
- *         description: Unauthorized - no token provided
+ *         description: Unauthorized
  *       404:
  *         description: User not found
- *       500:
- *         description: Internal server error
  */
 router.delete("/me", verifyToken, deleteMe);
 
@@ -130,7 +102,7 @@ router.delete("/me", verifyToken, deleteMe);
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Get user profile by ID
+ *     summary: Get user public profile
  *     tags: [Users]
  *     security:
  *       - cookieAuth: []
@@ -143,32 +115,55 @@ router.delete("/me", verifyToken, deleteMe);
  *         description: User ID
  *     responses:
  *       200:
- *         description: User profile
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     username:
- *                       type: string
- *                     firstname:
- *                       type: string
- *                     lastname:
- *                       type: string
- *                     status:
- *                       type: string
- *                     createdAt:
- *                       type: string
+ *         description: User public profile
  *       401:
  *         description: Unauthorized
  *       404:
  *         description: User not found
  */
 router.get("/:id", verifyToken, getUser);
+
+/**
+ * @swagger
+ * /api/users/picture/{id}:
+ *   patch:
+ *     summary: Update user profile picture
+ *     tags: [Users]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - file
+ *             properties:
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Profile picture updated successfully
+ *       400:
+ *         description: No file uploaded
+ *       403:
+ *         description: Can only update your own picture
+ */
+router.patch(
+  "/picture/:id",
+  verifyToken,
+  imageUpload.single("file"),
+  handleMulterError,
+  updatePicture
+);
 
 module.exports = router;

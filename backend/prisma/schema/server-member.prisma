@@ -18,5 +18,6 @@ model ServerMember {
 enum MemberRole {
   OWNER
   ADMIN
+  MODERATOR
   MEMBER
 }

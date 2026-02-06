@@ -77,7 +77,6 @@ describe("Admin API", () => {
     };
 
     it("should create user as admin", async () => {
-      // First call for verifyAdmin, then null for email check, null for username check
       prisma.user.findUnique
         .mockResolvedValueOnce(mockAdmin)
         .mockResolvedValueOnce(null)
@@ -116,7 +115,6 @@ describe("Admin API", () => {
 
   describe("PUT /api/admin/users/:id", () => {
     it("should update user as admin", async () => {
-      // First call for verifyAdmin, second for existing user check, third for username check
       prisma.user.findUnique
         .mockResolvedValueOnce(mockAdmin)
         .mockResolvedValueOnce(mockUser)

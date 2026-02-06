@@ -9,6 +9,14 @@ const emitToServer = (serverId, event, data) => {
 };
 
 /**
+ * Emit event to a specific channel
+ */
+const emitToChannel = (channelId, event, data) => {
+  const io = getIO();
+  io.to(`channel:${channelId}`).emit(event, data);
+};
+
+/**
  * Emit event to a specific user
  */
 const emitToUser = (userId, event, data) => {
@@ -22,6 +30,8 @@ const EVENTS = {
   MEMBER_JOINED: "member:joined",
   MEMBER_LEFT: "member:left",
   MEMBER_KICKED: "member:kicked",
+  MEMBER_BANNED: "member:banned",
+  MEMBER_UNBANNED: "member:unbanned",
   MEMBER_ROLE_CHANGED: "member:roleChanged",
   SERVER_OWNER_CHANGED: "server:ownerChanged",
   USER_ONLINE: "user:online",
@@ -33,10 +43,16 @@ const EVENTS = {
   MESSAGE_UPDATED: "message:updated",
   MESSAGE_DELETED: "message:deleted",
   USER_TYPING: "user:typing",
+  DM_MESSAGE_CREATED: "dm:messageCreated",
+  DM_MESSAGE_UPDATED: "dm:messageUpdated",
+  DM_MESSAGE_DELETED: "dm:messageDeleted",
+  DM_TYPING: "dm:typing",
+  DM_STOP_TYPING: "dm:stopTyping",
 };
 
 module.exports = {
   emitToServer,
+  emitToChannel,
   emitToUser,
   EVENTS,
 };
