@@ -18,6 +18,7 @@ export function useBanUser() {
         }) => banUserRequest(serverId, userId, reason),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["server-bans", variables.serverId] });
+            queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
             queryClient.invalidateQueries({ queryKey: ["allservers"] });
             toast.success("Utilisateur banni avec succès");
         },

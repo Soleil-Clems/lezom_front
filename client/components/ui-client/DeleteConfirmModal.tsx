@@ -19,6 +19,8 @@ type DeleteConfirmModalProps = {
     message: string;
     itemName: string;
     isPending: boolean;
+    confirmLabel?: string;
+    pendingLabel?: string;
 };
 
 export function DeleteConfirmModal({
@@ -29,6 +31,8 @@ export function DeleteConfirmModal({
     message,
     itemName,
     isPending,
+    confirmLabel = "Supprimer",
+    pendingLabel = "Suppression...",
 }: DeleteConfirmModalProps) {
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -59,10 +63,10 @@ export function DeleteConfirmModal({
                         {isPending ? (
                             <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Suppression...
+                                {pendingLabel}
                             </>
                         ) : (
-                            "Supprimer"
+                            confirmLabel
                         )}
                     </Button>
                 </DialogFooter>

@@ -42,17 +42,19 @@ export function ServerMembersList({
     useEffect(() => {
         if (!isConnected) return;
 
-        const handleMemberRoleChanged = (data: { serverId: number }) => {
+        const handleServerMembersUpdate = (data: { serverId: number }) => {
             if (String(data.serverId) === String(serverId)) {
                 queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
                 queryClient.invalidateQueries({ queryKey: ["allservers"] });
             }
         };
 
-        on("memberRoleChanged", handleMemberRoleChanged);
+        on("memberRoleChanged", handleServerMembersUpdate);
+        on("memberBanned", handleServerMembersUpdate);
 
         return () => {
-            off("memberRoleChanged", handleMemberRoleChanged);
+            off("memberRoleChanged", handleServerMembersUpdate);
+            off("memberBanned", handleServerMembersUpdate);
         };
     }, [isConnected, on, off, serverId, queryClient]);
 
