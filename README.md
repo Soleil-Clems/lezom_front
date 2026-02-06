@@ -83,6 +83,8 @@ npm run dev                    # Demarre sur http://localhost:3000
 
 ## Schema de la base de donnees
 
+![alt text](schema_db.png)
+
 La base de donnees utilise une architecture hybride :
 
 - **MySQL** (via Prisma) pour les donnees relationnelles (utilisateurs, serveurs, membres, channels, invitations, bans, tokens)
