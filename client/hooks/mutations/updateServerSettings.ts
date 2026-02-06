@@ -74,6 +74,7 @@ export function useUpdateMemberRole() {
         }) => updateMemberRoleRequest(serverId, memberId, role),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["allservers"] });
+            queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
             toast.success("Rôle mis à jour");
         },
         onError: (error: any) => toast.error(error.message)
