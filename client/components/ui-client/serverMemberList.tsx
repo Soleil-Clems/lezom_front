@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
 import { useUpdateMemberRole } from "@/hooks/mutations/updateServerSettings";
 import { useBanUser } from "@/hooks/mutations/useBanManagement";
 import { useTransferOwnership } from "@/hooks/mutations/useTransferOwnership";
+import { useSocket } from "@/hooks/websocket/useSocket";
+import { useQueryClient } from "@tanstack/react-query";
 
 type MemberRole = "server_member" | "server_admin" | "server_owner";
 
@@ -34,6 +36,25 @@ export function ServerMembersList({
     const banUser = useBanUser();
     const updateMemberRole = useUpdateMemberRole();
     const transferOwnership = useTransferOwnership();
+    const { isConnected, on, off } = useSocket();
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (!isConnected) return;
+
+        const handleMemberRoleChanged = (data: { serverId: number }) => {
+            if (String(data.serverId) === String(serverId)) {
+                queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
+                queryClient.invalidateQueries({ queryKey: ["allservers"] });
+            }
+        };
+
+        on("memberRoleChanged", handleMemberRoleChanged);
+
+        return () => {
+            off("memberRoleChanged", handleMemberRoleChanged);
+        };
+    }, [isConnected, on, off, serverId, queryClient]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
