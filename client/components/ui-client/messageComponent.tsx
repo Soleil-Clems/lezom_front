@@ -12,6 +12,8 @@ import {
   FileText,
   Monitor,
   X,
+  Mic,
+  Square,
 } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,10 +23,11 @@ import { useSendMessage } from "@/hooks/mutations/useSendMessage";
 import { useSendPrivateMessage } from "@/hooks/mutations/useSendPrivateMessage";
 import { socketManager } from "@/lib/socket";
 import { useSocketTyping } from "@/hooks/websocket/useSocketTyping";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
 import { gifApiKey, gifClientKey } from "@/lib/constants";
+import { upload } from "@/lib/upload";
 
 const TENOR_API_KEY = gifApiKey;
 const TENOR_CLIENT_KEY = gifClientKey;
@@ -53,6 +56,15 @@ export default function Message({ channelId, conversationId }: MessageProps) {
   const [gifs, setGifs] = useState<TenorGif[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoadingGifs, setIsLoadingGifs] = useState(false);
+
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const emojiPickerRef = useRef<HTMLDivElement>(null);
   const gifPickerRef = useRef<HTMLDivElement>(null);
@@ -94,7 +106,136 @@ export default function Message({ channelId, conversationId }: MessageProps) {
     }
   };
 
-  const onSubmit = (values: sendMessageType) => {
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+            ? "audio/webm;codecs=opus"
+            : "audio/webm",
+      });
+
+      audioChunksRef.current = [];
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        setAudioBlob(blob);
+        setAudioPreviewUrl(URL.createObjectURL(blob));
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorder.start(100);
+      setIsRecording(true);
+      setRecordingDuration(0);
+
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingDuration((prev) => prev + 1);
+      }, 1000);
+    } catch (error) {
+      console.error("Erreur accès microphone:", error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+  };
+
+  const cancelRecording = () => {
+    stopRecording();
+    setAudioBlob(null);
+    if (audioPreviewUrl) {
+      URL.revokeObjectURL(audioPreviewUrl);
+      setAudioPreviewUrl(null);
+    }
+    setRecordingDuration(0);
+  };
+
+  const sendVoiceMessage = async () => {
+    if (!audioBlob) return;
+
+    try {
+      const file = new File([audioBlob], `voice-${Date.now()}.webm`, {
+        type: "audio/webm",
+      });
+
+      const result = await upload(file);
+
+      if (isPrivateMessage) {
+        sendPrivateMessageMutation.mutate({
+          content: result.url,
+          type: "voice",
+        });
+      } else {
+        sendChannelMessageMutation.mutate({
+          content: result.url,
+          type: "voice",
+          channelId: channelId ? parseInt(channelId) : 0,
+        });
+      }
+
+      setAudioBlob(null);
+      if (audioPreviewUrl) {
+        URL.revokeObjectURL(audioPreviewUrl);
+        setAudioPreviewUrl(null);
+      }
+      setRecordingDuration(0);
+    } catch (error) {
+      console.error("Erreur envoi vocal:", error);
+    }
+  };
+
+  const formatDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+      if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, []);
+
+
+  const onSubmit = async (values: sendMessageType) => {
+    // @ts-expect-error
+    const hasText = values.content.trim().length > 0;
+    const hasFile = selectedFiles.length > 0;
+
+    if (hasText && hasFile) {
+      setSelectedFiles([]);
+      return;
+    }
+
+    if (!hasText && !hasFile) {
+      return;
+    }
+
+    if (hasFile) {
+      const file = selectedFiles[0];
+      const result = await upload(file);
+      values.content = result.url;
+    }
+
     if (isPrivateMessage) {
       sendPrivateMessageMutation.mutate({
         content: values.content,
@@ -159,18 +300,35 @@ export default function Message({ channelId, conversationId }: MessageProps) {
     form.handleSubmit(onSubmit)();
   };
 
-  // File handling
+  const getMessageTypeFromFile = (file: File) => {
+    if (file.type.startsWith("image/")) return "img";
+    return "file";
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // @ts-expect-error
+    if (form.getValues("content").trim().length > 0) {
+      form.setValue("content", "");
+      stopTyping();
+    }
+
+    const messageType = getMessageTypeFromFile(file);
+    form.setValue("type", messageType);
+    setSelectedFiles([file]);
     setShowAttachMenu(false);
   };
 
   const removeFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    if (selectedFiles.length <= 1) {
+      form.setValue("type", "text");
+    }
   };
 
-  // Screen capture
+
   const handleScreenCapture = async () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
@@ -193,12 +351,32 @@ export default function Message({ channelId, conversationId }: MessageProps) {
 
       stream.getTracks().forEach((track) => track.stop());
 
-      canvas.toBlob((blob) => {
+      canvas.toBlob(async (blob) => {
         if (blob) {
           const file = new File([blob], `screenshot-${Date.now()}.png`, {
             type: "image/png",
           });
-          setSelectedFiles((prev) => [...prev, file]);
+
+          try {
+            const result = await upload(file);
+
+            if (isPrivateMessage) {
+              sendPrivateMessageMutation.mutate({
+                content: result.url,
+                type: "img",
+              });
+            } else {
+              sendChannelMessageMutation.mutate({
+                content: result.url,
+                type: "img",
+                channelId: channelId ? parseInt(channelId) : 0,
+              });
+            }
+          } catch (error) {
+            console.error("Erreur upload screenshot:", error);
+            form.setValue("type", "img");
+            setSelectedFiles([file]);
+          }
         }
       });
 
@@ -208,6 +386,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
     }
   };
 
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -216,14 +395,12 @@ export default function Message({ channelId, conversationId }: MessageProps) {
       ) {
         setShowEmojiPicker(false);
       }
-
       if (
           gifPickerRef.current &&
           !gifPickerRef.current.contains(e.target as Node)
       ) {
         setShowGifPicker(false);
       }
-
       if (
           attachMenuRef.current &&
           !attachMenuRef.current.contains(e.target as Node)
@@ -242,6 +419,9 @@ export default function Message({ channelId, conversationId }: MessageProps) {
       ? sendPrivateMessageMutation.isPending
       : sendChannelMessageMutation.isPending;
 
+  const hasContent =
+      form.watch("content")?.trim().length > 0 || selectedFiles.length > 0;
+
   return (
       <div className="w-full px-4 pb-4">
         {isPrivateMessage && privateTyping.isAnyoneTyping && (
@@ -251,6 +431,105 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                   : `${privateTyping.typingUsers.length} personnes sont en train d'écrire...`}
             </div>
         )}
+
+
+        {(isRecording || audioBlob) && (
+            <div className="mb-2 flex items-center gap-3 p-3 bg-[#2B2D31] rounded-xl border border-zinc-700">
+              {isRecording ? (
+                  <>
+                    {/* Recording in progress */}
+                    <div className="flex items-center gap-2 flex-1">
+                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                      <span className="text-sm text-red-400 font-medium">
+                  Enregistrement...
+                </span>
+                      <span className="text-sm text-zinc-400 font-mono">
+                  {formatDuration(recordingDuration)}
+                </span>
+
+                      {/* Animated bars */}
+                      <div className="flex items-center gap-[2px] ml-2">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className="w-[3px] bg-red-400/70 rounded-full animate-pulse"
+                                style={{
+                                  height: `${Math.random() * 16 + 6}px`,
+                                  animationDelay: `${i * 80}ms`,
+                                  animationDuration: "0.5s",
+                                }}
+                            />
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={cancelRecording}
+                        className="text-zinc-400 hover:text-white"
+                    >
+                      <X className="size-4 mr-1" />
+                      Annuler
+                    </Button>
+
+                    <Button
+                        type="button"
+                        size="sm"
+                        onClick={stopRecording}
+                        className="bg-red-500 hover:bg-red-600 text-white"
+                    >
+                      <Square className="size-4 mr-1" />
+                      Arrêter
+                    </Button>
+                  </>
+              ) : audioBlob ? (
+                  <>
+                    {/* Audio preview */}
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-3 h-3 bg-indigo-500 rounded-full" />
+                      <span className="text-sm text-zinc-300">
+                  Message vocal
+                </span>
+                      <span className="text-sm text-zinc-500 font-mono">
+                  {formatDuration(recordingDuration)}
+                </span>
+                      {audioPreviewUrl && (
+                          <audio
+                              src={audioPreviewUrl}
+                              controls
+                              className="h-8 flex-1 max-w-[200px]"
+                          />
+                      )}
+                    </div>
+
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={cancelRecording}
+                        className="text-zinc-400 hover:text-white"
+                    >
+                      <X className="size-4 mr-1" />
+                      Supprimer
+                    </Button>
+
+                    <Button
+                        type="button"
+                        size="sm"
+                        onClick={sendVoiceMessage}
+                        disabled={isPending}
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                    >
+                      <Send className="size-4 mr-1" />
+                      Envoyer
+                    </Button>
+                  </>
+              ) : null}
+            </div>
+        )}
+
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* Preview des fichiers sélectionnés */}
           {selectedFiles.length > 0 && (
@@ -335,7 +614,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                         <div>
                           <p className="font-medium">Capture d'écran</p>
                           <p className="text-xs text-gray-400">
-                            Partager votre écran
+                            Envoyer directement
                           </p>
                         </div>
                       </button>
@@ -346,8 +625,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
               <input
                   ref={fileInputRef}
                   type="file"
-                  multiple
-                  accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                  accept="image/*,video/*,.pdf,.doc,.docx,.txt,webp,audio/*"
                   onChange={handleFileSelect}
                   className="hidden"
               />
@@ -361,7 +639,14 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                       <Field data-invalid={fieldState.invalid}>
                         <Textarea
                             {...field}
-                            placeholder="Écris ton message..."
+                            disabled={selectedFiles.length > 0 || isRecording || !!audioBlob}
+                            placeholder={
+                              isRecording
+                                  ? "Enregistrement en cours..."
+                                  : audioBlob
+                                      ? "Message vocal prêt à envoyer"
+                                      : "Écris ton message..."
+                            }
                             className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0 overflow-y-auto"
                             onChange={(e) => {
                               field.onChange(e);
@@ -386,12 +671,16 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                                 className="mt-1 text-xs text-red-500"
                             />
                         )}
+                        {selectedFiles.length > 0 && (
+                            <p className="text-xs text-zinc-400">
+                              Les messages avec fichier ne peuvent pas contenir de texte
+                            </p>
+                        )}
                       </Field>
                   )}
               />
             </div>
 
-            {/* Emoji */}
             <div ref={emojiPickerRef} className="relative">
               <Button
                   type="button"
@@ -418,7 +707,6 @@ export default function Message({ channelId, conversationId }: MessageProps) {
               )}
             </div>
 
-            {/* GIF */}
             <div ref={gifPickerRef} className="relative">
               <Button
                   type="button"
@@ -485,14 +773,34 @@ export default function Message({ channelId, conversationId }: MessageProps) {
               )}
             </div>
 
-            <Button
-                type="submit"
-                size="icon"
-                className="h-10 w-10 rounded-xl bg-purple-discord text-white"
-                disabled={isPending}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+            {hasContent || selectedFiles.length > 0 ? (
+                <Button
+                    type="submit"
+                    size="icon"
+                    className="h-10 w-10 rounded-xl bg-purple-discord text-white"
+                    disabled={isPending}
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
+            ) : (
+                <Button
+                    type="button"
+                    size="icon"
+                    className={`h-10 w-10 rounded-xl transition-colors ${
+                        isRecording
+                            ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
+                            : "bg-zinc-700 hover:bg-zinc-600 text-gray-300"
+                    }`}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={!!audioBlob}
+                >
+                  {isRecording ? (
+                      <Square className="h-4 w-4" />
+                  ) : (
+                      <Mic className="h-5 w-5" />
+                  )}
+                </Button>
+            )}
           </div>
         </form>
       </div>
