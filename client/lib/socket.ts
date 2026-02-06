@@ -22,11 +22,9 @@ class SocketManager {
         });
 
         this.socket.on('connect', () => {
-            console.log( 'WebSocket connecté');
         });
 
         this.socket.on('disconnect', () => {
-            console.log('WebSocket déconnecté');
         });
 
         return this.socket;

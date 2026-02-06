@@ -17,12 +17,10 @@ export const useSocketServers = () => {
         }
 
         const emitFindServers = () => {
-            console.log("J'émet findAllServers");
             socketManager.emit('findAllServers', {}, (response: any) => {
                 if (response?.error) {
                     setError(response.error);
                 } else {
-                    console.log("Données reçues du socket:", response);
                     setServers(response);
                 }
                 setLoading(false);

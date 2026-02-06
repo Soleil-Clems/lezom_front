@@ -1,28 +1,27 @@
 "use client"
 
-export function OnlineFriendItem({ member }: { member: any }) {
-  // Debug pour voir ce que tu reçois vraiment (à check dans ta console F12)
-  // console.log("User data:", member);
+export function OnlineFriendItem({member}: { member: any }) {
 
-  // Utilise username (ou name selon ton backend)
-  const name = member?.username || "Inconnu";
-  const initials = name.substring(0, 2).toUpperCase();
 
-  return (
-    <div className="flex items-center gap-3 p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-all">
-      <div className="relative shrink-0">
-        <div className="h-8 w-8 rounded-full bg-[#313338] flex items-center justify-center text-[10px] font-bold text-white uppercase group-hover:bg-indigo-500 transition-colors">
-          {initials}
-        </div>
-        <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-[3px] border-[#2B2D31] 
-          ${member?.isActive ? 'bg-green-500' : 'bg-zinc-500'}`} 
-        />
-      </div>
-      
-      {/* AFFICHAGE DU NOM ICI */}
-      <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 truncate">
+    const name = member?.username || "Inconnu";
+    const initials = name.substring(0, 2).toUpperCase();
+
+    return (
+        <div className="flex items-center gap-3 p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-all">
+            <div className="relative shrink-0">
+                <div
+                    className="h-8 w-8 rounded-full bg-[#313338] flex items-center justify-center text-[10px] font-bold text-white uppercase group-hover:bg-indigo-500 transition-colors">
+                    {initials}
+                </div>
+                <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-[3px] border-[#2B2D31] 
+          ${member?.isActive ? 'bg-green-500' : 'bg-zinc-500'}`}
+                />
+            </div>
+
+
+            <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 truncate">
         {name}
       </span>
-    </div>
-  );
+        </div>
+    );
 }
