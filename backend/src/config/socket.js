@@ -6,6 +6,8 @@ const { prisma } = require("./database");
 
 let io;
 
+const userSockets = new Map();
+
 const initSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
@@ -33,17 +35,27 @@ const initSocket = (httpServer) => {
 
   io.on("connection", async (socket) => {
     try {
-      console.log(`User connected: ${socket.user.id}`);
+      const userId = socket.user.id;
+      console.log(`User connected: ${userId}`);
 
-      socket.join(`user:${socket.user.id}`);
+      if (!userSockets.has(userId)) {
+        userSockets.set(userId, new Set());
+      }
+      userSockets.get(userId).add(socket.id);
 
-      await prisma.user.update({
-        where: { id: socket.user.id },
-        data: { status: "online" },
-      });
+      const isFirstConnection = userSockets.get(userId).size === 1;
+
+      socket.join(`user:${userId}`);
+
+      if (isFirstConnection) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { status: "online" },
+        });
+      }
 
       const memberships = await prisma.serverMember.findMany({
-        where: { userId: socket.user.id },
+        where: { userId },
         select: { serverId: true },
       });
 
@@ -51,17 +63,19 @@ const initSocket = (httpServer) => {
         socket.join(`server:${m.serverId}`);
       });
 
-      console.log(`User ${socket.user.id} joined ${memberships.length} server rooms`);
+      console.log(`User ${userId} joined ${memberships.length} server rooms`);
 
-      memberships.forEach((m) => {
-        socket.to(`server:${m.serverId}`).emit("user:online", {
-          userId: socket.user.id,
+      if (isFirstConnection) {
+        memberships.forEach((m) => {
+          socket.to(`server:${m.serverId}`).emit("user:online", {
+            userId,
+          });
         });
-      });
+      }
 
       socket.on("server:join", async (serverId) => {
         const isMember = await prisma.serverMember.findFirst({
-          where: { serverId, userId: socket.user.id },
+          where: { serverId, userId },
         });
         if (isMember) {
           socket.join(`server:${serverId}`);
@@ -72,19 +86,59 @@ const initSocket = (httpServer) => {
         socket.leave(`server:${serverId}`);
       });
 
+      socket.on("channel:join", (channelId) => {
+        socket.join(`channel:${channelId}`);
+      });
+
+      socket.on("channel:leave", (channelId) => {
+        socket.leave(`channel:${channelId}`);
+      });
+
+      socket.on("typing", ({ channelId, isTyping }) => {
+        socket.to(`channel:${channelId}`).emit("user:typing", {
+          userId,
+          username: socket.user.username,
+          channelId,
+          isTyping,
+        });
+      });
+
+      socket.on("dm:typing", ({ conversationId, targetUserId }) => {
+        io.to(`user:${targetUserId}`).emit("dm:typing", {
+          conversationId,
+          userId,
+        });
+      });
+
+      socket.on("dm:stopTyping", ({ conversationId, targetUserId }) => {
+        io.to(`user:${targetUserId}`).emit("dm:stopTyping", {
+          conversationId,
+          userId,
+        });
+      });
+
       socket.on("disconnect", async () => {
-        console.log(`User disconnected: ${socket.user.id}`);
+        console.log(`User disconnected: ${userId}`);
 
-        await prisma.user.update({
-          where: { id: socket.user.id },
-          data: { status: "offline", lastSeen: new Date() },
-        });
+        const sockets = userSockets.get(userId);
+        if (sockets) {
+          sockets.delete(socket.id);
 
-        memberships.forEach((m) => {
-          socket.to(`server:${m.serverId}`).emit("user:offline", {
-            userId: socket.user.id,
-          });
-        });
+          if (sockets.size === 0) {
+            userSockets.delete(userId);
+
+            await prisma.user.update({
+              where: { id: userId },
+              data: { status: "offline", lastSeen: new Date() },
+            });
+
+            memberships.forEach((m) => {
+              socket.to(`server:${m.serverId}`).emit("user:offline", {
+                userId,
+              });
+            });
+          }
+        }
       });
     } catch (error) {
       console.error("Socket connection error:", error);

@@ -12,6 +12,9 @@ const createChannelSchema = Joi.object({
   description: Joi.string().max(500).allow("", null).messages({
     "string.max": "Description must be at most 500 characters.",
   }),
+  type: Joi.string().valid("TEXT", "CALL").default("TEXT").messages({
+    "any.only": "Channel type must be TEXT or CALL.",
+  }),
 });
 
 const updateChannelSchema = Joi.object({

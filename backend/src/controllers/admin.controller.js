@@ -160,7 +160,6 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Prevent admin from deleting themselves
     if (id === req.user.id) {
       return res
         .status(400)

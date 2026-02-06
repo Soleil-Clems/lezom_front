@@ -13,6 +13,9 @@ const updateServerSchema = Joi.object({
     "string.min": "Server name cannot be empty.",
     "string.max": "Server name must be at most 100 characters.",
   }),
+  img: Joi.string().max(500).allow("", null).messages({
+    "string.max": "Image URL must be at most 500 characters.",
+  }),
 })
   .min(1)
   .messages({
@@ -20,8 +23,8 @@ const updateServerSchema = Joi.object({
   });
 
 const updateMemberRoleSchema = Joi.object({
-  role: Joi.string().valid("ADMIN", "MEMBER").required().messages({
-    "any.only": "Role must be ADMIN or MEMBER.",
+  role: Joi.string().valid("ADMIN", "MODERATOR", "MEMBER").required().messages({
+    "any.only": "Role must be ADMIN, MODERATOR, or MEMBER.",
     "any.required": "Role is required.",
   }),
 });

@@ -190,7 +190,6 @@ describe("Channel API", () => {
         .set("Cookie", `token=${token}`)
         .send({});
 
-      // Validation happens after middleware, so 403 if not authorized or 400 if validation fails
       expect([400, 403]).toContain(res.status);
     });
   });

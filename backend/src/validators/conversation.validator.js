@@ -1,12 +1,15 @@
 const Joi = require("joi");
 
-const createMessageSchema = Joi.object({
+const createConversationSchema = Joi.object({
+  userId: Joi.string().required().messages({
+    "any.required": "User ID is required.",
+  }),
+});
+
+const createPrivateMessageSchema = Joi.object({
   content: Joi.string().min(1).required().messages({
     "string.min": "Message content is required.",
     "any.required": "Message content is required.",
-  }),
-  channelId: Joi.string().required().messages({
-    "any.required": "Channel ID is required.",
   }),
   type: Joi.string()
     .valid("text", "voice", "img", "file", "system", "gif")
@@ -16,7 +19,7 @@ const createMessageSchema = Joi.object({
     }),
 });
 
-const updateMessageSchema = Joi.object({
+const updatePrivateMessageSchema = Joi.object({
   content: Joi.string().min(1).required().messages({
     "string.min": "Message content is required.",
     "any.required": "Message content is required.",
@@ -24,6 +27,7 @@ const updateMessageSchema = Joi.object({
 });
 
 module.exports = {
-  createMessageSchema,
-  updateMessageSchema,
+  createConversationSchema,
+  createPrivateMessageSchema,
+  updatePrivateMessageSchema,
 };
