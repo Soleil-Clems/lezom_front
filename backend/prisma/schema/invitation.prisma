@@ -1,0 +1,17 @@
+model Invitation {
+  id        String    @id @default(uuid())
+  serverId  String    @map("server_id")
+  code      String    @unique @db.VarChar(16)
+  createdBy String    @map("created_by")
+  expiresAt DateTime? @map("expires_at")
+  maxUses   Int?      @map("max_uses")
+  usesCount Int       @default(0) @map("uses_count")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  server  Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  creator User   @relation("InvitationCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([code])
+  @@index([serverId])
+  @@map("invitations")
+}

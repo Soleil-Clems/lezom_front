@@ -1,0 +1,17 @@
+model Server {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(100)
+  img       String?  @db.VarChar(500)
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner       User           @relation("ServerOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members     ServerMember[]
+  channels    Channel[]
+  invitations Invitation[]
+  bans        Ban[]
+
+  @@index([ownerId])
+  @@map("servers")
+}
