@@ -25,6 +25,8 @@ import { InvitationModalContent } from "./invitationModal";
 import { LeaveServerModal } from "./LeaveServerModal";
 import { TransferOwnershipModal } from "./TransferOwnershipModal";
 import { useLeaveServer } from "@/hooks/mutations/useLeaveServer";
+import { useDeleteServer } from "@/hooks/mutations/updateServerSettings";
+import { useRouter } from "next/navigation";
 
 interface ServerSettingsDropdownProps {
   serverId: string | number;
@@ -46,6 +48,8 @@ export function ServerSettingsDropdown({
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
 
   const leaveServer = useLeaveServer();
+  const deleteServer = useDeleteServer();
+  const router = useRouter();
 
   const handleLeaveServer = (newOwnerId?: number) => {
     leaveServer.mutate(
@@ -149,10 +153,18 @@ export function ServerSettingsDropdown({
           isOpen={leaveModalOpen}
           onClose={() => setLeaveModalOpen(false)}
           onConfirm={(newOwnerId) => handleLeaveServer(newOwnerId)}
+          onDeleteServer={() => {
+            deleteServer.mutate(serverId, {
+              onSuccess: () => {
+                setLeaveModalOpen(false);
+                router.push("/");
+              },
+            });
+          }}
           serverId={serverId}
           serverName={serverName}
           currentUserId={currentUserId}
-          isPending={leaveServer.isPending}
+          isPending={leaveServer.isPending || deleteServer.isPending}
         />
       ) : (
         <LeaveServerModal
