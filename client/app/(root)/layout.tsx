@@ -3,15 +3,7 @@ import {useGetAllServers} from "@/hooks/queries/useGetAllServers";
 import {SidebarProvider, SidebarInset, SidebarTrigger} from "@/components/ui/sidebar"
 import {ServerSidebar} from "@/components/ui-client/serversidebar"
 
-/*
-const inter = Inter({
-  subsets: ["latin"],
-})
 
-export const metadata: Metadata = {
-  title: "Lezom",
-  description: "Application",
-}*/
 
 export default function Layout({
                                    children,
