@@ -1,27 +1,10 @@
 import { customfetch } from "@/lib/customFetch"
-import { LoginSchema } from "@/schemas/auth.dto"
-import { registerSchema } from "@/schemas/register.dto"
-import z from "zod"
+import type { LoginType, RegisterType } from "@/schemas/auth.dto"
 
-
-
-export const loginRequest = async (body: z.infer<typeof LoginSchema>) => {
-    try {
-        const response = await customfetch.post("auth/login", body)
-        return response
-    } catch (error) {
-        throw error
-    }
+export const loginRequest = async (body: LoginType) => {
+  return customfetch.post("auth/login", body)
 }
 
-export const registerRequest = async (body: z.infer<typeof registerSchema>) => {
-    try {
-
-        const response = await customfetch.post("users", body)
-
-        return response
-    } catch (error) {
-
-        throw error
-    }
+export const registerRequest = async (body: RegisterType) => {
+  return customfetch.post("users", body)
 }
