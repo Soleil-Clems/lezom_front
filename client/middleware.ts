@@ -1,39 +1,33 @@
-// middleware.ts
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server"
+
+const PUBLIC_ROUTES = ["/login", "/register"]
 
 export async function middleware(request: NextRequest) {
-    const path = request.nextUrl.pathname;
+  const path = request.nextUrl.pathname
+  const token = request.cookies.get("auth-token")?.value
 
-    // Récupérer le token depuis le cookie
-    const token = request.cookies.get("auth-token")?.value;
+  const isPublicRoute = PUBLIC_ROUTES.some((route) => path.startsWith(route))
 
-    const isAuthRoute = path.startsWith("/login") || path.startsWith("/register");
+  if (!token && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
 
-    const protectedRoutes = ["/profil", "/servers", "/(homepage)"];
-    const isProtectedRoute =
-        path === "/" ||
-        protectedRoutes.some(route => path.startsWith(route));
+  if (token && isPublicRoute) {
+    return NextResponse.redirect(new URL("/", request.url))
+  }
 
-    // Rediriger vers login si pas de token et route protégée
-    if (!token && isProtectedRoute && !isAuthRoute) {
-        return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    // Rediriger vers (homepage) si déjà connecté et sur la page login
-    if (token && (path === "/login" || path === "/register")) {
-        return NextResponse.redirect(new URL("/(homepage)", request.url));
-    }
-
-    return NextResponse.next();
+  return NextResponse.next()
 }
 
 export const config = {
-    matcher: [
-        "/profil/:path*",
-        "/servers/:path*",
-        "/(homepage)/:path*",
-        "/",
-        "/login/:path*",
-        "/register/:path*",
-    ],
-};
+  matcher: [
+    "/",
+    "/profil/:path*",
+    "/servers/:path*",
+    "/settings/:path*",
+    "/join/:path*",
+    "/conversation/:path*",
+    "/login",
+    "/register",
+  ],
+}
