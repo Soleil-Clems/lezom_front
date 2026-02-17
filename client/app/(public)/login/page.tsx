@@ -1,142 +1,141 @@
 "use client";
 
-import {Button} from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import {
-    Field,
-    FieldError,
-    FieldLabel,
-} from "@/components/ui/field"
-import {Input} from "@/components/ui/input";
-import {LoginSchema} from "@/schemas/auth.dto";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {Controller, useForm} from "react-hook-form";
-import {z} from "zod";
-import {useLogin} from "@/hooks/mutations/useLogin";
-import useAuthStore from "@/store/authStore";
-import {useRouter} from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 
-export default function Page() {
-    const router = useRouter();
-    const {setToken} = useAuthStore()
-    const form = useForm<z.infer<typeof LoginSchema>>({
-        resolver: zodResolver(LoginSchema),
-        defaultValues: {
-            email: "test@gmail.com",
-            password: "testtest"
-        }
-    })
-    const loginMutation = useLogin();
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { LoginSchema, type LoginType } from "@/schemas/auth.dto";
+import { useLogin } from "@/hooks/mutations/useLogin";
+import useAuthStore from "@/store/authStore";
+import { AuthBackground } from "@/components/ui-client/AuthBackground";
 
-    const onSubmit = (formValues: z.infer<typeof LoginSchema>) => {
-        loginMutation.mutate(formValues, {
-            onSuccess: (data) => {
+export default function LoginPage() {
+  const router = useRouter();
+  const { setToken } = useAuthStore();
+  const loginMutation = useLogin();
 
-                setToken(data.access_token);
-                router.replace("/profil")
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginType>({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-            }
-        })
+  const onSubmit = (formValues: LoginType) => {
+    loginMutation.mutate(formValues, {
+      onSuccess: (data) => {
+        setToken(data.access_token);
+        router.replace("/");
+      },
+    });
+  };
 
-    }
+  return (
+    <div className="dark relative min-h-screen flex items-center justify-center p-4">
+      <AuthBackground />
 
-    return (
-        <div className="min-h-screen flex items-center justify-center px-4 bg-own-dark">
-            <Card className="w-full max-w-md p-6 sm:p-8 rounded-xl shadow bg-card">
-                <CardHeader>
-                    <CardTitle className="mb-6 text-center sm:text-left">
-                        <h1 className="text-2xl sm:text-3xl font-bold">Bon retour</h1>
-                    </CardTitle>
-                    <CardDescription className="mt-1 text-sm text-gray-500">
-                        On est content de te revoir !
-                    </CardDescription>
-                </CardHeader>
+      <Card className="relative z-10 w-full max-w-[440px] p-6 sm:p-8 bg-[#313338] border-white/[0.06] animate-in fade-in-0 zoom-in-95 duration-500">
+        <CardHeader className="text-center pb-0">
+          <div className="flex justify-center mb-3">
+            <Image
+              src="/lezom.svg"
+              alt="Lezom"
+              width={48}
+              height={48}
+              className="drop-shadow-lg"
+            />
+          </div>
+          <CardTitle className="text-2xl font-bold text-white">
+            Bon retour !
+          </CardTitle>
+          <CardDescription className="text-[#B5BAC1]">
+            On est content de te revoir
+          </CardDescription>
+        </CardHeader>
 
-                <form id="loginform" onSubmit={form.handleSubmit(onSubmit)}>
-                    <CardContent>
-                        <div className="flex flex-col gap-6">
-                            <div className="grid gap-2">
-                                <Controller
-                                    name="email"
-                                    control={form.control}
-                                    render={({field, fieldState}) => (
-                                        <Field data-invalid={fieldState.invalid}>
-                                            <FieldLabel htmlFor='email'>Email <span
-                                                className='text-sm flex items-start text-gray-500'>*</span></FieldLabel>
-                                            <Input
-                                                {...field}
-                                                id="email"
-                                                aria-invalid={fieldState.invalid}
-                                                placeholder='johndoe@gmail.com'
-                                                autoComplete='off'
-                                                type='email'
-                                            />
-                                            {fieldState.invalid && (
-                                                <FieldError errors={([fieldState.error])}/>
-                                            )}
-                                        </Field>
-                                    )}
-                                />
-                            </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <CardContent>
+            <div className="flex flex-col gap-5">
+              <Field data-invalid={!!errors.email}>
+                <FieldLabel
+                  htmlFor="email"
+                  className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
+                >
+                  Email <span className="text-red-400">*</span>
+                </FieldLabel>
+                <Input
+                  {...register("email")}
+                  id="email"
+                  type="email"
+                  aria-invalid={!!errors.email}
+                  autoComplete="email"
+                  className="bg-[#1E1F22] border-transparent text-white h-10"
+                />
+                {errors.email && <FieldError errors={[errors.email]} />}
+              </Field>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Controller
-                                        name="password"
-                                        control={form.control}
-                                        render={({field, fieldState}) => (
-                                            <Field data-invalid={fieldState.invalid}>
-                                                <FieldLabel htmlFor='password'>Mot de passe<span
-                                                    className='text-sm flex items-start  text-gray-500'>*</span></FieldLabel>
-                                                <Input
-                                                    {...field}
-                                                    id="password"
-                                                    type="password"
-                                                    aria-invalid={fieldState.invalid}
-                                                    placeholder='**********'
-                                                    autoComplete='off'
-                                                    className='flex items-center'
-                                                />
-                                                {fieldState.invalid && (
-                                                    <FieldError errors={([fieldState.error])}/>
-                                                )}
-                                            </Field>
-                                        )}
-                                    />
-                                </div>
-                                <a
-                                    href="#"
-                                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                >
-                                    Mot de passe oublié?
-                                </a>
+              <Field data-invalid={!!errors.password}>
+                <FieldLabel
+                  htmlFor="password"
+                  className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
+                >
+                  Mot de passe <span className="text-red-400">*</span>
+                </FieldLabel>
+                <Input
+                  {...register("password")}
+                  id="password"
+                  type="password"
+                  aria-invalid={!!errors.password}
+                  autoComplete="current-password"
+                  className="bg-[#1E1F22] border-transparent text-white h-10"
+                />
+                {errors.password && <FieldError errors={[errors.password]} />}
+              </Field>
+            </div>
+          </CardContent>
 
-                            </div>
-                        </div>
-                    </CardContent>
-
-                    <CardFooter className="flex-col gap-2 mt-5">
-                        <Button form="loginform" type="submit"
-                                className="w-full bg-purple-discord text-white hover:bg-gray-400 hover:text-white">
-                            Connexion
-                        </Button>
-                        <p className="text-sm text-gray-500 mt-4">
-                            Pas encore de compte ?{" "}
-                            <Link href="/register" className="text-purple-discord hover:underline">
-                                S'inscrire
-                            </Link>
-                        </p>
-                    </CardFooter>
-                </form>
-            </Card>
-        </div>
-    );
+          <CardFooter className="flex-col gap-3 pt-2">
+            <Button
+              type="submit"
+              disabled={loginMutation.isPending}
+              className="w-full h-11 bg-purple-discord text-white font-medium hover:bg-purple-discord/85 transition-colors"
+            >
+              {loginMutation.isPending && (
+                <Loader2 className="animate-spin" />
+              )}
+              {loginMutation.isPending ? "Connexion..." : "Se connecter"}
+            </Button>
+            <p className="text-sm text-[#A3A6AA] mt-1">
+              Pas encore de compte ?{" "}
+              <Link
+                href="/register"
+                className="text-[#00A8FC] hover:underline"
+              >
+                S&apos;inscrire
+              </Link>
+            </p>
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
+  );
 }
