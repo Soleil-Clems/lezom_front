@@ -6,7 +6,7 @@ export const passwordSchema = z
 
 export const LoginSchema = z.object({
   email: z.email({ message: "Email invalide" }),
-  password: passwordSchema,
+  password: z.string().min(1, { message: "Mot de passe requis" }),
 })
 
 export const RegisterSchema = z.object({
