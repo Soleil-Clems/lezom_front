@@ -33,9 +33,11 @@ export function useSendPrivateMessage(conversationId: string | undefined) {
             });
         },
         onSuccess: () => {
-            // Le WebSocket `newPrivateMessage` gère la mise à jour du cache
             queryClient.invalidateQueries({
                 queryKey: ["conversations"],
+            });
+            queryClient.invalidateQueries({
+                queryKey: ["conversationMessages", conversationId],
             });
         },
         onError: (error: any) => {

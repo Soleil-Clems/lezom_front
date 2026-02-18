@@ -53,7 +53,7 @@ export default function ConversationList() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-zinc-700">
+            <div className="px-5 py-4 border-b border-zinc-700">
                 <h2 className="text-lg font-semibold text-white">Messages privés</h2>
             </div>
 
@@ -63,26 +63,30 @@ export default function ConversationList() {
                         <p>Vous n&apos;avez aucune conversation</p>
                     </div>
                 ) : (
-                    <div className="py-2">
+                    <div className="px-2 py-2 flex flex-col gap-0.5">
                         {conversations?.map((conversation: conversationType) => {
                             const otherUser = getOtherUser(conversation);
                             const isActive = pathname === `/conversation/${conversation.id}`;
+                            const initials = (otherUser.username || "?").substring(0, 2).toUpperCase();
 
                             return (
                                 <Link
                                     key={conversation.id}
                                     href={`/conversation/${conversation.id}`}
                                     className={cn(
-                                        "flex items-center gap-3 px-4 py-3 hover:bg-zinc-700/50 transition-colors",
+                                        "flex items-center gap-3 px-3 py-2.5 rounded-md hover:bg-zinc-700/50 transition-colors",
                                         isActive && "bg-zinc-700"
                                     )}
                                 >
+                                    <div className="h-8 w-8 shrink-0 rounded-full bg-zinc-600 flex items-center justify-center text-[11px] font-semibold text-white uppercase">
+                                        {initials}
+                                    </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <span className="font-medium text-white truncate">
+                                            <span className="text-sm font-medium text-zinc-200 truncate">
                                                 {otherUser.username}
                                             </span>
-                                            <span className="text-xs text-zinc-400 ml-2">
+                                            <span className="text-xs text-zinc-500 ml-2 shrink-0">
                                                 {formatRelativeTime(conversation.updatedAt)}
                                             </span>
                                         </div>

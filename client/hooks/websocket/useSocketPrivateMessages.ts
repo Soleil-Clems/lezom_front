@@ -28,7 +28,15 @@ export function useSocketPrivateMessages(conversationId?: string) {
             queryClient.setQueryData<MessagesResponse>(
                 ["conversationMessages", conversationId],
                 (old) => {
-                    if (!old) return old;
+                    if (!old) {
+                        return {
+                            messages: [message],
+                            total: 1,
+                            page: 1,
+                            limit: 50,
+                            totalPages: 1,
+                        };
+                    }
                     // Éviter les doublons
                     if (old.messages.some((msg) => msg.id === message.id)) {
                         return old;
