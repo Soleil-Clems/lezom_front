@@ -9,13 +9,16 @@ import { useAuthUser } from "@/hooks/queries/useAuthUser";
 import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
 import { channelType } from "@/schemas/channel.dto";
 import { ServerSettingsDropdown } from "./dropdownMenu";
+import { useParams } from "next/navigation";
 
 type ChannelSidebarProps = {
   serverId?: string;
   channelId?: string;
 };
 
-export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
+export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
+  const params = useParams();
+  const channelId = params?.channelId as string | undefined;
   const { data: user } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
 
