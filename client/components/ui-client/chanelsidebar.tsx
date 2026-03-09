@@ -9,13 +9,16 @@ import { useAuthUser } from "@/hooks/queries/useAuthUser";
 import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
 import { channelType } from "@/schemas/channel.dto";
 import { ServerSettingsDropdown } from "./dropdownMenu";
+import { useParams } from "next/navigation";
 
 type ChannelSidebarProps = {
   serverId?: string;
   channelId?: string;
 };
 
-export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
+export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
+  const params = useParams();
+  const channelId = params?.channelId as string | undefined;
   const { data: user } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
 
@@ -45,7 +48,7 @@ export function ChannelSidebar({ serverId, channelId }: ChannelSidebarProps) {
 
   return (
     <aside
-      className={`${channelId ? "hidden" : "flex"} md:flex shrink-0 w-72 border-r border-black/20`}
+      className={`${channelId ? "hidden" : "flex"} md:flex shrink-0 w-full md:w-72 border-r border-black/20`}
     >
       <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
         {/* HEADER */}

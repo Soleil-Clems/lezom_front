@@ -95,7 +95,7 @@ export function MemberCard({
 
     return (
         <Card className="bg-[#1E1F22] border-none">
-            <CardContent className="flex items-center justify-between p-4">
+            <CardContent className="flex flex-wrap items-center justify-between gap-y-3 p-4">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
                         {getRoleIcon()}

@@ -9,6 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { MessageSquare, Plus, User } from "lucide-react";
 import {
@@ -31,6 +32,7 @@ import {useGetAllServers} from "@/hooks/queries/useGetAllServers";
 export function ServerSidebar() {
   const { data:servers, isError, isLoading } = useGetAllServers();
   const [open, setOpen] = useState(false);
+  const { setOpenMobile } = useSidebar();
 
 
   if (isLoading) return <Loading />;
@@ -49,7 +51,7 @@ export function ServerSidebar() {
           <SidebarGroup className="flex flex-col items-start md:items-center gap-3 px-3">
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
-                <Link href="/" className="group flex items-center gap-3 w-full outline-none">
+                <Link href="/" onClick={() => setOpenMobile(false)} className="group flex items-center gap-3 w-full outline-none">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[24px] bg-[#313338] text-indigo-400 transition-all duration-200 hover:rounded-[16px] hover:bg-indigo-500 hover:text-white">
                     <MessageSquare size={25} />
                   </div>
@@ -98,7 +100,7 @@ export function ServerSidebar() {
         </SidebarContent>
 
         <SidebarFooter className="py-4 px-3 flex flex-col items-start md:items-center">
-          <a href="/profil" className="group flex items-center gap-3 outline-none">
+          <a href="/profil" onClick={() => setOpenMobile(false)} className="group flex items-center gap-3 outline-none">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition-all duration-200 hover:rounded-[16px]">
               <User size={24} />
             </div>
