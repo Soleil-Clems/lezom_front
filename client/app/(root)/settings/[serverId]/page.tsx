@@ -104,10 +104,10 @@ export default function SettingsPage() {
                 </header>
 
                 <Tabs defaultValue="servers">
-                    <TabsList className="bg-[#1E1F22] mb-6">
-                        <TabsTrigger value="servers" className="px-10">Serveurs</TabsTrigger>
-                        <TabsTrigger value="channels" className="px-10">Salons</TabsTrigger>
-                        <TabsTrigger value="members" className="px-10">Membres</TabsTrigger>
+                    <TabsList className="bg-[#1E1F22] mb-6 w-full">
+                        <TabsTrigger value="servers" className="flex-1 px-2 sm:px-10">Serveurs</TabsTrigger>
+                        <TabsTrigger value="channels" className="flex-1 px-2 sm:px-10">Salons</TabsTrigger>
+                        <TabsTrigger value="members" className="flex-1 px-2 sm:px-10">Membres</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="servers" className="space-y-4 outline-none">
