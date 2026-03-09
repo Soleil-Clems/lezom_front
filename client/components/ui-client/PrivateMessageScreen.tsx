@@ -25,6 +25,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
     const [editingMessage, setEditingMessage] = useState<privateMessageType | null>(null);
     const [deletingMessage, setDeletingMessage] = useState<privateMessageType | null>(null);
     const [playingAudioId, setPlayingAudioId] = useState<number | null>(null);
+    const [activeMessageId, setActiveMessageId] = useState<number | null>(null);
     const audioRefs = useRef<Map<number, HTMLAudioElement>>(new Map());
 
     // Cleanup audio on unmount
@@ -148,10 +149,14 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                     const isText = message.type === "text";
                     const isImage = message.type === "img";
 
+                    const isActive = activeMessageId === message.id;
+                    const actionsVisibility = `${isActive ? "opacity-100" : "opacity-0"} sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`;
+
                     return (
                         <div
                             key={message.id}
                             className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
+                            onClick={() => setActiveMessageId(isActive ? null : message.id)}
                         >
                             <div className="flex items-center gap-2">
                                 <span className={`text-xs font-bold ${isMyMessage ? "text-emerald-400" : "text-indigo-400"}`}>
@@ -166,7 +171,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                             {isGif && (
                                 <div className="relative group">
                                     {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}>
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
                                             <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
                                         </div>
                                     )}
@@ -186,7 +191,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                             {isImage && (
                                 <div className="relative">
                                     {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}>
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
                                             <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
                                         </div>
                                     )}
@@ -204,7 +209,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                             {isVoice && (
                                 <div className="relative">
                                     {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}>
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
                                             <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
                                         </div>
                                     )}
@@ -237,7 +242,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                             {isFile && (
                                 <div className="relative">
                                     {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}>
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
                                             <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
                                         </div>
                                     )}
@@ -278,7 +283,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                                     }`}
                                 >
                                     {(canEdit || canDelete) && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}>
+                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
                                             <MessageActions
                                                 canEdit={canEdit}
                                                 canDelete={canDelete}
