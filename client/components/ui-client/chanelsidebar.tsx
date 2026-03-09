@@ -48,7 +48,7 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
 
   return (
     <aside
-      className={`${channelId ? "hidden" : "flex"} md:flex shrink-0 w-72 border-r border-black/20`}
+      className={`${channelId ? "hidden" : "flex"} md:flex shrink-0 w-full md:w-72 border-r border-black/20`}
     >
       <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
         {/* HEADER */}
