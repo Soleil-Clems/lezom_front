@@ -87,6 +87,11 @@ export function useSocketPrivateMessages(conversationId?: string) {
         on("privateMessageUpdated", handlePrivateMessageUpdated);
         on("privateMessageDeleted", handlePrivateMessageDeleted);
 
+        // Refetch pour rattraper les messages arrivés avant l'attachement des listeners
+        queryClient.invalidateQueries({
+            queryKey: ["conversationMessages", conversationId],
+        });
+
         return () => {
             off("newPrivateMessage", handleNewPrivateMessage);
             off("privateMessageUpdated", handlePrivateMessageUpdated);

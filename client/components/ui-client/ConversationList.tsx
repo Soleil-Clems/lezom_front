@@ -53,8 +53,8 @@ export default function ConversationList() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="px-5 py-4 border-b border-zinc-700">
-                <h2 className="text-lg font-semibold text-white">Messages privés</h2>
+            <div className="h-12 px-5 flex items-center border-b border-zinc-700">
+                <h2 className="font-semibold text-white">Messages privés</h2>
             </div>
 
             <div className="flex-1 overflow-y-auto">

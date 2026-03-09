@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSocket } from './useSocket';
 import { messageType } from '@/schemas/message.dto';
 
@@ -7,22 +7,25 @@ export function useSocketMessages(channelId?: string) {
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(!!channelId);
     const { isConnected, socket } = useSocket();
+    const pendingMessages = useRef<messageType[]>([]);
+    const historyLoaded = useRef(false);
 
     useEffect(() => {
         setMessages([]);
         setTypingUsers([]);
         setIsLoading(!!channelId);
+        pendingMessages.current = [];
+        historyLoaded.current = false;
     }, [channelId]);
 
     useEffect(() => {
         if (!channelId || !isConnected || !socket) return;
 
-        socket.emit('joinChannel', parseInt(channelId), (history: messageType[]) => {
-            setMessages(history);
-            setIsLoading(false);
-        });
-
         const handleNewMessage = (newMessage: messageType) => {
+            if (!historyLoaded.current) {
+                pendingMessages.current.push(newMessage);
+                return;
+            }
             setMessages((prev) => {
                 if (prev.find(m => m.id === newMessage.id)) return prev;
                 return [...prev, newMessage];
@@ -51,6 +54,19 @@ export function useSocketMessages(channelId?: string) {
         socket.on('messageUpdated', handleMessageUpdated);
         socket.on('messageDeleted', handleMessageDeleted);
         socket.on('userTyping', handleUserTyping);
+
+        socket.emit('joinChannel', parseInt(channelId), (history: messageType[]) => {
+            const merged = [...history];
+            for (const msg of pendingMessages.current) {
+                if (!merged.find(m => m.id === msg.id)) {
+                    merged.push(msg);
+                }
+            }
+            pendingMessages.current = [];
+            historyLoaded.current = true;
+            setMessages(merged);
+            setIsLoading(false);
+        });
 
         return () => {
             socket.off('newMessage', handleNewMessage);
