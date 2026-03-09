@@ -698,11 +698,11 @@ export default function Message({ channelId, conversationId }: MessageProps) {
               </Button>
 
               {showEmojiPicker && (
-                  <div className="absolute bottom-12 right-0 z-50">
+                  <div className="fixed bottom-20 left-2 right-2 z-50 sm:absolute sm:bottom-12 sm:right-0 sm:left-auto sm:w-auto">
                     <EmojiPicker
                         onEmojiClick={onEmojiClick}
                         theme={Theme.DARK}
-                        width={350}
+                        width="100%"
                         height={400}
                     />
                   </div>
@@ -724,7 +724,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
               </Button>
 
               {showGifPicker && (
-                  <div className="absolute bottom-12 right-0 z-50 bg-[#2B2D31] rounded-lg w-[420px] h-[520px] flex flex-col">
+                  <div className="fixed bottom-20 left-2 right-2 z-50 bg-[#2B2D31] rounded-lg h-105 flex flex-col sm:absolute sm:bottom-12 sm:left-auto sm:right-0 sm:w-105 sm:h-130">
                     <div className="p-4 border-b border-zinc-700">
                       <div className="flex gap-2">
                         <Input
