@@ -1,6 +1,7 @@
 import z from "zod";
 import { MessageTypeEnum } from "@/enums/enum";
 import { userSchema } from "@/schemas/user.dto";
+import { reactionSchema } from "@/schemas/reaction.dto";
 
 export const conversationSchema = z.object({
     id: z.number(),
@@ -16,6 +17,7 @@ export const privateMessageSchema = z.object({
     type: MessageTypeEnum,
     sender: userSchema,
     conversation: z.number(),
+    reactions: z.array(reactionSchema).optional(),
     createdAt: z.date().optional(),
     updatedAt: z.date().optional(),
 });

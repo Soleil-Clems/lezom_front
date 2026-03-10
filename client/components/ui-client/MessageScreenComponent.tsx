@@ -244,7 +244,7 @@ export default function MessageScreenComponent({
     return (
         <div
             key={message.id}
-            className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
+            className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
             onClick={() => setActiveMessageId(isActive ? null : Number(message.id))}
         >
           <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export default function MessageScreenComponent({
             {formatDate(message.createdAt)}
           </span>
           </div>
-          <div className="relative">
+          <div className="relative group">
             {canDelete && (
                 <div
                     className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${isActive ? "opacity-100" : "opacity-0"} sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}
@@ -466,7 +466,7 @@ export default function MessageScreenComponent({
                 return (
                     <div
                         key={message.id}
-                        className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
+                        className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
                         onClick={() => setActiveMessageId(isActive ? null : Number(message.id))}
                     >
                       <div className="flex items-center gap-2">
@@ -476,7 +476,7 @@ export default function MessageScreenComponent({
                   </span>
                       </div>
                       <div
-                          className={`relative p-3 max-w-[80%] break-words ${
+                          className={`relative group p-3 max-w-[80%] wrap-break-word ${
                               isMyMessage
                                   ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
                                   : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"

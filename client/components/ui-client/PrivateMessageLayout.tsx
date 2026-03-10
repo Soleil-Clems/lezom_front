@@ -23,7 +23,7 @@ export default function PrivateMessageLayout({ conversationId }: PrivateMessageL
 
     const messages = data?.messages || [];
 
-    useSocketPrivateMessages(conversationId);
+    const { addPrivateReaction } = useSocketPrivateMessages(conversationId);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -48,7 +48,7 @@ export default function PrivateMessageLayout({ conversationId }: PrivateMessageL
     return (
         <div className="flex flex-col h-full">
             <div className="flex-1 overflow-y-auto">
-                <PrivateMessageScreen messages={messages || []} conversationId={conversationId} />
+                <PrivateMessageScreen messages={messages || []} conversationId={conversationId} onAddReaction={addPrivateReaction} />
                 <div ref={messagesEndRef} />
             </div>
 
