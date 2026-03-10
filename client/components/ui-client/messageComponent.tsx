@@ -216,25 +216,37 @@ export default function Message({ channelId, conversationId }: MessageProps) {
   }, []);
 
 
-  const onSubmit = async (values: sendMessageType) => {
-    // @ts-expect-error
-    const hasText = values.content.trim().length > 0;
-    const hasFile = selectedFiles.length > 0;
+  const sendFileMessage = async () => {
+    if (selectedFiles.length === 0) return;
 
-    if (hasText && hasFile) {
-      setSelectedFiles([]);
-      return;
-    }
+    const file = selectedFiles[0];
+    const type = getMessageTypeFromFile(file);
 
-    if (!hasText && !hasFile) {
-      return;
-    }
-
-    if (hasFile) {
-      const file = selectedFiles[0];
+    try {
       const result = await upload(file);
-      values.content = result.url;
+
+      if (isPrivateMessage) {
+        sendPrivateMessageMutation.mutate({
+          content: result.url,
+          type,
+        });
+      } else {
+        sendChannelMessageMutation.mutate({
+          content: result.url,
+          type,
+          channelId: channelId ? parseInt(channelId) : 0,
+        });
+      }
+    } catch (error) {
+      console.error("Erreur upload fichier:", error);
     }
+
+    setSelectedFiles([]);
+    form.setValue("type", "text");
+  };
+
+  const onSubmit = async (values: sendMessageType) => {
+    if (!values.content.trim()) return;
 
     if (isPrivateMessage) {
       sendPrivateMessageMutation.mutate({
@@ -251,7 +263,6 @@ export default function Message({ channelId, conversationId }: MessageProps) {
       channelId: channelId ? parseInt(channelId) : 0,
     });
 
-    setSelectedFiles([]);
     stopTyping();
   };
 
@@ -309,14 +320,11 @@ export default function Message({ channelId, conversationId }: MessageProps) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // @ts-expect-error
-    if (form.getValues("content").trim().length > 0) {
+    if ((form.getValues("content") ?? "").trim().length > 0) {
       form.setValue("content", "");
       stopTyping();
     }
 
-    const messageType = getMessageTypeFromFile(file);
-    form.setValue("type", messageType);
     setSelectedFiles([file]);
     setShowAttachMenu(false);
   };
@@ -420,7 +428,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
       : sendChannelMessageMutation.isPending;
 
   const hasContent =
-      form.watch("content")?.trim().length > 0 || selectedFiles.length > 0;
+      (form.watch("content") ?? "").trim().length > 0 || selectedFiles.length > 0;
 
   return (
       <div className="w-full px-4 pb-4">
@@ -777,10 +785,11 @@ export default function Message({ channelId, conversationId }: MessageProps) {
 
             {hasContent || selectedFiles.length > 0 ? (
                 <Button
-                    type="submit"
+                    type={selectedFiles.length > 0 ? "button" : "submit"}
                     size="icon"
                     className="h-10 w-10 rounded-xl bg-purple-discord text-white"
                     disabled={isPending}
+                    onClick={selectedFiles.length > 0 ? sendFileMessage : undefined}
                 >
                   <Send className="h-5 w-5" />
                 </Button>

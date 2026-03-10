@@ -9,7 +9,7 @@ export function useEditProfilPicture(id?: number) {
 
   return useMutation({
     mutationFn: (file: File) =>
-      updatePictureRequest(id?.toString() ?? "", file),
+      updatePictureRequest(id!, file),
     onSuccess: () => {
       toast.success("Photo de profil mise à jour !");
       queryClient.invalidateQueries({ queryKey: ["authuser"] });

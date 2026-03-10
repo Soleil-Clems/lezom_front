@@ -10,7 +10,7 @@ import {
 
 const QUICK_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🔥"];
 
-interface MessageActionsProps {
+export interface MessageActionsProps {
     canEdit: boolean;
     canDelete: boolean;
     onEdit?: () => void;
