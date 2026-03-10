@@ -10,6 +10,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface DeleteMessageDialogProps {
     open: boolean;
@@ -24,15 +25,18 @@ export default function DeleteMessageDialog({
     onConfirm,
     isLoading = false,
 }: DeleteMessageDialogProps) {
+    const t = useTranslations("messageDialog");
+    const tc = useTranslations("common");
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="bg-zinc-900 border-zinc-700">
                 <DialogHeader>
                     <DialogTitle className="text-zinc-100">
-                        Supprimer le message
+                        {t("deleteMessage")}
                     </DialogTitle>
                     <DialogDescription className="text-zinc-400">
-                        Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.
+                        {t("deleteMessageConfirm")}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -42,14 +46,14 @@ export default function DeleteMessageDialog({
                         disabled={isLoading}
                         className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
                     >
-                        Annuler
+                        {tc("cancel")}
                     </Button>
                     <Button
                         variant="destructive"
                         onClick={onConfirm}
                         disabled={isLoading}
                     >
-                        {isLoading ? "Suppression..." : "Supprimer"}
+                        {isLoading ? tc("deleting") : tc("delete")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

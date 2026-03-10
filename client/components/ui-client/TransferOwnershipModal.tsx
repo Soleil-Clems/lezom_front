@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Search, Crown } from "lucide-react";
 import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
 import { MembershipType } from "@/schemas/member.dto";
+import { useTranslations } from "next-intl";
 
 type TransferOwnershipModalProps = {
     isOpen: boolean;
@@ -36,6 +37,8 @@ export function TransferOwnershipModal({
     currentUserId,
     isPending,
 }: TransferOwnershipModalProps) {
+    const t = useTranslations("transfer");
+    const tc = useTranslations("common");
     const [search, setSearch] = useState("");
     const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
 
@@ -68,22 +71,20 @@ export function TransferOwnershipModal({
             <DialogContent className="bg-[#313338] border-none text-white sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-rose-400">
-                        {isAlone ? "Supprimer le serveur" : "Transférer la propriété et quitter"}
+                        {isAlone ? t("deleteServer") : t("transferAndLeave")}
                     </DialogTitle>
                     <DialogDescription className="text-zinc-400">
                         {isAlone ? (
                             <>
-                                Vous êtes le seul membre du serveur{" "}
-                                <span className="text-white font-medium">{serverName}</span>.
+                                {t("aloneDesc", { name: serverName })}
                                 <br />
-                                Le serveur sera supprimé si vous le quittez.
+                                {t("serverWillBeDeleted")}
                             </>
                         ) : (
                             <>
-                                Vous êtes le propriétaire du serveur{" "}
-                                <span className="text-white font-medium">{serverName}</span>.
+                                {t("ownerDesc", { name: serverName })}
                                 <br />
-                                Sélectionnez un nouveau propriétaire avant de quitter.
+                                {t("selectNewOwner")}
                             </>
                         )}
                     </DialogDescription>
@@ -94,7 +95,7 @@ export function TransferOwnershipModal({
                         <div className="relative mb-4">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
                             <Input
-                                placeholder="Rechercher un membre..."
+                                placeholder={tc("searchMember")}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-10 bg-[#1e1f22] border-none text-white placeholder:text-zinc-500"
@@ -108,7 +109,7 @@ export function TransferOwnershipModal({
                                 </div>
                             ) : filteredMembers.length === 0 ? (
                                 <p className="text-center text-zinc-500 py-4">
-                                    Aucun membre trouvé
+                                    {tc("noMemberFound")}
                                 </p>
                             ) : (
                                 filteredMembers.map((membership: MembershipType) => (
@@ -146,7 +147,7 @@ export function TransferOwnershipModal({
                         disabled={isPending}
                         className="text-zinc-400 hover:text-white"
                     >
-                        Annuler
+                        {tc("cancel")}
                     </Button>
                     {isAlone ? (
                         <Button
@@ -158,10 +159,10 @@ export function TransferOwnershipModal({
                             {isPending ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Suppression...
+                                    {t("deleting")}
                                 </>
                             ) : (
-                                "Supprimer le serveur"
+                                t("deleteServer")
                             )}
                         </Button>
                     ) : (
@@ -174,10 +175,10 @@ export function TransferOwnershipModal({
                             {isPending ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Transfert...
+                                    {t("transferring")}
                                 </>
                             ) : (
-                                "Transférer et quitter"
+                                t("transferAndLeaveBtn")
                             )}
                         </Button>
                     )}

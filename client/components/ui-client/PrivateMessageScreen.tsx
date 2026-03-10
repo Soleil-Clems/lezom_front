@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Play, Pause, Download, FileText } from "lucide-react";
 import { privateMessageType } from "@/schemas/conversation.dto";
 import { useAuthUser } from "@/hooks/queries/useAuthUser";
@@ -18,6 +20,9 @@ interface PrivateMessageScreenProps {
 }
 
 export default function PrivateMessageScreen({ messages, conversationId }: PrivateMessageScreenProps) {
+    const t = useTranslations("messages");
+    const tc = useTranslations("common");
+    const locale = useLocale();
     const { data: user, isLoading, isError } = useAuthUser();
     const updateMessage = useUpdatePrivateMessage(conversationId);
     const deleteMessage = useDeletePrivateMessage(conversationId);
@@ -97,9 +102,9 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
         try {
             const parts = url.split("/");
             const raw = parts[parts.length - 1];
-            return decodeURIComponent(raw.split("?")[0]) || "Fichier";
+            return decodeURIComponent(raw.split("?")[0]) || tc("file");
         } catch {
-            return "Fichier";
+            return tc("file");
         }
     };
 
@@ -120,13 +125,13 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
         if (days === 0) {
-            return date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+            return date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
         } else if (days === 1) {
-            return "Hier";
+            return tc("yesterday");
         } else if (days < 7) {
-            return date.toLocaleDateString("fr-FR", { weekday: "short" });
+            return date.toLocaleDateString(locale, { weekday: "short" });
         } else {
-            return date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" });
+            return date.toLocaleDateString(locale, { day: "2-digit", month: "2-digit" });
         }
     };
 
@@ -136,7 +141,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
         <div className="w-full p-4 space-y-4">
             {messageList.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-zinc-400">
-                    <p>Aucun message. Commencez la conversation !</p>
+                    <p>{t("noMessagesPrivate")}</p>
                 </div>
             ) : (
                 messageList.map((message) => {
@@ -160,7 +165,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                         >
                             <div className="flex items-center gap-2">
                                 <span className={`text-xs font-bold ${isMyMessage ? "text-emerald-400" : "text-indigo-400"}`}>
-                                    {isMyMessage ? "Moi" : message.sender.username}
+                                    {isMyMessage ? tc("me") : message.sender.username}
                                 </span>
                                 <span className="text-xs text-zinc-500">
                                     {formatDate(message.createdAt)}

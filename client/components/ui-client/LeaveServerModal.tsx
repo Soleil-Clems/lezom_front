@@ -10,6 +10,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type LeaveServerModalProps = {
     isOpen: boolean;
@@ -26,13 +27,16 @@ export function LeaveServerModal({
     serverName,
     isPending,
 }: LeaveServerModalProps) {
+    const t = useTranslations("server");
+    const tc = useTranslations("common");
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="bg-[#313338] border-none text-white sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-rose-400">Quitter le serveur</DialogTitle>
+                    <DialogTitle className="text-rose-400">{t("leaveServer")}</DialogTitle>
                     <DialogDescription className="text-zinc-400">
-                        Voulez-vous vraiment quitter le serveur{" "}
+                        {t("leaveServerConfirm")}{" "}
                         <span className="text-white font-medium">{serverName}</span> ?
                     </DialogDescription>
                 </DialogHeader>
@@ -45,7 +49,7 @@ export function LeaveServerModal({
                         disabled={isPending}
                         className="text-zinc-400 hover:text-white"
                     >
-                        Annuler
+                        {tc("cancel")}
                     </Button>
                     <Button
                         type="button"
@@ -56,10 +60,10 @@ export function LeaveServerModal({
                         {isPending ? (
                             <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Départ...
+                                {t("leaving")}
                             </>
                         ) : (
-                            "Quitter"
+                            t("leave")
                         )}
                     </Button>
                 </DialogFooter>

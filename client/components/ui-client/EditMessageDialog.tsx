@@ -9,6 +9,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface EditMessageDialogProps {
     open: boolean;
@@ -25,6 +26,8 @@ export default function EditMessageDialog({
     onSave,
     isLoading = false,
 }: EditMessageDialogProps) {
+    const t = useTranslations("messageDialog");
+    const tc = useTranslations("common");
     const [content, setContent] = useState(initialContent);
 
     useEffect(() => {
@@ -54,7 +57,7 @@ export default function EditMessageDialog({
             <DialogContent className="bg-zinc-900 border-zinc-700">
                 <DialogHeader>
                     <DialogTitle className="text-zinc-100">
-                        Modifier le message
+                        {t("editMessage")}
                     </DialogTitle>
                 </DialogHeader>
                 <div className="py-4">
@@ -63,11 +66,11 @@ export default function EditMessageDialog({
                         onChange={(e) => setContent(e.target.value)}
                         onKeyDown={handleKeyDown}
                         className="w-full min-h-[100px] p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                        placeholder="Votre message..."
+                        placeholder={t("editPlaceholder")}
                         autoFocus
                     />
                     <p className="text-xs text-zinc-500 mt-2">
-                        Appuyez sur Entrée pour sauvegarder, Shift+Entrée pour une nouvelle ligne
+                        {t("editHint")}
                     </p>
                 </div>
                 <DialogFooter>
@@ -77,14 +80,14 @@ export default function EditMessageDialog({
                         disabled={isLoading}
                         className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
                     >
-                        Annuler
+                        {tc("cancel")}
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={isLoading || !content.trim() || content === initialContent}
                         className="bg-indigo-600 hover:bg-indigo-700 text-white"
                     >
-                        {isLoading ? "Sauvegarde..." : "Sauvegarder"}
+                        {isLoading ? tc("saving") : t("saveMessage")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

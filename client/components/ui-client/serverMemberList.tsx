@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,8 @@ export function ServerMembersList({
     currentUserRole,
     onOpenBanModal
 }: ServerMembersListProps) {
+    const t = useTranslations("settings");
+    const tc = useTranslations("common");
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [searchInput, setSearchInput] = useState("");
@@ -100,20 +103,20 @@ export function ServerMembersList({
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                     <Input
                         type="text"
-                        placeholder="Rechercher un membre..."
+                        placeholder={t("searchMember")}
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         className="pl-9 bg-[#1E1F22] border-white/10 text-white placeholder:text-zinc-500"
                     />
                 </div>
                 <Button type="submit" variant="secondary" size="sm">
-                    Rechercher
+                    {tc("search")}
                 </Button>
             </form>
 
             {members.length === 0 ? (
                 <div className="text-center text-zinc-500 text-sm py-4">
-                    {search ? "Aucun membre trouvé" : "Aucun membre sur ce serveur"}
+                    {search ? tc("noMemberFound") : t("noMembers")}
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -145,7 +148,7 @@ export function ServerMembersList({
             {meta && meta.totalPages > 1 && (
                 <div className="flex items-center justify-between pt-4 border-t border-white/5">
                     <span className="text-xs text-zinc-500">
-                        {meta.total} membre{meta.total > 1 ? "s" : ""} - Page {meta.page}/{meta.totalPages}
+                        {t("totalMembers", { total: meta.total, page: meta.page, totalPages: meta.totalPages })}
                     </span>
                     <div className="flex gap-2">
                         <Button

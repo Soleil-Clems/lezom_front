@@ -28,11 +28,14 @@ import Link from "next/link";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ModalServerContent } from "./modalserver";
 import {useGetAllServers} from "@/hooks/queries/useGetAllServers";
+import { useTranslations } from "next-intl";
 
 export function ServerSidebar() {
   const { data:servers, isError, isLoading } = useGetAllServers();
   const [open, setOpen] = useState(false);
   const { setOpenMobile } = useSidebar();
+  const t = useTranslations("server");
+  const tm = useTranslations("messages");
 
 
   if (isLoading) return <Loading />;
@@ -43,7 +46,7 @@ export function ServerSidebar() {
       <Sidebar collapsible="offcanvas" className="w-[280px] md:w-20 border-r-0 bg-[#1E1F22]">
         <SidebarHeader className="flex items-center justify-center py-4">
           <span className="text-[10px] font-bold tracking-tight text-muted-foreground hidden md:block uppercase">
-            Serveurs
+            {t("servers")}
           </span>
         </SidebarHeader>
 
@@ -56,12 +59,12 @@ export function ServerSidebar() {
                     <MessageSquare size={25} />
                   </div>
                   <span className="block md:hidden font-bold text-zinc-400 hover:text-white">
-                    Messages privés
+                    {tm("privateMessages")}
                   </span>
                 </Link>
               </TooltipTrigger>
               <TooltipContent side="right" className="hidden md:block">
-                <p>Messages privés</p>
+                <p>{tm("privateMessages")}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -85,13 +88,13 @@ export function ServerSidebar() {
                         <Plus size={25} />
                       </div>
                       <span className="block md:hidden font-bold text-zinc-400 hover:text-white">
-                        Ajouter un serveur
+                        {t("addServer")}
                       </span>
                     </button>
                   </TooltipTrigger>
                 </DialogTrigger>
                 <TooltipContent side="right" className="hidden md:block">
-                  <p>Ajouter un serveur</p>
+                  <p>{t("addServer")}</p>
                 </TooltipContent>
               </Tooltip>
               <ModalServerContent onSuccess={() => setOpen(false)}/>

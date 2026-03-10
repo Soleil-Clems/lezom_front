@@ -27,6 +27,7 @@ import { TransferOwnershipModal } from "./TransferOwnershipModal";
 import { useLeaveServer } from "@/hooks/mutations/useLeaveServer";
 import { useDeleteServer } from "@/hooks/mutations/updateServerSettings";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface ServerSettingsDropdownProps {
   serverId: string | number;
@@ -41,6 +42,7 @@ export function ServerSettingsDropdown({
   serverName,
   currentUserId,
 }: ServerSettingsDropdownProps) {
+  const t = useTranslations("server");
   const canAccessSettings = userRole === "server_owner" || userRole === "server_admin";
   const isOwner = userRole === "server_owner";
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
@@ -78,7 +80,7 @@ export function ServerSettingsDropdown({
 
           <DropdownMenuContent className="w-56 bg-[#111214] border-none text-[#b5bac1] p-2">
             <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-bold uppercase text-zinc-500">
-              Options du serveur
+              {t("serverOptions")}
             </DropdownMenuLabel>
 
             <DropdownMenuGroup className="space-y-0.5">
@@ -89,7 +91,7 @@ export function ServerSettingsDropdown({
                     onSelect={(e) => e.preventDefault()}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    <span className="text-sm font-medium">Créer un channel</span>
+                    <span className="text-sm font-medium">{t("createChannel")}</span>
                   </DropdownMenuItem>
                 </DialogTrigger>
               )}
@@ -102,7 +104,7 @@ export function ServerSettingsDropdown({
                   <Link href={`/settings/${serverId}`}>
                     <Settings2 className="mr-2 h-4 w-4" />
                     <span className="text-sm font-medium">
-                      Paramètres serveur
+                      {t("serverSettings")}
                     </span>
                   </Link>
                 </DropdownMenuItem>
@@ -117,7 +119,7 @@ export function ServerSettingsDropdown({
               >
                 <UserPlus className="mr-2 h-4 w-4" />
                 <span className="text-sm font-medium">
-                  Inviter sur le serveur
+                  {t("inviteToServer")}
                 </span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -132,7 +134,7 @@ export function ServerSettingsDropdown({
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              <span className="text-sm font-medium">Quitter le serveur</span>
+              <span className="text-sm font-medium">{t("leaveServer")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

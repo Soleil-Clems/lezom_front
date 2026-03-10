@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -23,32 +24,34 @@ type InvitationModalContentProps = {
     onOpenChange?: (open: boolean) => void;
 }
 
-const MAX_USES_OPTIONS = [
-    { label: "1 utilisation", value: "1" },
-    { label: "5 utilisations", value: "5" },
-    { label: "10 utilisations", value: "10" },
-    { label: "25 utilisations", value: "25" },
-    { label: "50 utilisations", value: "50" },
-    { label: "100 utilisations", value: "100" },
-    { label: "Illimité", value: "unlimited" },
-]
-
-const EXPIRES_OPTIONS = [
-    { label: "30 minutes", value: "1800" },
-    { label: "1 heure", value: "3600" },
-    { label: "6 heures", value: "21600" },
-    { label: "12 heures", value: "43200" },
-    { label: "1 jour", value: "86400" },
-    { label: "7 jours", value: "604800" },
-    { label: "Jamais", value: "never" },
-]
-
-function getExpirationLabel(expiresIn: string): string {
-    const option = EXPIRES_OPTIONS.find(o => o.value === expiresIn)
-    return option ? option.label.toLowerCase() : ""
-}
-
 export function InvitationModalContent({ serverId, open, onOpenChange }: InvitationModalContentProps) {
+    const t = useTranslations("invitation")
+    const tc = useTranslations("common")
+
+    const MAX_USES_OPTIONS = [
+        { label: t("use1"), value: "1" },
+        { label: t("use5"), value: "5" },
+        { label: t("use10"), value: "10" },
+        { label: t("use25"), value: "25" },
+        { label: t("use50"), value: "50" },
+        { label: t("use100"), value: "100" },
+        { label: t("unlimited"), value: "unlimited" },
+    ]
+
+    const EXPIRES_OPTIONS = [
+        { label: t("minutes30"), value: "1800" },
+        { label: t("hour1"), value: "3600" },
+        { label: t("hours6"), value: "21600" },
+        { label: t("hours12"), value: "43200" },
+        { label: t("day1"), value: "86400" },
+        { label: t("days7"), value: "604800" },
+        { label: t("never"), value: "never" },
+    ]
+
+    const getExpirationLabel = (expiresIn: string): string => {
+        const option = EXPIRES_OPTIONS.find(o => o.value === expiresIn)
+        return option ? option.label.toLowerCase() : ""
+    }
     const [maxUses, setMaxUses] = useState("unlimited")
     const [expiresIn, setExpiresIn] = useState("604800")
     const [invitation, setInvitation] = useState<any>(null)
@@ -102,16 +105,16 @@ export function InvitationModalContent({ serverId, open, onOpenChange }: Invitat
     return (
         <DialogContent className="bg-[#313338] border-none text-white sm:max-w-md">
             <DialogHeader>
-                <DialogTitle>Inviter sur le serveur</DialogTitle>
+                <DialogTitle>{t("inviteToServer")}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4">
                 <div className="space-y-2">
-                    <p className="text-zinc-400 text-sm">Envoie ce lien à un ami :</p>
+                    <p className="text-zinc-400 text-sm">{t("sendLink")}</p>
                     <div className="flex items-center gap-2">
                         <Input
                             readOnly
-                            value={createInvitation.isPending ? "Génération..." : invitationUrl}
+                            value={createInvitation.isPending ? tc("generating") : invitationUrl}
                             className="bg-[#1e1f22] border-none text-zinc-300"
                         />
                         <Button
@@ -120,12 +123,12 @@ export function InvitationModalContent({ serverId, open, onOpenChange }: Invitat
                             disabled={!invitation}
                             className="bg-indigo-500 hover:bg-indigo-600 text-white shrink-0"
                         >
-                            {copied ? <Check className="h-4 w-4" /> : "Copier"}
+                            {copied ? <Check className="h-4 w-4" /> : tc("copy")}
                         </Button>
                     </div>
                     {invitation && (
                         <p className="text-zinc-500 text-xs">
-                            Ton lien d'invitation expire {expiresIn === "never" ? "jamais" : `dans ${getExpirationLabel(expiresIn)}`}.
+                            {t("linkExpires", { expiry: expiresIn === "never" ? t("never").toLowerCase() : getExpirationLabel(expiresIn) })}
                         </p>
                     )}
                 </div>
@@ -137,13 +140,13 @@ export function InvitationModalContent({ serverId, open, onOpenChange }: Invitat
                         className="flex items-center gap-1 text-sm text-indigo-400 hover:text-indigo-300"
                     >
                         {showSettings ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                        Modifier les paramètres
+                        {t("editSettings")}
                     </button>
 
                     {showSettings && (
                         <div className="mt-3 p-4 bg-[#2b2d31] rounded-md space-y-4">
                             <div className="space-y-2">
-                                <label className="text-sm text-zinc-400">Expire après</label>
+                                <label className="text-sm text-zinc-400">{t("expiresAfter")}</label>
                                 <Select value={expiresIn} onValueChange={setExpiresIn}>
                                     <SelectTrigger className="w-full bg-[#1e1f22] border-none text-zinc-300">
                                         <SelectValue />
@@ -163,7 +166,7 @@ export function InvitationModalContent({ serverId, open, onOpenChange }: Invitat
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm text-zinc-400">Nombre maximum d'utilisations</label>
+                                <label className="text-sm text-zinc-400">{t("maxUses")}</label>
                                 <Select value={maxUses} onValueChange={setMaxUses}>
                                     <SelectTrigger className="w-full bg-[#1e1f22] border-none text-zinc-300">
                                         <SelectValue />
@@ -187,7 +190,7 @@ export function InvitationModalContent({ serverId, open, onOpenChange }: Invitat
                                 disabled={createInvitation.isPending}
                                 className="w-full bg-indigo-500 hover:bg-indigo-600 text-white"
                             >
-                                {createInvitation.isPending ? "Génération..." : "Générer un nouveau lien"}
+                                {createInvitation.isPending ? tc("generating") : t("generateNewLink")}
                             </Button>
                         </div>
                     )}

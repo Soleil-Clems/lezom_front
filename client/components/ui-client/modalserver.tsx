@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreateServerDto } from "@/schemas/create-server.dto";
 import { useCreateServer } from "@/hooks/mutations/useCreateServer";
+import { useTranslations } from "next-intl";
 
 type ModalServerContentProps = {
   onSuccess: () => void;
@@ -20,6 +21,8 @@ type ModalServerContentProps = {
 
 export function ModalServerContent({ onSuccess }: ModalServerContentProps) {
   const createServerMutation = useCreateServer();
+  const t = useTranslations("server");
+  const tc = useTranslations("common");
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,7 +37,7 @@ export function ModalServerContent({ onSuccess }: ModalServerContentProps) {
       await createServerMutation.mutateAsync(body as CreateServerDto);
       onSuccess();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Une erreur est survenue";
+      const message = error instanceof Error ? error.message : tc("errorOccurred");
       alert(`Erreur : ${message}`);
     }
   };
@@ -44,10 +47,10 @@ export function ModalServerContent({ onSuccess }: ModalServerContentProps) {
       <form onSubmit={handleSubmit}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center text-white">
-            Crée ton serveur
+            {t("createServer")}
           </DialogTitle>
           <DialogDescription className="text-center text-[#b5bac1]">
-            Donne un nom à ton serveur pour commencer.
+            {t("createServerDesc")}
           </DialogDescription>
         </DialogHeader>
 
@@ -57,12 +60,12 @@ export function ModalServerContent({ onSuccess }: ModalServerContentProps) {
               htmlFor="name_server"
               className="text-xs font-bold uppercase text-[#b5bac1]"
             >
-              Nom du serveur
+              {t("serverName")}
             </Label>
             <Input
               id="name_server"
               name="name_server"
-              placeholder="nom du serveur"
+              placeholder={t("serverNamePlaceholder")}
               required
               className="bg-[#1e1f22] border-none text-white h-12 focus-visible:ring-1 focus-visible:ring-indigo-500"
             />
@@ -76,7 +79,7 @@ export function ModalServerContent({ onSuccess }: ModalServerContentProps) {
               variant="ghost"
               className="text-white hover:bg-transparent hover:underline"
             >
-              Retour
+              {tc("back")}
             </Button>
           </DialogClose>
           <Button
@@ -84,7 +87,7 @@ export function ModalServerContent({ onSuccess }: ModalServerContentProps) {
             disabled={createServerMutation.isPending}
             className="bg-[#5865f2] hover:bg-[#4752c4] text-white px-8"
           >
-            {createServerMutation.isPending ? "Création..." : "Créer"}
+            {createServerMutation.isPending ? tc("creating") : t("create")}
           </Button>
         </DialogFooter>
       </form>

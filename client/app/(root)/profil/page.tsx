@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Mail, Shield, Calendar, Pencil, Camera } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -20,8 +22,12 @@ import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 import useAuthStore from "@/store/authStore";
 import { EditProfileInfoForm } from "@/components/ui-client/EditProfileInfoForm";
+import { LanguageSwitcher } from "@/components/ui-client/LanguageSwitcher";
 
 export default function ProfilePage() {
+  const t = useTranslations("profile");
+  const ta = useTranslations("auth");
+  const locale = useLocale();
   const { data: user, isLoading, isError } = useAuthUser();
   const { logout } = useAuthStore();
   const editPictureMutation = useEditProfilPicture(user?.id);
@@ -31,7 +37,7 @@ export default function ProfilePage() {
   if (isLoading) return <Loading />;
   if (isError || !user) return <Error />;
 
-  const joinedDate = new Date(user.createdAt).toLocaleDateString("fr-FR", {
+  const joinedDate = new Date(user.createdAt).toLocaleDateString(locale, {
     month: "long",
     year: "numeric",
   });
@@ -111,7 +117,7 @@ export default function ProfilePage() {
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogContent className="dark bg-[#313338] border-zinc-700 text-white">
             <DialogHeader>
-              <DialogTitle>Modifier votre profil</DialogTitle>
+              <DialogTitle>{t("editProfile")}</DialogTitle>
             </DialogHeader>
             <EditProfileInfoForm
               user={user}
@@ -126,22 +132,21 @@ export default function ProfilePage() {
           <div className="md:col-span-2 space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
               <CardHeader className="text-white font-semibold">
-                À propos de moi
+                {t("aboutMe")}
               </CardHeader>
               <CardContent>
                 <p>
-                  {user.description || "Cet utilisateur n'a pas encore de bio."}
+                  {user.description || t("noBio")}
                 </p>
               </CardContent>
             </Card>
 
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
               <CardHeader className="text-white font-semibold">
-                Activité récente
+                {t("recentActivity")}
               </CardHeader>
               <CardContent className="text-sm italic text-zinc-500">
-                Dernière connexion le{" "}
-                {new Date(user.lastSeen).toLocaleDateString()}
+                {t("lastSeen", { date: new Date(user.lastSeen).toLocaleDateString(locale) })}
               </CardContent>
             </Card>
           </div>
@@ -149,7 +154,7 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
               <CardHeader className="text-white font-semibold">
-                Informations
+                {t("information")}
               </CardHeader>
               <CardContent className="space-y-4 text-sm">
                 <div className="flex items-center gap-3">
@@ -158,20 +163,21 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Calendar size={18} className="text-zinc-500" />
-                  <span>Membre depuis {joinedDate}</span>
+                  <span>{t("memberSince", { date: joinedDate })}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield size={18} className="text-zinc-400" />
                   <span className="text-indigo-400 font-medium capitalize">
-                    Badge {user.role}
+                    {t("badge", { role: user.role })}
                   </span>
                 </div>
-                <div className="pt-4 w-54">
+                <div className="pt-4 space-y-3">
+                  <LanguageSwitcher />
                   <Button
                     className="w-full hover:bg-red-500 bg-grey-purple text-white border border-black-200"
                     onClick={() => logout()}
                   >
-                    Se déconnecter
+                    {ta("logout")}
                   </Button>
                 </div>
               </CardContent>

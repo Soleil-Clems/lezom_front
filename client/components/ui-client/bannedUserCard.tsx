@@ -2,6 +2,8 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { UserX, Loader2 } from "lucide-react";
 import { BanType } from "@/schemas/ban.dto";
 
@@ -12,7 +14,10 @@ type BannedUserCardProps = {
 };
 
 export function BannedUserCard({ ban, isPending, onOpenUnbanModal }: BannedUserCardProps) {
-    const formattedDate = new Date(ban.bannedAt).toLocaleDateString("fr-FR", {
+    const t = useTranslations("ban");
+    const locale = useLocale();
+
+    const formattedDate = new Date(ban.bannedAt).toLocaleDateString(locale, {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -28,11 +33,11 @@ export function BannedUserCard({ ban, isPending, onOpenUnbanModal }: BannedUserC
                     <div>
                         <p className="text-white font-medium">{ban.user.username}</p>
                         <p className="text-xs text-zinc-500">
-                            Banni {ban.bannedBy ? `par ${ban.bannedBy.username}` : ""} le {formattedDate}
+                            {t("bannedBy", { username: ban.bannedBy?.username ?? "", date: formattedDate })}
                         </p>
                         {ban.reason && (
                             <p className="text-xs text-zinc-400 mt-1">
-                                Raison: {ban.reason}
+                                {t("reasonLabel", { reason: ban.reason })}
                             </p>
                         )}
                     </div>
@@ -47,7 +52,7 @@ export function BannedUserCard({ ban, isPending, onOpenUnbanModal }: BannedUserC
                     {isPending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                        "Débannir"
+                        t("unban")
                     )}
                 </Button>
             </CardContent>

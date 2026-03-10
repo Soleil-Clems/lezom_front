@@ -10,6 +10,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type DeleteConfirmModalProps = {
     isOpen: boolean;
@@ -31,9 +32,14 @@ export function DeleteConfirmModal({
     message,
     itemName,
     isPending,
-    confirmLabel = "Supprimer",
-    pendingLabel = "Suppression...",
+    confirmLabel,
+    pendingLabel,
 }: DeleteConfirmModalProps) {
+    const t = useTranslations("common");
+
+    const resolvedConfirmLabel = confirmLabel ?? t("delete");
+    const resolvedPendingLabel = pendingLabel ?? t("deleting");
+
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="bg-[#313338] border-none text-white sm:max-w-md">
@@ -52,7 +58,7 @@ export function DeleteConfirmModal({
                         disabled={isPending}
                         className="text-zinc-400 hover:text-white"
                     >
-                        Annuler
+                        {t("cancel")}
                     </Button>
                     <Button
                         type="button"
@@ -63,10 +69,10 @@ export function DeleteConfirmModal({
                         {isPending ? (
                             <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                {pendingLabel}
+                                {resolvedPendingLabel}
                             </>
                         ) : (
-                            confirmLabel
+                            resolvedConfirmLabel
                         )}
                     </Button>
                 </DialogFooter>

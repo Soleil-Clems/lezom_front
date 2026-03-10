@@ -8,6 +8,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useTranslations } from "next-intl";
 
 export interface MessageActionsProps {
     canEdit: boolean;
@@ -22,6 +23,9 @@ export default function MessageActions({
     onEdit,
     onDelete,
 }: MessageActionsProps) {
+    const t = useTranslations("messageDialog");
+    const tc = useTranslations("common");
+
     if (!canEdit && !canDelete) return null;
 
     return (
@@ -38,7 +42,7 @@ export default function MessageActions({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-zinc-900 text-xs">
-                            Modifier
+                            {t("edit")}
                         </TooltipContent>
                     </Tooltip>
                 )}
@@ -53,7 +57,7 @@ export default function MessageActions({
                             </button>
                         </TooltipTrigger>
                         <TooltipContent side="top" className="bg-zinc-900 text-xs">
-                            Supprimer
+                            {tc("delete")}
                         </TooltipContent>
                     </Tooltip>
                 )}

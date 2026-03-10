@@ -17,6 +17,7 @@ import { useAuthUser } from "@/hooks/queries/useAuthUser"
 import { useGetAllServers } from "@/hooks/queries/useGetAllServers"
 import { useUpdateServer, useDeleteServer } from "@/hooks/mutations/updateServerSettings"
 import { useBanUser } from "@/hooks/mutations/useBanManagement"
+import { useTranslations } from "next-intl"
 
 type MemberToBan = {
     id: number
@@ -28,6 +29,9 @@ export default function SettingsPage() {
     const params = useParams()
     const serverId = params.serverId as string
 
+    const t = useTranslations("settings")
+    const ts = useTranslations("server")
+    const tc = useTranslations("common")
     const { data: user, isLoading: authLoading } = useAuthUser()
     const { data: allServersData, isLoading: serversLoading } = useGetAllServers()
 
@@ -52,9 +56,9 @@ export default function SettingsPage() {
     if (!currentServer) {
         return (
             <div className="h-screen w-full flex flex-col items-center justify-center bg-[#313338] text-white">
-                <p>Serveur non trouvé</p>
+                <p>{ts("serverNotFound")}</p>
                 <Button variant="ghost" onClick={() => router.back()} className="mt-4">
-                    <ArrowLeft className="w-4 h-4 mr-2" /> Retour
+                    <ArrowLeft className="w-4 h-4 mr-2" /> {tc("back")}
                 </Button>
             </div>
         )
@@ -96,25 +100,25 @@ export default function SettingsPage() {
                 <header className="flex items-center justify-between border-b border-white/10 pb-6">
                     <div className="flex items-center gap-3 text-white">
                         <Settings2 className="w-8 h-8 text-zinc-400" />
-                        <h1 className="text-2xl font-bold">Paramètres</h1>
+                        <h1 className="text-2xl font-bold">{t("settings")}</h1>
                     </div>
                     <Button variant="ghost" onClick={() => router.back()} className="text-zinc-400">
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Retour
+                        <ArrowLeft className="w-4 h-4 mr-2" /> {tc("back")}
                     </Button>
                 </header>
 
                 <Tabs defaultValue="servers">
                     <TabsList className="bg-[#1E1F22] mb-6 w-full">
-                        <TabsTrigger value="servers" className="flex-1 px-2 sm:px-10">Serveurs</TabsTrigger>
-                        <TabsTrigger value="channels" className="flex-1 px-2 sm:px-10">Salons</TabsTrigger>
-                        <TabsTrigger value="members" className="flex-1 px-2 sm:px-10">Membres</TabsTrigger>
+                        <TabsTrigger value="servers" className="flex-1 px-2 sm:px-10">{t("servers")}</TabsTrigger>
+                        <TabsTrigger value="channels" className="flex-1 px-2 sm:px-10">{t("channels")}</TabsTrigger>
+                        <TabsTrigger value="members" className="flex-1 px-2 sm:px-10">{t("members")}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="servers" className="space-y-4 outline-none">
                         <ManagementCard
                             key={currentServer.id}
                             id={currentServer.id}
-                            label="Nom du serveur"
+                            label={ts("serverName")}
                             initialValue={currentServer.name}
                             type="server"
                             onSave={(newName: string) => updateServer.mutate({ id: currentServer.id, name: newName })}
@@ -140,7 +144,7 @@ export default function SettingsPage() {
                         <div>
                             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                                 <Server size={18} className="text-indigo-400" />
-                                Membres du serveur
+                                {t("serverMembers")}
                             </h2>
                             <div className="bg-[#2B2D31] rounded-xl border border-white/5 overflow-hidden mb-4">
                                 <div className="bg-[#1E1F22] px-4 py-3 flex items-center gap-2 border-b border-white/5">
@@ -161,7 +165,7 @@ export default function SettingsPage() {
                         <div>
                             <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                                 <UserX size={18} className="text-rose-400" />
-                                Utilisateurs bannis
+                                {t("bannedUsers")}
                             </h2>
                             <div className="bg-[#2B2D31] rounded-xl border border-white/5 overflow-hidden mb-4">
                                 <div className="bg-[#1E1F22] px-4 py-3 flex items-center gap-2 border-b border-white/5">
