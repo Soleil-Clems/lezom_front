@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { userUpdateType } from "@/schemas/user.dto";
 
-export function useEditProfil(id: string) {
+export function useEditProfil(id: number) {
   const queryClient = useQueryClient();
 
   return useMutation({
