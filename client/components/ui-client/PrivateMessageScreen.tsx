@@ -11,13 +11,15 @@ import Error from "@/components/ui-client/Error";
 import MessageActions from "@/components/ui-client/MessageActions";
 import EditMessageDialog from "@/components/ui-client/EditMessageDialog";
 import DeleteMessageDialog from "@/components/ui-client/DeleteMessageDialog";
+import MessageReactions from "@/components/ui-client/messageReactions";
 
 interface PrivateMessageScreenProps {
     messages: privateMessageType[];
     conversationId?: string;
+    onAddReaction?: (messageId: number, emoji: string) => void;
 }
 
-export default function PrivateMessageScreen({ messages, conversationId }: PrivateMessageScreenProps) {
+export default function PrivateMessageScreen({ messages, conversationId, onAddReaction }: PrivateMessageScreenProps) {
     const { data: user, isLoading, isError } = useAuthUser();
     const updateMessage = useUpdatePrivateMessage(conversationId);
     const deleteMessage = useDeletePrivateMessage(conversationId);
@@ -155,7 +157,7 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                     return (
                         <div
                             key={message.id}
-                            className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
+                            className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
                             onClick={() => setActiveMessageId(isActive ? null : message.id)}
                         >
                             <div className="flex items-center gap-2">
@@ -170,11 +172,9 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                             {/* ── GIF ── */}
                             {isGif && (
                                 <div className="relative group">
-                                    {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
-                                            <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
-                                        </div>
-                                    )}
+                                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
+                                        <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} onReact={(emoji) => { onAddReaction?.(message.id, emoji); setActiveMessageId(null); }} />
+                                    </div>
                                     <img
                                         src={message.content}
                                         alt="GIF"
@@ -189,12 +189,10 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
 
                             {/* ── IMAGE ── */}
                             {isImage && (
-                                <div className="relative">
-                                    {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
-                                            <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
-                                        </div>
-                                    )}
+                                <div className="relative group">
+                                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
+                                        <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} onReact={(emoji) => { onAddReaction?.(message.id, emoji); setActiveMessageId(null); }} />
+                                    </div>
                                     <img
                                         src={message.content}
                                         alt="Image"
@@ -207,12 +205,10 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
 
                             {/* ── VOICE ── */}
                             {isVoice && (
-                                <div className="relative">
-                                    {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
-                                            <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
-                                        </div>
-                                    )}
+                                <div className="relative group">
+                                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
+                                        <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} onReact={(emoji) => { onAddReaction?.(message.id, emoji); setActiveMessageId(null); }} />
+                                    </div>
                                     <div className={`flex items-center gap-3 p-3 rounded-xl min-w-[220px] max-w-[320px] ${isMyMessage ? "bg-indigo-600" : "bg-[#383a40]"}`}>
                                         <button
                                             onClick={() => toggleAudio(message.id, message.content)}
@@ -240,12 +236,10 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
 
                             {/* ── FILE ── */}
                             {isFile && (
-                                <div className="relative">
-                                    {canDelete && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
-                                            <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} />
-                                        </div>
-                                    )}
+                                <div className="relative group">
+                                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
+                                        <MessageActions canEdit={false} canDelete={canDelete} onDelete={() => setDeletingMessage(message)} onReact={(emoji) => { onAddReaction?.(message.id, emoji); setActiveMessageId(null); }} />
+                                    </div>
                                     <a
                                         href={message.content}
                                         target="_blank"
@@ -276,25 +270,30 @@ export default function PrivateMessageScreen({ messages, conversationId }: Priva
                             {/* ── TEXT ── */}
                             {isText && (
                                 <div
-                                    className={`relative p-3 max-w-[80%] break-words ${
+                                    className={`relative group p-3 max-w-[80%] wrap-break-word ${
                                         isMyMessage
                                             ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
                                             : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
                                     }`}
                                 >
-                                    {(canEdit || canDelete) && (
-                                        <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
-                                            <MessageActions
-                                                canEdit={canEdit}
-                                                canDelete={canDelete}
-                                                onEdit={() => setEditingMessage(message)}
-                                                onDelete={() => setDeletingMessage(message)}
-                                            />
-                                        </div>
-                                    )}
+                                    <div className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${actionsVisibility}`} onClick={(e) => e.stopPropagation()}>
+                                        <MessageActions
+                                            canEdit={canEdit}
+                                            canDelete={canDelete}
+                                            onEdit={() => setEditingMessage(message)}
+                                            onDelete={() => setDeletingMessage(message)}
+                                            onReact={(emoji) => { onAddReaction?.(message.id, emoji); setActiveMessageId(null); }}
+                                        />
+                                    </div>
                                     {message.content}
                                 </div>
                             )}
+
+                            <MessageReactions
+                                reactions={message.reactions ?? []}
+                                currentUserId={Number(user?.id ?? 0)}
+                                onReact={(emoji) => { onAddReaction?.(message.id, emoji); setActiveMessageId(null); }}
+                            />
                         </div>
                     );
                 })

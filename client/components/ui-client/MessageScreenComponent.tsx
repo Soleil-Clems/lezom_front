@@ -13,6 +13,7 @@ import SystemMessage from "@/components/ui-client/SystemMessage";
 import MessageActions from "@/components/ui-client/MessageActions";
 import EditMessageDialog from "@/components/ui-client/EditMessageDialog";
 import DeleteMessageDialog from "@/components/ui-client/DeleteMessageDialog";
+import MessageReactions from "@/components/ui-client/messageReactions";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,7 @@ interface Props {
   channelId?: string;
   onUpdateMessage?: (messageId: number, content: string) => void;
   onRemoveMessage?: (messageId: number) => void;
+  onAddReaction?: (messageId: number, emoji: string) => void;
 }
 
 export default function MessageScreenComponent({
@@ -34,6 +36,7 @@ export default function MessageScreenComponent({
                                                  channelId,
                                                  onUpdateMessage,
                                                  onRemoveMessage,
+                                                 onAddReaction,
                                                }: Props) {
   const { data: user, isLoading, isError } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
@@ -50,6 +53,7 @@ export default function MessageScreenComponent({
 
   const [editingMessage, setEditingMessage] = useState<messageType | null>(null);
   const [deletingMessage, setDeletingMessage] = useState<messageType | null>(null);
+  const [activeMessageId, setActiveMessageId] = useState<number | null>(null);
   const [playingAudioId, setPlayingAudioId] = useState<number | null>(null);
   const audioRefs = useRef<Map<number, HTMLAudioElement>>(new Map());
 
@@ -235,10 +239,13 @@ export default function MessageScreenComponent({
   }) => {
     const canDelete = canDeleteMessage(message);
 
+    const isActive = activeMessageId === Number(message.id);
+
     return (
         <div
             key={message.id}
-            className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
+            className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
+            onClick={() => setActiveMessageId(isActive ? null : Number(message.id))}
         >
           <div className="flex items-center gap-2">
             <AuthorName message={message} isMyMessage={isMyMessage} />
@@ -246,20 +253,27 @@ export default function MessageScreenComponent({
             {formatDate(message.createdAt)}
           </span>
           </div>
-          <div className="relative">
+          <div className="relative group">
             {canDelete && (
                 <div
-                    className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}
+                    className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${isActive ? "opacity-100" : "opacity-0"} sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}
+                    onClick={(e) => e.stopPropagation()}
                 >
                   <MessageActions
                       canEdit={false}
                       canDelete={canDelete}
                       onDelete={() => setDeletingMessage(message)}
+                      onReact={(emoji) => { onAddReaction?.(Number(message.id), emoji); setActiveMessageId(null); }}
                   />
                 </div>
             )}
             {children}
           </div>
+          <MessageReactions
+              reactions={message.reactions ?? []}
+              currentUserId={Number(user?.id ?? 0)}
+              onReact={(emoji) => { onAddReaction?.(Number(message.id), emoji); setActiveMessageId(null); }}
+          />
         </div>
     );
   };
@@ -447,10 +461,13 @@ export default function MessageScreenComponent({
                 const canEdit = canEditMessage(message);
                 const canDelete = canDeleteMessage(message);
 
+                const isActive = activeMessageId === Number(message.id);
+
                 return (
                     <div
                         key={message.id}
-                        className={`flex flex-col gap-1 group ${isMyMessage ? "items-end" : "items-start"}`}
+                        className={`flex flex-col gap-1 ${isMyMessage ? "items-end" : "items-start"}`}
+                        onClick={() => setActiveMessageId(isActive ? null : Number(message.id))}
                     >
                       <div className="flex items-center gap-2">
                         <AuthorName message={message} isMyMessage={isMyMessage} />
@@ -459,7 +476,7 @@ export default function MessageScreenComponent({
                   </span>
                       </div>
                       <div
-                          className={`relative p-3 max-w-[80%] break-words ${
+                          className={`relative group p-3 max-w-[80%] wrap-break-word ${
                               isMyMessage
                                   ? "bg-indigo-600 rounded-l-xl rounded-br-xl text-white"
                                   : "bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200"
@@ -467,18 +484,25 @@ export default function MessageScreenComponent({
                       >
                         {(canEdit || canDelete) && (
                             <div
-                                className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} opacity-0 group-hover:opacity-100 transition-opacity z-10`}
+                                className={`absolute -top-4 ${isMyMessage ? "-left-2" : "-right-2"} ${isActive ? "opacity-100" : "opacity-0"} sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10`}
+                                onClick={(e) => e.stopPropagation()}
                             >
                               <MessageActions
                                   canEdit={canEdit}
                                   canDelete={canDelete}
                                   onEdit={() => setEditingMessage(message)}
                                   onDelete={() => setDeletingMessage(message)}
+                                  onReact={(emoji) => { onAddReaction?.(Number(message.id), emoji); setActiveMessageId(null); }}
                               />
                             </div>
                         )}
                         {message.content}
                       </div>
+                      <MessageReactions
+                          reactions={message.reactions ?? []}
+                          currentUserId={Number(user?.id ?? 0)}
+                          onReact={(emoji) => { onAddReaction?.(Number(message.id), emoji); setActiveMessageId(null); }}
+                      />
                     </div>
                 );
               })}
