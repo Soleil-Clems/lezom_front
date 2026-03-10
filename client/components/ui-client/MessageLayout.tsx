@@ -11,7 +11,7 @@ export default function MessageLayout({ channelId }: { channelId: string }) {
   const params = useParams();
   const serverId = params.serverId as string;
 
-  const { messages, isLoading, typingUsers, updateMessage, removeMessage } =
+  const { messages, isLoading, typingUsers, updateMessage, removeMessage, addReaction } =
     useSocketMessages(channelId);
 
   if (isLoading) return <Loading />;
@@ -26,6 +26,7 @@ export default function MessageLayout({ channelId }: { channelId: string }) {
             channelId={channelId}
             onUpdateMessage={updateMessage}
             onRemoveMessage={removeMessage}
+            onAddReaction={addReaction}
           />
         </div>
         <div className="shrink-0">

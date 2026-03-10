@@ -25,6 +25,7 @@ export type sendMessageType = z.infer<typeof sendMessageSchema>*/
 import z from "zod"
 import {MessageTypeEnum} from "@/enums/enum";
 import {userSchema} from "@/schemas/user.dto";
+import { reactionSchema } from "./reaction.dto";
 
 
 export const messageSchema = z.object({
@@ -33,6 +34,7 @@ export const messageSchema = z.object({
     type: MessageTypeEnum,
     createdAt: z.date().optional(),
     author: userSchema,
+    reactions: z.array(reactionSchema).optional()
 })
 
 export const sendMessageSchema = z
