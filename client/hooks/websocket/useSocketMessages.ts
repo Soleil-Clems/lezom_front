@@ -42,6 +42,11 @@ export function useSocketMessages(channelId?: string) {
             setMessages((prev) => prev.filter((m) => m.id !== messageId));
         };
 
+        const handleReactionAdded = (addReaction: messageType) => {
+            setMessages((prev) =>
+                prev.map((m) => (Number(m.id) === Number(addReaction.id) ? addReaction : m)))
+        }
+
         const handleUserTyping = ({ firstname, isTyping }: { firstname: string, isTyping: boolean }) => {
             setTypingUsers((prev) =>
                 isTyping
@@ -54,6 +59,7 @@ export function useSocketMessages(channelId?: string) {
         socket.on('messageUpdated', handleMessageUpdated);
         socket.on('messageDeleted', handleMessageDeleted);
         socket.on('userTyping', handleUserTyping);
+        socket.on('reactionAdded',handleReactionAdded);
 
         socket.emit('joinChannel', parseInt(channelId), (history: messageType[]) => {
             const merged = [...history];
@@ -73,6 +79,7 @@ export function useSocketMessages(channelId?: string) {
             socket.off('messageUpdated', handleMessageUpdated);
             socket.off('messageDeleted', handleMessageDeleted);
             socket.off('userTyping', handleUserTyping);
+            socket.off('reactionAdded', handleReactionAdded);
         };
     }, [channelId, isConnected, socket]);
 
@@ -86,5 +93,9 @@ export function useSocketMessages(channelId?: string) {
         setMessages((prev) => prev.filter((m) => m.id !== messageId));
     };
 
-    return { messages, isLoading, typingUsers, updateMessage, removeMessage };
+    const addReaction = (messageId: number, emoji: string) => {
+        socket?.emit('addReaction', { messageId, emoji, channelId: parseInt(channelId ?? '0') })
+    };
+
+    return { messages, isLoading, typingUsers, updateMessage, removeMessage, addReaction };
 }

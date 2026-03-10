@@ -12,7 +12,7 @@ interface MessagesResponse {
 }
 
 export function useSocketPrivateMessages(conversationId?: string) {
-    const { isConnected, on, off } = useSocket();
+    const { isConnected, on, off, socket } = useSocket();
     const queryClient = useQueryClient();
 
     useEffect(() => {
@@ -83,9 +83,25 @@ export function useSocketPrivateMessages(conversationId?: string) {
             );
         };
 
+        const handlePrivateReactionAdded = (updatedMessage: any) => {
+            queryClient.setQueryData<MessagesResponse>(
+                ["conversationMessages", conversationId],
+                (old) => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        messages: old.messages.map((msg) =>
+                            Number(msg.id) === Number(updatedMessage.id) ? { ...msg, ...updatedMessage } : msg
+                        ),
+                    };
+                }
+            );
+        };
+
         on("newPrivateMessage", handleNewPrivateMessage);
         on("privateMessageUpdated", handlePrivateMessageUpdated);
         on("privateMessageDeleted", handlePrivateMessageDeleted);
+        on("privateReactionAdded", handlePrivateReactionAdded);
 
         // Refetch pour rattraper les messages arrivés avant l'attachement des listeners
         queryClient.invalidateQueries({
@@ -96,6 +112,17 @@ export function useSocketPrivateMessages(conversationId?: string) {
             off("newPrivateMessage", handleNewPrivateMessage);
             off("privateMessageUpdated", handlePrivateMessageUpdated);
             off("privateMessageDeleted", handlePrivateMessageDeleted);
+            off("privateReactionAdded", handlePrivateReactionAdded);
         };
     }, [isConnected, conversationId, on, off, queryClient]);
+
+    const addPrivateReaction = (messageId: number, emoji: string) => {
+        socket?.emit('addPrivateReaction', {
+            messageId,
+            emoji,
+            conversationId: parseInt(conversationId ?? '0'),
+        });
+    };
+
+    return { addPrivateReaction };
 }

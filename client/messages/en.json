@@ -43,7 +43,8 @@
     "selectDate": "Select a date",
     "createMyAccount": "Create my account",
     "alreadyHaveAccount": "Already have an account?",
-    "logout": "Log out"
+    "logout": "Log out",
+    "captchaRequired": "Please complete the captcha"
   },
   "validation": {
     "emailInvalid": "Invalid email",
