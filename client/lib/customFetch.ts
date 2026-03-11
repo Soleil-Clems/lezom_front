@@ -48,6 +48,8 @@ class CustomFetch {
         "auth/register",
         "auth/refresh",
         "auth/logout",
+        "auth/verify-otp",
+        "auth/resend-otp",
       ];
       const shouldSkipRefresh = skipRefreshEndpoints.some((e) =>
         endpoint.includes(e),

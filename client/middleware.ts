@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 
-const PUBLIC_ROUTES = ["/login", "/register"]
+const PUBLIC_ROUTES = ["/login", "/register", "/verify-otp"]
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
@@ -29,5 +29,6 @@ export const config = {
     "/conversation/:path*",
     "/login",
     "/register",
+    "/verify-otp",
   ],
 }

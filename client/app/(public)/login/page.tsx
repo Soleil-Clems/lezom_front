@@ -56,8 +56,12 @@ export default function LoginPage() {
 
     loginMutation.mutate({ ...formValues, captchaToken }, {
       onSuccess: (data) => {
-        setToken(data.access_token);
-        router.replace("/");
+        if (data.requiresTwoFactor) {
+          router.replace(`/verify-otp?userId=${data.userId}`);
+        } else {
+          setToken(data.access_token);
+          router.replace("/");
+        }
       },
       onError: () => {
         recaptchaRef.current?.reset();
