@@ -283,6 +283,19 @@ export default function MessageScreenComponent({
     );
   };
 
+  const renderContent = (text: string) => {
+    const parts = text.split(/(@\w+)/g);
+    return parts.map((part, i) =>
+      part.startsWith("@") ? (
+        <span key={i} className="text-yellow-300 font-medium bg-yellow-400/10 rounded px-0.5">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+
   return (
       <div className="w-full p-4 space-y-4 min-h-full">
         {messages.length === 0 ? (
@@ -500,7 +513,7 @@ export default function MessageScreenComponent({
                               />
                             </div>
                         )}
-                        {message.content}
+                        {renderContent(message.content)}
                       </div>
                       <MessageReactions
                           reactions={message.reactions ?? []}

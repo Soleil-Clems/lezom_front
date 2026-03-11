@@ -29,6 +29,9 @@ import { Input } from "@/components/ui/input";
 import { gifApiKey, gifClientKey } from "@/lib/constants";
 import { upload } from "@/lib/upload";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
+
 
 const TENOR_API_KEY = gifApiKey;
 const TENOR_CLIENT_KEY = gifClientKey;
@@ -53,9 +56,30 @@ export default function Message({ channelId, conversationId }: MessageProps) {
   const socket = socketManager.getSocket();
   const isPrivateMessage = !!conversationId;
 
+  const params = useParams();
+const serverId = params?.serverId as string;
+const { data: membersData } = useGetServerMembers(serverId, { limit: 100 });
+const members = membersData?.data?.map((m) => m.members) ?? [];
+
+
+
+
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
+
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const filteredMembers = mentionQuery !== null
+  ? members.filter((m: any) =>
+      m.username?.toLowerCase().startsWith(mentionQuery.toLowerCase())
+    )
+  : [];
+
+
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [gifs, setGifs] = useState<TenorGif[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -269,6 +293,18 @@ export default function Message({ channelId, conversationId }: MessageProps) {
 
     stopTyping();
   };
+
+const insertMention = (username: string) => {
+  const current = form.getValues("content");
+  const cursor = textareaRef.current?.selectionStart ?? current.length;
+  const textBefore = current.slice(0, cursor);
+  const textAfter = current.slice(cursor);
+  const newBefore = textBefore.replace(/@\w*$/, `@${username} `);
+  form.setValue("content", newBefore + textAfter);
+  setMentionQuery(null);
+  setTimeout(() => textareaRef.current?.focus(), 0);
+};
+
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
     const current = form.getValues("content");
@@ -545,7 +581,6 @@ export default function Message({ channelId, conversationId }: MessageProps) {
         )}
 
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* Preview des fichiers sélectionnés */}
           {selectedFiles.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-2 p-2 bg-[#2B2D31] rounded-lg">
                 {selectedFiles.map((file, index) => (
@@ -583,7 +618,23 @@ export default function Message({ channelId, conversationId }: MessageProps) {
           )}
 
           <div className="flex items-end gap-2 rounded-2xl bg-[#1E1F22] p-2 shadow-lg relative">
-            {/* Menu Attachement */}
+            {filteredMembers.length > 0 && (
+              <div className="absolute bottom-full mb-1 left-0 right-0 z-50 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                {filteredMembers.map((member: any) => (
+                  <button
+                    key={member.id}
+                    type="button"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      insertMention(member.username);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-zinc-700 text-left"
+                  >
+                    <span className="text-sm text-zinc-200">@{member.username}</span>
+                  </button>
+                ))}
+              </div>
+            )}
             <div ref={attachMenuRef} className="relative">
               <Button
                   type="button"
@@ -653,6 +704,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                       <Field data-invalid={fieldState.invalid}>
                         <Textarea
                             {...field}
+                            ref={(el) => { field.ref(el); (textareaRef as any).current = el; }}
                             disabled={selectedFiles.length > 0 || isRecording || !!audioBlob}
                             placeholder={
                               isRecording
@@ -663,9 +715,20 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                             }
                             className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0 overflow-y-auto"
                             onChange={(e) => {
-                              field.onChange(e);
-                              handleTyping(e.target.value);
+                            field.onChange(e);
+                            handleTyping(e.target.value);
+
+                              const val = e.target.value;
+                              const cursor = e.target.selectionStart ?? 0;
+                              const textBeforeCursor = val.slice(0, cursor);
+                              const match = textBeforeCursor.match(/@(\w*)$/);
+                              if (match) {
+                                setMentionQuery(match[1]);
+                              } else {
+                                setMentionQuery(null);
+                              }
                             }}
+
                             onBlur={() => {
                               field.onBlur();
                               if (isPrivateMessage) {

@@ -23,7 +23,8 @@
     "noMemberFound": "Aucun membre trouvé",
     "members": "Membres — {count}",
     "page": "Page {page}/{totalPages}",
-    "memberCount": "{count} membre{count, plural, one {} other {s}}"
+    "memberCount": "{count} membre{count, plural, one {} other {s}}",
+    "searchMember": "Rechercher un membre..."
   },
   "auth": {
     "welcomeBack": "Bon retour !",
