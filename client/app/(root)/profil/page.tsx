@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { Mail, Shield, Calendar, Pencil, Camera } from "lucide-react";
+import { Mail, Shield, Calendar, Pencil, Camera, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import {
 
 import { useAuthUser } from "@/hooks/queries/useAuthUser";
 import { useEditProfilPicture } from "@/hooks/mutations/useEditProfilPicture";
+import { useEditProfil } from "@/hooks/mutations/useEditProfil";
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
 import useAuthStore from "@/store/authStore";
@@ -31,6 +32,7 @@ export default function ProfilePage() {
   const { data: user, isLoading, isError } = useAuthUser();
   const { logout } = useAuthStore();
   const editPictureMutation = useEditProfilPicture(user?.id);
+  const editProfilMutation = useEditProfil(user?.id ?? 0);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -170,6 +172,29 @@ export default function ProfilePage() {
                   <span className="text-indigo-400 font-medium capitalize">
                     {t("badge", { role: user.role })}
                   </span>
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                  <div className="flex items-center gap-3">
+                    <ShieldCheck size={18} className="text-zinc-500" />
+                    <div>
+                      <p className="text-sm">{t("twoFactorAuth")}</p>
+                      <p className="text-xs text-zinc-500">{t("twoFactorDesc")}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => editProfilMutation.mutate({ isTwoFactorEnabled: !user.isTwoFactorEnabled })}
+                    disabled={editProfilMutation.isPending}
+                    className={`relative shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                      user.isTwoFactorEnabled ? "bg-indigo-500" : "bg-zinc-600"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        user.isTwoFactorEnabled ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
                 </div>
                 <div className="pt-4 space-y-3">
                   <LanguageSwitcher />

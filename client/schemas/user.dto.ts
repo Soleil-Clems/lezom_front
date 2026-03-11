@@ -8,6 +8,7 @@ export const userSchema = z.object({
   description: z.string(),
   email: z.email("Email invalide"),
   isActive: z.boolean(),
+  isTwoFactorEnabled: z.boolean(),
   role: z.string(),
   lastSeen: z.date(),
   createdAt: z.date(),
@@ -16,10 +17,11 @@ export const userSchema = z.object({
 });
 
 export const userUpdateSchema = z.object({
-  username: z.string(),
-  firstname: z.string(),
-  lastname: z.string(),
-  isActive: z.boolean(),
+  username: z.string().optional(),
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+  isActive: z.boolean().optional(),
+  isTwoFactorEnabled: z.boolean().optional(),
 });
 
 export type userType = z.infer<typeof userSchema>;

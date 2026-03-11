@@ -44,7 +44,13 @@
     "createMyAccount": "Créer mon compte",
     "alreadyHaveAccount": "Déjà un compte ?",
     "logout": "Se déconnecter",
-    "captchaRequired": "Veuillez compléter le captcha"
+    "captchaRequired": "Veuillez compléter le captcha",
+    "verifyOtp": "Vérification en deux étapes",
+    "verifyOtpDesc": "Un code à 6 chiffres a été envoyé à ton adresse email",
+    "verify": "Vérifier",
+    "verifying": "Vérification...",
+    "resendCode": "Renvoyer le code",
+    "resendIn": "Renvoyer dans {seconds}s"
   },
   "validation": {
     "emailInvalid": "Email invalide",
@@ -162,7 +168,9 @@
     "activeProfile": "Profil Actif",
     "activeProfileDesc": "Apparaître en ligne pour les autres.",
     "saveChanges": "Sauvegarder les modifications",
-    "savingChanges": "Enregistrement..."
+    "savingChanges": "Enregistrement...",
+    "twoFactorAuth": "Authentification à deux facteurs",
+    "twoFactorDesc": "Un code sera envoyé à ton email à chaque connexion"
   },
   "settings": {
     "settings": "Paramètres",

@@ -44,7 +44,13 @@
     "createMyAccount": "Create my account",
     "alreadyHaveAccount": "Already have an account?",
     "logout": "Log out",
-    "captchaRequired": "Please complete the captcha"
+    "captchaRequired": "Please complete the captcha",
+    "verifyOtp": "Two-step verification",
+    "verifyOtpDesc": "A 6-digit code has been sent to your email",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "resendCode": "Resend code",
+    "resendIn": "Resend in {seconds}s"
   },
   "validation": {
     "emailInvalid": "Invalid email",
@@ -162,7 +168,9 @@
     "activeProfile": "Active Profile",
     "activeProfileDesc": "Appear online to others.",
     "saveChanges": "Save changes",
-    "savingChanges": "Saving..."
+    "savingChanges": "Saving...",
+    "twoFactorAuth": "Two-factor authentication",
+    "twoFactorDesc": "A code will be sent to your email on each login"
   },
   "settings": {
     "settings": "Settings",
