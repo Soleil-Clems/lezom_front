@@ -16,6 +16,7 @@ import {channelRequest} from "@/requests/channelRequest"
 import {useParams} from "next/navigation"
 import {useCreateChannel} from "@/hooks/mutations/useCreateChannel";
 import {createChannelType} from "@/schemas/channel.dto";
+import {useTranslations} from "next-intl";
 
 type ModalChanelContentProps = {
     onSuccess: () => void;
@@ -25,6 +26,8 @@ export function ModalChanelContent({onSuccess}: ModalChanelContentProps) {
     const [isLoading, setIsLoading] = useState(false);
     const params = useParams();
     const createChannelMutation = useCreateChannel()
+    const t = useTranslations("channel");
+    const tc = useTranslations("common");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -44,7 +47,7 @@ export function ModalChanelContent({onSuccess}: ModalChanelContentProps) {
             await createChannelMutation.mutateAsync(body);
             onSuccess();
         } catch (error: any) {
-            alert(`Erreur : ${error.message}`);
+            alert(`Erreur : ${error.message || tc("errorOccurred")}`);
         } finally {
             setIsLoading(false);
         }
@@ -54,28 +57,26 @@ export function ModalChanelContent({onSuccess}: ModalChanelContentProps) {
         <DialogContent className="bg-[#313338] text-[#dbdee1] border-none sm:max-w-md">
             <form onSubmit={handleSubmit}>
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-white">Crée ton Chanel</DialogTitle>
+                    <DialogTitle className="text-2xl font-bold text-white">{t("createChannel")}</DialogTitle>
                     <DialogDescription className="text-[#b5bac1]">
-                        Remplie les différentes informations pour créer ton chanel.
+                        {t("createChannelDesc")}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="text-xs font-bold uppercase text-[#b5bac1]">Nom du
-                            Chanel</Label>
+                        <Label htmlFor="name" className="text-xs font-bold uppercase text-[#b5bac1]">{t("channelName")}</Label>
                         <Input
                             id="name"
                             name="name_chanel"
-                            placeholder="nouveau-salon"
+                            placeholder={t("channelPlaceholder")}
                             required
                             className="bg-[#1e1f22] border-none text-white focus-visible:ring-1 focus-visible:ring-indigo-500"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="type_chanel" className="text-xs font-bold uppercase text-[#b5bac1]">Type de
-                            salon</Label>
+                        <Label htmlFor="type_chanel" className="text-xs font-bold uppercase text-[#b5bac1]">{t("channelType")}</Label>
                         <select
                             id="type_chanel"
                             name="type_chanel"
@@ -91,7 +92,7 @@ export function ModalChanelContent({onSuccess}: ModalChanelContentProps) {
                     <DialogClose asChild>
                         <Button type="button" variant="ghost"
                                 className="text-white hover:bg-transparent hover:underline">
-                            Annuler
+                            {tc("cancel")}
                         </Button>
                     </DialogClose>
                     <Button
@@ -99,7 +100,7 @@ export function ModalChanelContent({onSuccess}: ModalChanelContentProps) {
                         disabled={isLoading}
                         className="bg-[#5865f2] hover:bg-[#4752c4] text-white px-6"
                     >
-                        {isLoading ? "Création..." : "Confirmer"}
+                        {isLoading ? tc("creating") : tc("confirm")}
                     </Button>
                 </DialogFooter>
             </form>

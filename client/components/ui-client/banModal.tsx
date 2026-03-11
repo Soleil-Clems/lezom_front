@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, UserX } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type BanModalContentProps = {
     username: string;
@@ -26,6 +27,8 @@ export function BanModalContent({
     onCancel,
     isPending,
 }: BanModalContentProps) {
+    const t = useTranslations("ban");
+    const tc = useTranslations("common");
     const [reason, setReason] = useState("");
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -38,24 +41,23 @@ export function BanModalContent({
             <DialogHeader>
                 <div className="flex items-center gap-2">
                     <UserX className="w-5 h-5 text-rose-400" />
-                    <DialogTitle>Bannir un utilisateur</DialogTitle>
+                    <DialogTitle>{t("banUser")}</DialogTitle>
                 </div>
                 <DialogDescription className="text-zinc-400">
-                    Vous êtes sur le point de bannir <span className="text-white font-medium">{username}</span>.
-                    Cette action peut être annulée ultérieurement.
+                    {t("banConfirmDesc", { username })}
                 </DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="reason" className="text-zinc-400">
-                        Raison (optionnel)
+                        {t("reason")}
                     </Label>
                     <Input
                         id="reason"
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
-                        placeholder="Entrez une raison..."
+                        placeholder={t("reasonPlaceholder")}
                         className="bg-[#1e1f22] border-none text-zinc-300"
                         disabled={isPending}
                     />
@@ -69,7 +71,7 @@ export function BanModalContent({
                         disabled={isPending}
                         className="text-zinc-400 hover:text-white"
                     >
-                        Annuler
+                        {tc("cancel")}
                     </Button>
                     <Button
                         type="submit"
@@ -79,10 +81,10 @@ export function BanModalContent({
                         {isPending ? (
                             <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Bannissement...
+                                {t("banning")}
                             </>
                         ) : (
-                            "Confirmer le bannissement"
+                            t("confirmBan")
                         )}
                     </Button>
                 </DialogFooter>

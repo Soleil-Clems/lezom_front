@@ -3,6 +3,7 @@
 import { ManagementCard } from "@/components/ui-client/managementcard";
 import { useGetAllChannelsOfAServer } from "@/hooks/queries/useGetAllChannelsOfAServer";
 import { useUpdateChannel, useDeleteChannel } from "@/hooks/mutations/updateServerSettings";
+import { useTranslations } from "next-intl";
 
 type ServerChannelsListProps = {
     serverId: string | number;
@@ -13,9 +14,11 @@ export function ServerChannelsList({ serverId, isOwner }: ServerChannelsListProp
     const { data: serverData, isLoading } = useGetAllChannelsOfAServer(String(serverId));
     const updateChannel = useUpdateChannel();
     const deleteChannel = useDeleteChannel();
+    const t = useTranslations("server");
+    const tc = useTranslations("common");
 
     if (isLoading) {
-        return <div className="p-4 text-xs text-zinc-500 italic">Chargement...</div>;
+        return <div className="p-4 text-xs text-zinc-500 italic">{tc("loading")}</div>;
     }
 
     const channels = serverData?.[0]?.channels || [];
@@ -23,7 +26,7 @@ export function ServerChannelsList({ serverId, isOwner }: ServerChannelsListProp
     if (channels.length === 0) {
         return (
             <div className="p-4 text-center text-zinc-500 text-sm">
-                Aucun salon sur ce serveur
+                {t("noChannelsOnServer")}
             </div>
         );
     }
@@ -34,7 +37,7 @@ export function ServerChannelsList({ serverId, isOwner }: ServerChannelsListProp
                 <ManagementCard
                     key={channel.id}
                     id={channel.id}
-                    label="Nom du salon"
+                    label={t("channelName")}
                     initialValue={channel.name}
                     type="channel"
                     onSave={(newName: string) => updateChannel.mutate({ id: channel.id, name: newName })}

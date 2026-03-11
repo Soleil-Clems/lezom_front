@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
+import { useTranslations, useLocale } from "next-intl";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useRef, useState } from "react";
 
@@ -33,6 +35,10 @@ import { useRegister } from "@/hooks/mutations/useRegister";
 import { AuthBackground } from "@/components/ui-client/AuthBackground";
 
 export default function RegisterPage() {
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
+  const locale = useLocale();
+  const dateLocale = locale === "fr" ? fr : enUS;
   const router = useRouter();
   const registerMutation = useRegister();
   const recaptchaRef = useRef<ReCAPTCHA>(null);
@@ -94,10 +100,10 @@ export default function RegisterPage() {
               />
             </div>
             <CardTitle className="text-2xl font-bold text-white">
-              Créer un compte
+              {t("createAccount")}
             </CardTitle>
             <CardDescription className="text-[#B5BAC1]">
-              Rejoins la communauté Lezom
+              {t("joinCommunity")}
             </CardDescription>
           </CardHeader>
 
@@ -110,7 +116,7 @@ export default function RegisterPage() {
                         htmlFor="firstname"
                         className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
                     >
-                      Prénom <span className="text-red-400">*</span>
+                      {t("firstname")} <span className="text-red-400">*</span>
                     </FieldLabel>
                     <Input
                         {...register("firstname")}
@@ -130,7 +136,7 @@ export default function RegisterPage() {
                         htmlFor="lastname"
                         className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
                     >
-                      Nom <span className="text-red-400">*</span>
+                      {t("lastname")} <span className="text-red-400">*</span>
                     </FieldLabel>
                     <Input
                         {...register("lastname")}
@@ -151,7 +157,7 @@ export default function RegisterPage() {
                       htmlFor="username"
                       className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
                   >
-                    Pseudo <span className="text-red-400">*</span>
+                    {t("username")} <span className="text-red-400">*</span>
                   </FieldLabel>
                   <Input
                       {...register("username")}
@@ -190,7 +196,7 @@ export default function RegisterPage() {
                       htmlFor="password"
                       className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
                   >
-                    Mot de passe <span className="text-red-400">*</span>
+                    {t("password")} <span className="text-red-400">*</span>
                   </FieldLabel>
                   <Input
                       {...register("password")}
@@ -208,7 +214,7 @@ export default function RegisterPage() {
 
                 <Field data-invalid={!!errors.birthdate}>
                   <FieldLabel className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]">
-                    Date de naissance <span className="text-red-400">*</span>
+                    {t("birthdate")} <span className="text-red-400">*</span>
                   </FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -220,8 +226,8 @@ export default function RegisterPage() {
                       >
                         <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                         {selectedDate
-                            ? format(selectedDate, "d MMMM yyyy", { locale: fr })
-                            : "Sélectionner une date"}
+                            ? format(selectedDate, "d MMMM yyyy", { locale: dateLocale })
+                            : t("selectDate")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -261,7 +267,7 @@ export default function RegisterPage() {
                   />
                   {captchaError && (
                       <p className="text-red-400 text-xs mt-1">
-                        Veuillez compléter le captcha
+                        {t("captchaRequired")}
                       </p>
                   )}
                 </div>
@@ -277,12 +283,14 @@ export default function RegisterPage() {
                 {registerMutation.isPending && (
                     <Loader2 className="animate-spin" />
                 )}
-                {registerMutation.isPending ? "Création..." : "Créer mon compte"}
+                {registerMutation.isPending
+                    ? tc("creating")
+                    : t("createMyAccount")}
               </Button>
               <p className="text-sm text-[#A3A6AA] mt-1">
-                Déjà un compte ?{" "}
+                {t("alreadyHaveAccount")}{" "}
                 <Link href="/login" className="text-[#00A8FC] hover:underline">
-                  Se connecter
+                  {t("login")}
                 </Link>
               </p>
             </CardFooter>

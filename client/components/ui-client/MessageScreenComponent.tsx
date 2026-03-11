@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter, useParams } from "next/navigation";
 import { MessageSquare, User, Download, FileText, Play, Pause } from "lucide-react";
 import { messageType } from "@/schemas/message.dto";
@@ -38,6 +40,9 @@ export default function MessageScreenComponent({
                                                  onRemoveMessage,
                                                  onAddReaction,
                                                }: Props) {
+  const t = useTranslations("messages");
+  const tc = useTranslations("common");
+  const locale = useLocale();
   const { data: user, isLoading, isError } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -139,9 +144,9 @@ export default function MessageScreenComponent({
     try {
       const parts = url.split("/");
       const raw = parts[parts.length - 1];
-      return decodeURIComponent(raw.split("?")[0]) || "Fichier";
+      return decodeURIComponent(raw.split("?")[0]) || tc("file");
     } catch {
-      return "Fichier";
+      return tc("file");
     }
   };
 
@@ -185,12 +190,12 @@ export default function MessageScreenComponent({
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (days === 0)
-      return date.toLocaleTimeString("fr-FR", {
+      return date.toLocaleTimeString(locale, {
         hour: "2-digit",
         minute: "2-digit",
       });
-    if (days === 1) return "Hier";
-    return date.toLocaleDateString("fr-FR", {
+    if (days === 1) return tc("yesterday");
+    return date.toLocaleDateString(locale, {
       day: "2-digit",
       month: "2-digit",
     });
@@ -198,7 +203,7 @@ export default function MessageScreenComponent({
 
   const AuthorName = ({ message, isMyMessage }: { message: messageType; isMyMessage: boolean }) => {
     if (isMyMessage) {
-      return <span className="text-xs font-bold text-emerald-400">Moi</span>;
+      return <span className="text-xs font-bold text-emerald-400">{tc("me")}</span>;
     }
 
     return (
@@ -214,14 +219,14 @@ export default function MessageScreenComponent({
                 className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
             >
               <MessageSquare className="size-4" />
-              Envoyer un message
+              {t("sendMessage")}
             </DropdownMenuItem>
             <DropdownMenuItem
                 onClick={() => router.push(`/profil/${message.author.id}`)}
                 className="cursor-pointer text-zinc-200 focus:bg-zinc-700 focus:text-white"
             >
               <User className="size-4" />
-              Voir le profil
+              {t("viewProfile")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -284,11 +289,10 @@ export default function MessageScreenComponent({
             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
               <div className="text-6xl mb-4">💬</div>
               <h3 className="text-xl font-semibold text-zinc-300 mb-2">
-                Aucun message pour le moment
+                {t("noMessages")}
               </h3>
               <p className="text-sm text-zinc-500 max-w-md">
-                Soyez le premier à lancer la conversation ! Envoyez un message pour
-                commencer à discuter.
+                {t("beFirst")}
               </p>
             </div>
         ) : (
@@ -517,7 +521,7 @@ export default function MessageScreenComponent({
                 <span className="w-1 h-1 bg-zinc-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
               </div>
               {typingUsers.join(", ")}{" "}
-              {typingUsers.length > 1 ? "écrivent..." : "écrit..."}
+              {typingUsers.length > 1 ? t("writingMultiple") : t("writingSingle")}
             </div>
         )}
 

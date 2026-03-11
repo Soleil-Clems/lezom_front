@@ -28,6 +28,7 @@ import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
 import { Input } from "@/components/ui/input";
 import { gifApiKey, gifClientKey } from "@/lib/constants";
 import { upload } from "@/lib/upload";
+import { useTranslations } from "next-intl";
 
 const TENOR_API_KEY = gifApiKey;
 const TENOR_CLIENT_KEY = gifClientKey;
@@ -46,6 +47,9 @@ interface MessageProps {
 }
 
 export default function Message({ channelId, conversationId }: MessageProps) {
+  const tm = useTranslations("messages");
+  const tc = useTranslations("common");
+  const ta = useTranslations("attachments");
   const socket = socketManager.getSocket();
   const isPrivateMessage = !!conversationId;
 
@@ -435,8 +439,8 @@ export default function Message({ channelId, conversationId }: MessageProps) {
         {isPrivateMessage && privateTyping.isAnyoneTyping && (
             <div className="px-2 py-1 text-xs text-zinc-400 italic">
               {privateTyping.typingUsers.length === 1
-                  ? `${privateTyping.typingUsers[0].username} est en train d'écrire...`
-                  : `${privateTyping.typingUsers.length} personnes sont en train d'écrire...`}
+                  ? tm("typing", { name: privateTyping.typingUsers[0].username })
+                  : tm("typingMultiple", { count: privateTyping.typingUsers.length })}
             </div>
         )}
 
@@ -449,7 +453,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                     <div className="flex items-center gap-2 flex-1">
                       <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
                       <span className="text-sm text-red-400 font-medium">
-                  Enregistrement...
+                  {tm("recording")}
                 </span>
                       <span className="text-sm text-zinc-400 font-mono">
                   {formatDuration(recordingDuration)}
@@ -479,7 +483,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                         className="text-zinc-400 hover:text-white"
                     >
                       <X className="size-4 mr-1" />
-                      Annuler
+                      {tc("cancel")}
                     </Button>
 
                     <Button
@@ -489,7 +493,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                         className="bg-red-500 hover:bg-red-600 text-white"
                     >
                       <Square className="size-4 mr-1" />
-                      Arrêter
+                      {tm("stop")}
                     </Button>
                   </>
               ) : audioBlob ? (
@@ -498,7 +502,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                     <div className="flex flex-col gap-2 flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <div className="w-3 h-3 bg-indigo-500 rounded-full shrink-0" />
-                        <span className="text-sm text-zinc-300">Message vocal</span>
+                        <span className="text-sm text-zinc-300">{tm("voiceMessage")}</span>
                         <span className="text-sm text-zinc-500 font-mono">
                           {formatDuration(recordingDuration)}
                         </span>
@@ -521,7 +525,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                           className="text-zinc-400 hover:text-white"
                       >
                         <X className="size-4 mr-1" />
-                        Supprimer
+                        {tc("delete")}
                       </Button>
 
                       <Button
@@ -532,7 +536,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                           className="bg-indigo-600 hover:bg-indigo-500 text-white"
                       >
                         <Send className="size-4 mr-1" />
-                        Envoyer
+                        {tm("send")}
                       </Button>
                     </div>
                   </>
@@ -606,9 +610,9 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                           <Image className="h-4 w-4 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium">Télécharger un fichier</p>
+                          <p className="font-medium">{ta("uploadFile")}</p>
                           <p className="text-xs text-gray-400">
-                            Images, vidéos, documents
+                            {ta("uploadFileDesc")}
                           </p>
                         </div>
                       </button>
@@ -622,9 +626,9 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                           <Monitor className="h-4 w-4 text-white" />
                         </div>
                         <div>
-                          <p className="font-medium">Capture d'écran</p>
+                          <p className="font-medium">{ta("screenshot")}</p>
                           <p className="text-xs text-gray-400">
-                            Envoyer directement
+                            {ta("screenshotDesc")}
                           </p>
                         </div>
                       </button>
@@ -652,10 +656,10 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                             disabled={selectedFiles.length > 0 || isRecording || !!audioBlob}
                             placeholder={
                               isRecording
-                                  ? "Enregistrement en cours..."
+                                  ? tm("recordingInProgress")
                                   : audioBlob
-                                      ? "Message vocal prêt à envoyer"
-                                      : "Écris ton message..."
+                                      ? tm("voiceReady")
+                                      : tm("writeMessage")
                             }
                             className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0 overflow-y-auto"
                             onChange={(e) => {
@@ -683,7 +687,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
                         )}
                         {selectedFiles.length > 0 && (
                             <p className="text-xs text-zinc-400">
-                              Les messages avec fichier ne peuvent pas contenir de texte
+                              {tm("fileNoText")}
                             </p>
                         )}
                       </Field>
@@ -760,7 +764,7 @@ export default function Message({ channelId, conversationId }: MessageProps) {
 
                     <div className="flex-1 overflow-y-auto p-4">
                       {isLoadingGifs ? (
-                          <p className="text-center text-gray-400">Chargement...</p>
+                          <p className="text-center text-gray-400">{tc("loading")}</p>
                       ) : (
                           <div className="grid grid-cols-2 gap-2">
                             {gifs.map((gif) => (

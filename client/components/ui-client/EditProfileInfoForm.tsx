@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import { useTranslations } from "next-intl";
 import { useEditProfil } from "@/hooks/mutations/useEditProfil";
 import { userType } from "@/schemas/user.dto";
 
@@ -38,6 +39,8 @@ export function EditProfileInfoForm({
   user: userType;
   onSuccess: () => void;
 }) {
+  const t = useTranslations("profile");
+  const ta = useTranslations("auth");
   const editProfile = useEditProfil(user.id);
 
   const form = useForm<EditProfileFormValues>({
@@ -65,7 +68,7 @@ export function EditProfileInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                  Prénom
+                  {ta("firstname")}
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="bg-[#1E1F22] border-none text-white" />
@@ -80,7 +83,7 @@ export function EditProfileInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                  Nom
+                  {ta("lastname")}
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="bg-[#1E1F22] border-none text-white" />
@@ -97,7 +100,7 @@ export function EditProfileInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                Nom d&apos;utilisateur
+                {t("usernameLabel")}
               </FormLabel>
               <FormControl>
                 <Input {...field} className="bg-[#1E1F22] border-none text-white" />
@@ -113,7 +116,7 @@ export function EditProfileInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                Description
+                {t("description")}
               </FormLabel>
               <FormControl>
                 <Textarea
@@ -133,10 +136,10 @@ export function EditProfileInfoForm({
             <FormItem className="flex items-center justify-between p-3 bg-[#1E1F22] rounded-lg">
               <div className="space-y-0.5">
                 <FormLabel className="text-sm font-medium text-white">
-                  Profil Actif
+                  {t("activeProfile")}
                 </FormLabel>
                 <FormDescription className="text-xs text-zinc-400">
-                  Apparaître en ligne pour les autres.
+                  {t("activeProfileDesc")}
                 </FormDescription>
               </div>
               <FormControl>
@@ -151,7 +154,7 @@ export function EditProfileInfoForm({
           className="w-full bg-[#5764f2] hover:bg-[#4752C4] text-white"
           disabled={editProfile.isPending}
         >
-          {editProfile.isPending ? "Enregistrement..." : "Sauvegarder les modifications"}
+          {editProfile.isPending ? t("savingChanges") : t("saveChanges")}
         </Button>
       </form>
     </Form>

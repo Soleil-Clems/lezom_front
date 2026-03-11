@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useRef, useState } from "react";
 
@@ -26,6 +27,7 @@ import useAuthStore from "@/store/authStore";
 import { AuthBackground } from "@/components/ui-client/AuthBackground";
 
 export default function LoginPage() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const { setToken } = useAuthStore();
   const loginMutation = useLogin();
@@ -80,10 +82,10 @@ export default function LoginPage() {
               />
             </div>
             <CardTitle className="text-2xl font-bold text-white">
-              Bon retour !
+              {t("welcomeBack")}
             </CardTitle>
             <CardDescription className="text-[#B5BAC1]">
-              On est content de te revoir
+              {t("welcomeBackDesc")}
             </CardDescription>
           </CardHeader>
 
@@ -113,7 +115,7 @@ export default function LoginPage() {
                       htmlFor="password"
                       className="text-xs font-bold uppercase tracking-wide text-[#B5BAC1]"
                   >
-                    Mot de passe <span className="text-red-400">*</span>
+                    {t("password")} <span className="text-red-400">*</span>
                   </FieldLabel>
                   <Input
                       {...register("password")}
@@ -139,7 +141,7 @@ export default function LoginPage() {
                   />
                   {captchaError && (
                       <p className="text-red-400 text-xs mt-1">
-                        Veuillez compléter le captcha
+                        {t("captchaRequired")}
                       </p>
                   )}
                 </div>
@@ -153,12 +155,12 @@ export default function LoginPage() {
                   className="w-full h-11 bg-purple-discord text-white font-medium hover:bg-purple-discord/85 transition-colors"
               >
                 {loginMutation.isPending && <Loader2 className="animate-spin" />}
-                {loginMutation.isPending ? "Connexion..." : "Se connecter"}
+                {loginMutation.isPending ? t("loggingIn") : t("login")}
               </Button>
               <p className="text-sm text-[#A3A6AA] mt-1">
-                Pas encore de compte ?{" "}
+                {t("noAccount")}{" "}
                 <Link href="/register" className="text-[#00A8FC] hover:underline">
-                  S&apos;inscrire
+                  {t("register")}
                 </Link>
               </p>
             </CardFooter>

@@ -8,6 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslations } from "next-intl";
 import { User, Shield, Loader2, Sword, ChevronDown } from "lucide-react";
 
 type MemberRole = "server_member" | "server_admin" | "server_owner";
@@ -35,6 +36,8 @@ export function MemberCard({
     isPending,
     isRoleChangePending = false
 }: MemberCardProps) {
+    const t = useTranslations("roles");
+    const tb = useTranslations("ban");
     const isOwner = member.role === "server_owner";
     const isAdmin = member.role === "server_admin";
 
@@ -52,17 +55,17 @@ export function MemberCard({
         if (currentUserIsOwner) {
             if (isAdmin) {
                 return [
-                    { value: "server_member", label: "Membre" },
-                    { value: "server_owner", label: "Propriétaire" }
+                    { value: "server_member", label: t("member") },
+                    { value: "server_owner", label: t("owner") }
                 ];
             } else {
                 return [
-                    { value: "server_admin", label: "Administrateur" },
-                    { value: "server_owner", label: "Propriétaire" }
+                    { value: "server_admin", label: t("administrator") },
+                    { value: "server_owner", label: t("owner") }
                 ];
             }
         } else if (currentUserIsAdmin && member.role === "server_member") {
-            return [{ value: "server_admin", label: "Administrateur" }];
+            return [{ value: "server_admin", label: t("administrator") }];
         }
         return [];
     };
@@ -80,13 +83,13 @@ export function MemberCard({
         if (isOwner) {
             return (
                 <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
-                    Propriétaire
+                    {t("owner")}
                 </span>
             );
         } else if (isAdmin) {
             return (
                 <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
-                    Admin
+                    {t("admin")}
                 </span>
             );
         }
@@ -104,7 +107,7 @@ export function MemberCard({
                         <p className="text-white font-medium flex items-center gap-2">
                             {member.username}
                             {isCurrentUser && (
-                                <span className="text-xs text-zinc-500">(vous)</span>
+                                <span className="text-xs text-zinc-500">{t("you")}</span>
                             )}
                             {getRoleBadge()}
                         </p>
@@ -125,7 +128,7 @@ export function MemberCard({
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
                                         <>
-                                            Changer rôle
+                                            {t("changeRole")}
                                             <ChevronDown className="w-4 h-4 ml-1" />
                                         </>
                                     )}
@@ -156,7 +159,7 @@ export function MemberCard({
                             {isPending ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                                "Bannir"
+                                tb("ban")
                             )}
                         </Button>
                     )}

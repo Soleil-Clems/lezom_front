@@ -1,5 +1,7 @@
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
+import {NextIntlClientProvider} from "next-intl";
+import {getLocale, getMessages} from "next-intl/server";
 import ReactQueryProvider from "@/providers/ReactQueryProvider"
 import "./globals.css";
 import {Toaster} from "@/components/ui/sonner"
@@ -24,19 +26,24 @@ export const metadata: Metadata = {
     }
 };
 
-export default function RootLayout({
+export default async function RootLayout({
                                        children,
                                    }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const locale = await getLocale();
+    const messages = await getMessages();
+
     return (
-        <html lang="fr" className="dark">
+        <html lang={locale} className="dark">
         <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased bg-own-dark`}
         >
-            <ReactQueryProvider>
-                {children}
-            </ReactQueryProvider>
+            <NextIntlClientProvider messages={messages}>
+                <ReactQueryProvider>
+                    {children}
+                </ReactQueryProvider>
+            </NextIntlClientProvider>
             <Toaster position="top-center"/>
         </body>
         </html>

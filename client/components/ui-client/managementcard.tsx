@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Loader2, Save, Hash } from "lucide-react"
 import { DeleteConfirmModal } from "./DeleteConfirmModal"
+import { useTranslations } from "next-intl"
 
 type ManagementCardProps = {
   id: string | number;
@@ -29,6 +30,8 @@ export function ManagementCard({
   isPending,
   isOwner = false
 }: ManagementCardProps) {
+  const t = useTranslations("server");
+  const tc = useTranslations("common");
   const [currentValue, setCurrentValue] = useState(initialValue);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const hasChanged = currentValue !== initialValue && currentValue.trim() !== "";
@@ -54,7 +57,7 @@ export function ManagementCard({
             onClick={() => onSave(currentValue)}
           >
             {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            Enregistrer
+            {tc("save")}
           </Button>
         </div>
         {isOwner && (
@@ -65,7 +68,7 @@ export function ManagementCard({
               className="w-full border-rose-500 text-rose-400 hover:text-white hover:bg-rose-500 h-10"
               onClick={() => setShowDeleteModal(true)}
             >
-              {type === 'server' ? 'Supprimer le serveur' : 'Supprimer le salon'}
+              {type === 'server' ? t("deleteServer") : t("deleteChannel")}
             </Button>
           </div>
         )}
@@ -78,8 +81,8 @@ export function ManagementCard({
           onDelete();
           setShowDeleteModal(false);
         }}
-        title={type === 'server' ? 'Supprimer le serveur' : 'Supprimer le salon'}
-        message={`Êtes-vous sûr de vouloir supprimer ${type === 'server' ? 'le serveur' : 'le salon'}`}
+        title={type === 'server' ? t("deleteServer") : t("deleteChannel")}
+        message={type === 'server' ? t("deleteServerConfirm") : t("deleteChannelConfirm")}
         itemName={initialValue}
         isPending={isPending}
       />

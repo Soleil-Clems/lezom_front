@@ -1,5 +1,6 @@
 "use client"
 import { useState, use } from "react"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -13,6 +14,8 @@ type JoinPageProps = {
 
 export default function JoinPage({ params }: JoinPageProps) {
     const { code } = use(params)
+    const t = useTranslations("invitation")
+    const tc = useTranslations("common")
     const router = useRouter()
     const [error, setError] = useState<string | null>(null)
 
@@ -26,7 +29,7 @@ export default function JoinPage({ params }: JoinPageProps) {
                 router.push(`/servers/${data.server.id}`)
             },
             onError: (err: Error) => {
-                setError(err.message || "Une erreur est survenue")
+                setError(err.message || tc("errorOccurred"))
             },
         })
     }
@@ -37,7 +40,7 @@ export default function JoinPage({ params }: JoinPageProps) {
                 {isLoading ? (
                     <CardContent className="flex flex-col items-center justify-center py-16">
                         <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
-                        <p className="text-zinc-400 mt-4 text-sm">Chargement de l'invitation...</p>
+                        <p className="text-zinc-400 mt-4 text-sm">{t("loadingInvitation")}</p>
                     </CardContent>
                 ) : isError ? (
                     <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
@@ -45,9 +48,9 @@ export default function JoinPage({ params }: JoinPageProps) {
                             <AlertCircle className="h-8 w-8 text-red-400" />
                         </div>
                         <div className="text-center space-y-2">
-                            <h2 className="text-xl font-semibold">Invitation invalide</h2>
+                            <h2 className="text-xl font-semibold">{t("invalidInvitation")}</h2>
                             <p className="text-zinc-400 text-sm">
-                                {(previewError as Error)?.message || "Cette invitation est invalide ou a expiré."}
+                                {(previewError as Error)?.message || t("invalidInvitationDesc")}
                             </p>
                         </div>
                         <Button
@@ -55,13 +58,13 @@ export default function JoinPage({ params }: JoinPageProps) {
                             variant="ghost"
                             className="text-zinc-400 hover:text-white"
                         >
-                            Retour à l'accueil
+                            {t("backToHome")}
                         </Button>
                     </CardContent>
                 ) : (
                     <>
                         <CardHeader className="flex flex-col items-center text-center pb-2">
-                            <p className="text-sm text-zinc-400 mb-4">Tu as été invité à rejoindre un serveur</p>
+                            <p className="text-sm text-zinc-400 mb-4">{t("invitedToJoin")}</p>
                             {preview.server.img ? (
                                 <img
                                     src={preview.server.img}
@@ -76,7 +79,7 @@ export default function JoinPage({ params }: JoinPageProps) {
                             <h2 className="text-2xl font-bold mt-4">{preview.server.name}</h2>
                             <div className="flex items-center gap-2 text-zinc-400 text-sm mt-1">
                                 <Users className="h-4 w-4" />
-                                <span>{preview.server.memberCount} membre{preview.server.memberCount !== 1 ? "s" : ""}</span>
+                                <span>{tc("memberCount", { count: preview.server.memberCount })}</span>
                             </div>
                         </CardHeader>
 
@@ -93,8 +96,8 @@ export default function JoinPage({ params }: JoinPageProps) {
                                 className="w-full bg-indigo-500 hover:bg-indigo-600 text-white"
                             >
                                 {joinServer.isPending
-                                    ? "Connexion en cours..."
-                                    : `Rejoindre ${preview.server.name}`}
+                                    ? t("joining")
+                                    : t("join", { name: preview.server.name })}
                             </Button>
                         </CardContent>
                     </>

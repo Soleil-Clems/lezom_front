@@ -10,6 +10,7 @@ import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
 import { channelType } from "@/schemas/channel.dto";
 import { ServerSettingsDropdown } from "./dropdownMenu";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 type ChannelSidebarProps = {
   serverId?: string;
@@ -21,11 +22,12 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
   const channelId = params?.channelId as string | undefined;
   const { data: user } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
+  const t = useTranslations("server");
 
   if (!serverId) {
     return (
       <div className="w-72 h-full bg-[#2B2D31] flex flex-col items-center justify-center p-4 text-zinc-500 text-center">
-        <p>Sélectionnez un serveur pour voir les salons</p>
+        <p>{t("selectServer")}</p>
       </div>
     );
   }
@@ -53,7 +55,7 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
       <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
         {/* HEADER */}
         <div className="h-12 px-5 flex items-center justify-between border-b border-black/20 shrink-0">
-          <h2 className="font-semibold text-white">Salons</h2>
+          <h2 className="font-semibold text-white">{t("channels")}</h2>
           <ServerSettingsDropdown
             serverId={serverId}
             userRole={userRole}
@@ -101,7 +103,7 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
 
           {channels.length === 0 && (
             <p className="text-xs text-zinc-500 text-center mt-4">
-              Aucun salon trouvé
+              {t("noChannelFound")}
             </p>
           )}
         </div>
