@@ -42,8 +42,8 @@ export default function LoginPage() {
   } = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "cassidyng06@gmail.com",
+      password: "testtest",
     },
   });
 
@@ -53,6 +53,7 @@ export default function LoginPage() {
       return;
     }
     setCaptchaError(false);
+    console.log(formValues)
 
     loginMutation.mutate({ ...formValues, captchaToken }, {
       onSuccess: (data) => {
@@ -93,6 +94,7 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
 
+          {/* eslint-disable-next-line react-hooks/refs */}
           <form onSubmit={handleSubmit(onSubmit)}>
             <CardContent>
               <div className="flex flex-col gap-5">
