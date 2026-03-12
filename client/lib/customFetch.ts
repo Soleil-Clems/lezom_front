@@ -80,6 +80,11 @@ class CustomFetch {
     }
 
     if (!res.ok) {
+      if (endpoint === "auth/me" && res.status >= 400 && res.status < 500) {
+        this.handleAuthFailure();
+        throw new Error("Session expirée. Veuillez vous reconnecter.");
+      }
+
       let message = `Erreur ${res.status}`;
       try {
         const errorData = await res.json();
