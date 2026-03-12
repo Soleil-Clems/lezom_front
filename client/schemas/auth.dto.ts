@@ -7,7 +7,7 @@ export const passwordSchema = z
 export const LoginSchema = z.object({
   email: z.email({ message: "Email invalide" }),
   password: z.string().min(1, { message: "Mot de passe requis" }),
-    // captchaToken: z.string().min(1, "Captcha requis"),
+  captchaToken: z.string().min(1, "Captcha requis").optional(),
 })
 
 export const RegisterSchema = z.object({
@@ -17,8 +17,9 @@ export const RegisterSchema = z.object({
   email: z.email({ message: "Email invalide" }),
   password: passwordSchema,
   birthdate: z.string().min(1, "Date de naissance requise"),
-  // captchaToken: z.string().min(1, "Captcha requis"),
+   captchaToken: z.string().min(1, "Captcha requis").optional(),
 })
 
-export type LoginType = z.infer<typeof LoginSchema>
-export type RegisterType = z.infer<typeof RegisterSchema>
+export type LoginType = z.infer<typeof LoginSchema> & { token: string };
+
+export type RegisterType = z.infer<typeof RegisterSchema> & { token: string };
