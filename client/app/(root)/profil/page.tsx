@@ -24,6 +24,7 @@ import Error from "@/components/ui-client/Error";
 import useAuthStore from "@/store/authStore";
 import { EditProfileInfoForm } from "@/components/ui-client/EditProfileInfoForm";
 import { LanguageSwitcher } from "@/components/ui-client/LanguageSwitcher";
+import {Switch} from "@/components/ui/switch";
 
 export default function ProfilePage() {
   const t = useTranslations("profile");
