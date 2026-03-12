@@ -42,7 +42,7 @@ export default function LoginPage() {
   } = useForm<LoginType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "cassidyng06@gmail.com",
+      email: "test@gmail.com",
       password: "testtest",
     },
   });
@@ -53,7 +53,6 @@ export default function LoginPage() {
       return;
     }
     setCaptchaError(false);
-    console.log(formValues)
 
     loginMutation.mutate({ ...formValues, captchaToken }, {
       onSuccess: (data) => {
