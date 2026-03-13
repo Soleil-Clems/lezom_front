@@ -7,8 +7,6 @@ import { useAuthUser } from "@/hooks/queries/useAuthUser";
 import { conversationType } from "@/schemas/conversation.dto";
 import Loading from "@/components/ui-client/Loading";
 import Error from "@/components/ui-client/Error";
-import FriendSearchBar from "@/components/ui-client/FriendSearchBar";
-import FriendList from "@/components/ui-client/FriendList";
 import { cn } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -61,14 +59,6 @@ export default function ConversationList() {
         <div className="flex flex-col h-full overflow-hidden">
             <div className="h-12 px-5 flex items-center border-b border-zinc-700 shrink-0">
                 <h2 className="font-semibold text-white">{tm("privateMessages")}</h2>
-            </div>
-
-            <div className="shrink-0 border-b border-zinc-700">
-                <FriendSearchBar />
-            </div>
-
-            <div className="shrink-0 border-b border-zinc-700 overflow-y-auto max-h-56">
-                <FriendList />
             </div>
 
             <div className="flex-1 overflow-y-auto min-h-0">

@@ -47,7 +47,7 @@ export default function PrivateMessageLayout({ conversationId }: PrivateMessageL
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto discord-scrollbar">
                 <PrivateMessageScreen messages={messages || []} conversationId={conversationId} onAddReaction={addPrivateReaction} />
                 <div ref={messagesEndRef} />
             </div>

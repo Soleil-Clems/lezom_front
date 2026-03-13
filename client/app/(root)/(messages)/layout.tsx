@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import ConversationList from "@/components/ui-client/ConversationList";
+import { FriendsSidebar } from "@/components/ui-client/FriendsSidebar";
 
 export default function MessagesLayout({
     children,
@@ -24,6 +25,8 @@ export default function MessagesLayout({
             <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {children}
             </main>
+
+            {isConversationOpen && <FriendsSidebar />}
         </div>
     );
 }

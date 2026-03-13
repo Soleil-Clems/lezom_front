@@ -129,3 +129,27 @@
     @apply bg-background text-foreground;
   }
 }
+
+.discord-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #1a1b1e transparent;
+}
+
+.discord-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.discord-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.discord-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #1a1b1e;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.discord-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: #111214;
+}

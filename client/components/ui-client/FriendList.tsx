@@ -44,12 +44,10 @@ export default function FriendList() {
 
     return (
         <div className="px-3 py-2">
-            {/* Titre section */}
-            <p className="px-1 pb-1 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
+            {/* <p className="px-1 pb-1 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
                 Liste d&apos;amis
-            </p>
+            </p> */}
 
-            {/* Demandes en attente */}
             <div className="mb-1">
                 <button
                     onClick={() => setShowPending((v) => !v)}
@@ -89,7 +87,6 @@ export default function FriendList() {
                 ))}
             </div>
 
-            {/* Amis en ligne */}
             {onlineFriends.length > 0 && (
                 <div className="mb-1">
                     <p className="px-1 py-1 text-xs font-semibold text-zinc-500 uppercase tracking-wide">
@@ -107,7 +104,6 @@ export default function FriendList() {
                 </div>
             )}
 
-            {/* Amis hors ligne */}
             {offlineFriends.length > 0 && (
                 <div>
                     <p className="px-1 py-1 text-xs font-semibold text-zinc-500 uppercase tracking-wide">

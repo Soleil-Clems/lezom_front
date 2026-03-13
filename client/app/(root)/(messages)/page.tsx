@@ -1,24 +1,22 @@
 "use client";
 
-import { MessageSquare } from "lucide-react";
-import { useTranslations } from "next-intl";
+import AddFriendButton from "@/components/ui-client/AddFriendButton";
+import FriendList from "@/components/ui-client/FriendList";
 
 export default function MessagesPage() {
-    const t = useTranslations("messages");
-
     return (
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-20 h-20 rounded-full bg-zinc-700 flex items-center justify-center mb-6">
-                <MessageSquare className="h-10 w-10 text-zinc-400" />
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+            <div className="h-12 px-5 flex items-center border-b border-zinc-700 shrink-0">
+                <h2 className="font-semibold text-white">Amis</h2>
             </div>
 
-            <h2 className="text-2xl font-bold text-white mb-2">
-                {t("yourPrivateMessages")}
-            </h2>
+            <div className="shrink-0 border-b border-zinc-700">
+                <AddFriendButton />
+            </div>
 
-            <p className="text-zinc-400 max-w-md">
-                {t("selectConversation")}
-            </p>
+            <div className="flex-1 overflow-y-auto">
+                <FriendList />
+            </div>
         </div>
     );
 }
