@@ -25,7 +25,7 @@ export default function AddFriendButton() {
     return (
         <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) setQuery(""); }}>
             <DialogTrigger asChild>
-                <button className="w-20% mx-3 my-2 px-4 py-1.5 rounded-md bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white text-sm font-medium transition-colors">
+                <button className="px-3 py-1 rounded-md bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-700 text-white text-sm font-medium transition-colors whitespace-nowrap">
                     Ajouter un ami
                 </button>
             </DialogTrigger>

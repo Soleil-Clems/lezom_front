@@ -1,7 +1,6 @@
 "use client";
 
 import { Users, X } from "lucide-react";
-import AddFriendButton from "@/components/ui-client/AddFriendButton";
 import FriendList from "@/components/ui-client/FriendList";
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import {
@@ -16,7 +15,7 @@ import {
 const FriendsSidebarContent = ({ showClose = false }: { showClose?: boolean }) => (
     <div className="flex flex-col h-full bg-[#2B2D31] text-zinc-300 w-full overflow-hidden border-l border-black/10">
         <div className="h-12 border-b border-black/20 flex items-center justify-between px-4 shrink-0">
-            <span className="opacity-70 text-[11px] uppercase tracking-widest font-bold">Amis</span>
+            <span className="opacity-70 text-[11px] uppercase tracking-widest font-bold">Actif maintenant</span>
             {showClose && (
                 <SheetClose className="p-1 hover:bg-white/10 rounded-md transition outline-none">
                     <X className="w-5 h-5 text-zinc-400" />
@@ -24,12 +23,8 @@ const FriendsSidebarContent = ({ showClose = false }: { showClose?: boolean }) =
             )}
         </div>
 
-        <div className="shrink-0 border-b border-zinc-700">
-            <AddFriendButton />
-        </div>
-
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-            <FriendList />
+            <FriendList filter="all" />
         </div>
     </div>
 );
@@ -52,7 +47,7 @@ export function FriendsSidebar() {
                     </SheetTrigger>
                     <SheetContent side="right" className="p-0 w-[280px] bg-[#2B2D31] border-none [&>button]:hidden">
                         <SheetHeader className="sr-only">
-                            <SheetTitle>Amis</SheetTitle>
+                            <SheetTitle>Actif maintenant</SheetTitle>
                         </SheetHeader>
                         <FriendsSidebarContent showClose={true} />
                     </SheetContent>
