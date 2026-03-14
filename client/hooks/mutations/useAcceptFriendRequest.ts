@@ -11,6 +11,7 @@ export function useAcceptFriendRequest() {
         mutationFn: (requestId: number) => acceptFriendRequestRequest(requestId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["friends"] });
+            queryClient.invalidateQueries({ queryKey: ["friends", "pending"] });
             toast.success("Demande acceptée");
         },
         onError: (error: any) => {

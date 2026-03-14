@@ -1,31 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import FriendList from "@/components/ui-client/FriendList";
 import AddFriendButton from "@/components/ui-client/AddFriendButton";
 import { useGetPendingRequests } from "@/hooks/queries/useGetPendingRequests";
-import { friendRequestType } from "@/schemas/friend.dto";
 
 type Tab = "online" | "all" | "pending";
 
 export default function MessagesPage() {
+    const t = useTranslations("friends");
     const [tab, setTab] = useState<Tab>("online");
-    const { data: pendingRequests } = useGetPendingRequests();
-    const pendingCount = (pendingRequests as friendRequestType[] ?? []).length;
+    const { data: pendingRequests = [] } = useGetPendingRequests();
 
     return (
         <div className="flex-1 flex flex-col h-full overflow-hidden">
             <div className="h-12 px-4 flex items-center gap-3 border-b border-zinc-700 shrink-0">
-                <span className="font-semibold text-white border-r border-zinc-600 pr-4 shrink-0">Amis</span>
+                <span className="font-semibold text-white border-r border-zinc-600 pr-4 shrink-0">{t("friends")}</span>
 
                 <div className="flex items-center gap-1">
-                    <TabButton label="En ligne" active={tab === "online"} onClick={() => setTab("online")} />
-                    <TabButton label="Tous" active={tab === "all"} onClick={() => setTab("all")} />
+                    <TabButton label={t("online")} active={tab === "online"} onClick={() => setTab("online")} />
+                    <TabButton label={t("all")} active={tab === "all"} onClick={() => setTab("all")} />
                     <TabButton
-                        label="En attente"
+                        label={t("pending")}
                         active={tab === "pending"}
                         onClick={() => setTab("pending")}
-                        badge={pendingCount}
+                        badge={pendingRequests.length}
                     />
                 </div>
 

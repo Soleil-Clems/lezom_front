@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useGetFriends } from "@/hooks/queries/useGetFriends";
 import { useGetPendingRequests } from "@/hooks/queries/useGetPendingRequests";
 import { useOnlineUserIds } from "@/hooks/queries/useOnlineUserIds";
@@ -8,29 +10,26 @@ import { useAcceptFriendRequest } from "@/hooks/mutations/useAcceptFriendRequest
 import { useDeclineFriendRequest } from "@/hooks/mutations/useDeclineFriendRequest";
 import { useRemoveFriend } from "@/hooks/mutations/useRemoveFriend";
 import { useCreateConversation } from "@/hooks/mutations/useCreateConversation";
-import { friendUserType, friendRequestType } from "@/schemas/friend.dto";
+import { friendUserType } from "@/schemas/friend.dto";
 import { MessageSquare, UserMinus } from "lucide-react";
+import { DeleteConfirmModal } from "@/components/ui-client/DeleteConfirmModal";
 
 type Filter = "online" | "all" | "pending";
 
 export default function FriendList({ filter = "all" }: { filter?: Filter }) {
     const router = useRouter();
+    const t = useTranslations("friends");
 
-    const { data: friends } = useGetFriends();
-    const { data: pendingRequests } = useGetPendingRequests();
+    const { data: friends = [] } = useGetFriends();
+    const { data: pendingRequests = [] } = useGetPendingRequests();
     const { data: onlineIds } = useOnlineUserIds();
 
     const { mutate: acceptRequest } = useAcceptFriendRequest();
     const { mutate: declineRequest } = useDeclineFriendRequest();
-    const { mutate: removeFriend } = useRemoveFriend();
+    const { mutate: removeFriend, isPending: isRemoving } = useRemoveFriend();
     const { mutate: createConversation } = useCreateConversation();
 
-    const friendsList = (friends as friendUserType[]) ?? [];
-    const pendingList = (pendingRequests as friendRequestType[]) ?? [];
-    const onlineSet = new Set(onlineIds ?? []);
-
-    const onlineFriends = friendsList.filter((f) => onlineSet.has(f.id));
-    const offlineFriends = friendsList.filter((f) => !onlineSet.has(f.id));
+    const [friendToRemove, setFriendToRemove] = useState<friendUserType | null>(null);
 
     const handleOpenConversation = (userId: number) => {
         createConversation(
@@ -43,40 +42,46 @@ export default function FriendList({ filter = "all" }: { filter?: Filter }) {
         );
     };
 
+    const handleConfirmRemove = () => {
+        if (friendToRemove) {
+            removeFriend(friendToRemove.id, {
+                onSettled: () => setFriendToRemove(null),
+            });
+        }
+    };
+
     /* ── Onglet En attente ── */
     if (filter === "pending") {
         return (
             <div className="px-4 py-3">
                 <p className="px-1 pb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
-                    Demandes en attente — {pendingList.length}
+                    {t("pendingRequests", { count: pendingRequests.length })}
                 </p>
-                {pendingList.length === 0 && (
-                    <p className="text-sm text-zinc-500 px-1">Aucune demande en attente</p>
+                {pendingRequests.length === 0 && (
+                    <p className="text-sm text-zinc-500 px-1">{t("noPendingRequests")}</p>
                 )}
-                {pendingList.map((req: friendRequestType) => (
+                {pendingRequests.map((req) => (
                     <div
                         key={req.id}
                         className="flex items-center gap-3 px-3 py-3 rounded-md hover:bg-zinc-700/50 border-t border-zinc-700/40"
                     >
-                        <div className="h-9 w-9 shrink-0 rounded-full bg-zinc-600 flex items-center justify-center text-sm font-semibold text-white uppercase">
-                            {req.sender.username.substring(0, 2)}
-                        </div>
+                        <UserAvatar username={req.sender.username} img={req.sender.img} />
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-zinc-200 truncate">{req.sender.username}</p>
-                            <p className="text-xs text-zinc-500">Demande d&apos;ami reçue</p>
+                            <p className="text-xs text-zinc-500">{t("friendRequestReceived")}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                             <button
                                 onClick={() => acceptRequest(req.id)}
                                 className="p-1.5 rounded-full bg-zinc-700 hover:bg-green-600 text-zinc-300 hover:text-white transition-colors"
-                                title="Accepter"
+                                title={t("accept")}
                             >
                                 ✓
                             </button>
                             <button
                                 onClick={() => declineRequest(req.id)}
                                 className="p-1.5 rounded-full bg-zinc-700 hover:bg-red-600 text-zinc-300 hover:text-white transition-colors"
-                                title="Refuser"
+                                title={t("decline")}
                             >
                                 ✕
                             </button>
@@ -88,68 +93,67 @@ export default function FriendList({ filter = "all" }: { filter?: Filter }) {
     }
 
     /* ── Onglet En ligne / Tous ── */
-    return (
-        <div className="px-4 py-3">
-            {filter === "online" && onlineFriends.length === 0 && (
-                <p className="text-sm text-zinc-500 px-1">Aucun ami en ligne</p>
-            )}
-            {filter === "all" && friendsList.length === 0 && (
-                <p className="text-sm text-zinc-500 px-1">Aucun ami pour l&apos;instant</p>
-            )}
+    const onlineSet = new Set(onlineIds ?? []);
+    const onlineFriends = friends.filter((f) => onlineSet.has(f.id));
+    const offlineFriends = friends.filter((f) => !onlineSet.has(f.id));
 
-            {filter === "online" ? (
-                <>
-                    {onlineFriends.length > 0 && (
-                        <p className="px-1 pb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
-                            En ligne — {onlineFriends.length}
-                        </p>
-                    )}
-                    {onlineFriends.map((friend) => (
-                        <FriendItem
-                            key={friend.id}
-                            friend={friend}
-                            isOnline={true}
-                            onMessage={() => handleOpenConversation(friend.id)}
-                            onRemove={() => removeFriend(friend.id)}
-                        />
-                    ))}
-                </>
-            ) : (
-                <>
-                    {onlineFriends.length > 0 && (
-                        <>
-                            <p className="px-1 pb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
-                                En ligne — {onlineFriends.length}
-                            </p>
-                            {onlineFriends.map((friend) => (
-                                <FriendItem
-                                    key={friend.id}
-                                    friend={friend}
-                                    isOnline={true}
-                                    onMessage={() => handleOpenConversation(friend.id)}
-                                    onRemove={() => removeFriend(friend.id)}
-                                />
-                            ))}
-                        </>
-                    )}
-                    {offlineFriends.length > 0 && (
-                        <>
-                            <p className="px-1 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
-                                Hors ligne — {offlineFriends.length}
-                            </p>
-                            {offlineFriends.map((friend) => (
-                                <FriendItem
-                                    key={friend.id}
-                                    friend={friend}
-                                    isOnline={false}
-                                    onMessage={() => handleOpenConversation(friend.id)}
-                                    onRemove={() => removeFriend(friend.id)}
-                                />
-                            ))}
-                        </>
-                    )}
-                </>
-            )}
+    const renderSection = (list: friendUserType[], label: string, isOnline: boolean) => {
+        if (list.length === 0) return null;
+        return (
+            <>
+                <p className="px-1 pb-2 text-xs font-semibold text-zinc-400 uppercase tracking-wide">
+                    {label}
+                </p>
+                {list.map((friend) => (
+                    <FriendItem
+                        key={friend.id}
+                        friend={friend}
+                        isOnline={isOnline}
+                        onMessage={() => handleOpenConversation(friend.id)}
+                        onRemove={() => setFriendToRemove(friend)}
+                    />
+                ))}
+            </>
+        );
+    };
+
+    return (
+        <>
+            <div className="px-4 py-3">
+                {filter === "online" && onlineFriends.length === 0 && (
+                    <p className="text-sm text-zinc-500 px-1">{t("noFriendsOnline")}</p>
+                )}
+                {filter === "all" && friends.length === 0 && (
+                    <p className="text-sm text-zinc-500 px-1">{t("noFriendsYet")}</p>
+                )}
+
+                {renderSection(onlineFriends, t("onlineCount", { count: onlineFriends.length }), true)}
+                {filter === "all" && renderSection(offlineFriends, t("offlineCount", { count: offlineFriends.length }), false)}
+            </div>
+
+            <DeleteConfirmModal
+                isOpen={!!friendToRemove}
+                onClose={() => setFriendToRemove(null)}
+                onConfirm={handleConfirmRemove}
+                title={t("removeFriendTitle")}
+                message={t("removeFriendConfirm")}
+                itemName={friendToRemove?.username ?? ""}
+                isPending={isRemoving}
+            />
+        </>
+    );
+}
+
+function UserAvatar({ username, img, size = "h-9 w-9" }: { username: string; img?: string; size?: string }) {
+    return img ? (
+        <img
+            src={img}
+            alt={username}
+            className={`${size} shrink-0 rounded-full object-cover`}
+        />
+    ) : (
+        <div className={`${size} shrink-0 rounded-full bg-zinc-600 flex items-center justify-center text-sm font-semibold text-white uppercase`}>
+            {username.substring(0, 2)}
         </div>
     );
 }
@@ -165,12 +169,13 @@ function FriendItem({
     onMessage: () => void;
     onRemove: () => void;
 }) {
+    const to = useTranslations("online");
+    const tf = useTranslations("friends");
+
     return (
         <div className="group flex items-center gap-3 px-3 py-3 rounded-md hover:bg-zinc-700/50 border-t border-zinc-700/40 transition-colors">
             <div className="relative shrink-0">
-                <div className="h-9 w-9 rounded-full bg-zinc-600 flex items-center justify-center text-sm font-semibold text-white uppercase">
-                    {friend.username.substring(0, 2)}
-                </div>
+                <UserAvatar username={friend.username} img={friend.img} />
                 <span
                     className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#313338] ${
                         isOnline ? "bg-green-500" : "bg-zinc-500"
@@ -180,21 +185,21 @@ function FriendItem({
 
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-zinc-200 truncate">{friend.username}</p>
-                <p className="text-xs text-zinc-500">{isOnline ? "En ligne" : "Hors ligne"}</p>
+                <p className="text-xs text-zinc-500">{isOnline ? to("online") : to("offline")}</p>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
                 <button
                     onClick={onMessage}
                     className="p-1.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-colors"
-                    title="Envoyer un message"
+                    title={tf("sendMessage")}
                 >
                     <MessageSquare className="w-4 h-4" />
                 </button>
                 <button
                     onClick={onRemove}
                     className="p-1.5 rounded-full bg-zinc-700 hover:bg-red-600 text-zinc-300 hover:text-white transition-colors"
-                    title="Supprimer l'ami"
+                    title={tf("removeFriend")}
                 >
                     <UserMinus className="w-4 h-4" />
                 </button>
