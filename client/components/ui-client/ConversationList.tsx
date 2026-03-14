@@ -56,12 +56,12 @@ export default function ConversationList() {
 
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="h-12 px-5 flex items-center border-b border-zinc-700">
+        <div className="flex flex-col h-full overflow-hidden">
+            <div className="h-12 px-5 flex items-center border-b border-zinc-700 shrink-0">
                 <h2 className="font-semibold text-white">{tm("privateMessages")}</h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto min-h-0">
                 {conversations?.length === 0 ? (
                     <div className="p-4 text-center text-zinc-400">
                         <p>{tm("noConversation")}</p>
