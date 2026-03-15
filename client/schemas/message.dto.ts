@@ -23,6 +23,15 @@ export const updateMessageParamsSchema = z.object({
   content: z.string(),
 });
 
+export const channelMessagesPageSchema = z.object({
+  messages: z.array(messageSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
+});
+
 export type messageType = z.infer<typeof messageSchema>;
 export type sendMessageType = z.infer<typeof sendMessageSchema>;
 export type UpdateMessageParamsType = z.infer<typeof updateMessageParamsSchema>;
+export type ChannelMessagesPageType = z.infer<typeof channelMessagesPageSchema>;

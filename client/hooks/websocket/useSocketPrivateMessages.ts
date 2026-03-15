@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, InfiniteData } from "@tanstack/react-query";
 import { useSocket } from "./useSocket";
 import { PrivateMessagesPageType } from "@/schemas/conversation.dto";
 
@@ -17,25 +17,23 @@ export function useSocketPrivateMessages(conversationId?: string) {
         return;
       }
 
-      queryClient.setQueryData<PrivateMessagesPageType>(
+      queryClient.setQueryData<InfiniteData<PrivateMessagesPageType>>(
         ["conversationMessages", conversationId],
         (old) => {
-          if (!old) {
-            return {
-              messages: [message],
-              total: 1,
-              page: 1,
-              limit: 50,
-              totalPages: 1,
-            };
-          }
-          if (old.messages.some((msg) => msg.id === message.id)) {
-            return old;
-          }
+          if (!old) return old;
+          const firstPage = old.pages[0];
+          if (firstPage?.messages?.some((msg) => msg.id === message.id)) return old;
           return {
             ...old,
-            messages: [...old.messages, message],
-            total: old.total + 1,
+            pages: old.pages.map((page, index) =>
+              index === 0
+                ? {
+                    ...page,
+                    messages: [...page.messages, message],
+                    total: page.total + 1,
+                  }
+                : page,
+            ),
           };
         },
       );
@@ -46,48 +44,57 @@ export function useSocketPrivateMessages(conversationId?: string) {
     };
 
     const handlePrivateMessageUpdated = (updatedMessage: any) => {
-      queryClient.setQueryData<PrivateMessagesPageType>(
+      queryClient.setQueryData<InfiniteData<PrivateMessagesPageType>>(
         ["conversationMessages", conversationId],
         (old) => {
           if (!old) return old;
           return {
             ...old,
-            messages: old.messages.map((msg) =>
-              msg.id === updatedMessage.id
-                ? { ...msg, ...updatedMessage }
-                : msg,
-            ),
+            pages: old.pages.map((page) => ({
+              ...page,
+              messages: page.messages.map((msg) =>
+                msg.id === updatedMessage.id
+                  ? { ...msg, ...updatedMessage }
+                  : msg,
+              ),
+            })),
           };
         },
       );
     };
 
     const handlePrivateMessageDeleted = (messageId: number) => {
-      queryClient.setQueryData<PrivateMessagesPageType>(
+      queryClient.setQueryData<InfiniteData<PrivateMessagesPageType>>(
         ["conversationMessages", conversationId],
         (old) => {
           if (!old) return old;
           return {
             ...old,
-            messages: old.messages.filter((msg) => msg.id !== messageId),
-            total: old.total - 1,
+            pages: old.pages.map((page) => {
+              const filtered = page.messages.filter((msg) => msg.id !== messageId);
+              if (filtered.length === page.messages.length) return page;
+              return { ...page, messages: filtered, total: page.total - 1 };
+            }),
           };
         },
       );
     };
 
     const handlePrivateReactionAdded = (updatedMessage: any) => {
-      queryClient.setQueryData<PrivateMessagesPageType>(
+      queryClient.setQueryData<InfiniteData<PrivateMessagesPageType>>(
         ["conversationMessages", conversationId],
         (old) => {
           if (!old) return old;
           return {
             ...old,
-            messages: old.messages.map((msg) =>
-              Number(msg.id) === Number(updatedMessage.id)
-                ? { ...msg, ...updatedMessage }
-                : msg,
-            ),
+            pages: old.pages.map((page) => ({
+              ...page,
+              messages: page.messages.map((msg) =>
+                Number(msg.id) === Number(updatedMessage.id)
+                  ? { ...msg, ...updatedMessage }
+                  : msg,
+              ),
+            })),
           };
         },
       );
@@ -97,10 +104,6 @@ export function useSocketPrivateMessages(conversationId?: string) {
     on("privateMessageUpdated", handlePrivateMessageUpdated);
     on("privateMessageDeleted", handlePrivateMessageDeleted);
     on("privateReactionAdded", handlePrivateReactionAdded);
-
-    queryClient.invalidateQueries({
-      queryKey: ["conversationMessages", conversationId],
-    });
 
     return () => {
       off("newPrivateMessage", handleNewPrivateMessage);

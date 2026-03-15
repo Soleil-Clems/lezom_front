@@ -45,7 +45,6 @@ export default function MessageScreenComponent({
   const locale = useLocale();
   const { data: user, isLoading, isError } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
-  const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const params = useParams();
   const createConversation = useCreateConversation();
@@ -160,15 +159,6 @@ export default function MessageScreenComponent({
     }
   };
 
-  const scrollToBottom = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, typingUsers]);
 
   // Cleanup audio on unmount
   useEffect(() => {
@@ -538,7 +528,6 @@ export default function MessageScreenComponent({
             </div>
         )}
 
-        <div ref={scrollRef} />
 
         <EditMessageDialog
             open={!!editingMessage}
