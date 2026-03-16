@@ -4,35 +4,59 @@ import { userSchema } from "@/schemas/user.dto";
 import { reactionSchema } from "@/schemas/reaction.dto";
 
 export const conversationSchema = z.object({
-    id: z.number(),
-    user1: userSchema,
-    user2: userSchema,
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
+  id: z.number(),
+  user1: userSchema,
+  user2: userSchema,
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 });
 
 export const privateMessageSchema = z.object({
-    id: z.number(),
-    content: z.string(),
-    type: MessageTypeEnum,
-    sender: userSchema,
-    conversation: z.number(),
-    reactions: z.array(reactionSchema).optional(),
-    createdAt: z.date().optional(),
-    updatedAt: z.date().optional(),
+  id: z.number(),
+  content: z.string(),
+  type: MessageTypeEnum,
+  sender: userSchema,
+  conversation: z.number(),
+  reactions: z.array(reactionSchema).optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 });
 
 export const sendPrivateMessageSchema = z.object({
-    content: z.string().min(1, "Le message ne peut pas être vide"),
-    type: MessageTypeEnum,
-    conversationId: z.number(),
+  content: z.string().min(1, "Le message ne peut pas être vide"),
+  type: MessageTypeEnum,
+  conversationId: z.number(),
 });
 
 export const createConversationSchema = z.object({
-    userId: z.number(),
+  userId: z.number(),
+});
+
+export const typingUserSchema = z.object({
+  userId: z.number(),
+  username: z.string(),
+});
+
+export const conversationsPageSchema = z.object({
+  conversations: z.array(conversationSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
+});
+
+export const privateMessagesPageSchema = z.object({
+  messages: z.array(privateMessageSchema),
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number(),
 });
 
 export type conversationType = z.infer<typeof conversationSchema>;
 export type privateMessageType = z.infer<typeof privateMessageSchema>;
 export type sendPrivateMessageType = z.infer<typeof sendPrivateMessageSchema>;
 export type createConversationType = z.infer<typeof createConversationSchema>;
+export type ConversationsPageType = z.infer<typeof conversationsPageSchema>;
+export type PrivateMessagesPageType = z.infer<typeof privateMessagesPageSchema>;
+export type TypingUserType = z.infer<typeof typingUserSchema>;

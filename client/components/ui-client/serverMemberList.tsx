@@ -12,166 +12,179 @@ import { useBanUser } from "@/hooks/mutations/useBanManagement";
 import { useTransferOwnership } from "@/hooks/mutations/useTransferOwnership";
 import { useSocket } from "@/hooks/websocket/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
-
-type MemberRole = "server_member" | "server_admin" | "server_owner";
+import { MemberRoleType } from "@/schemas/member.dto";
 
 type ServerMembersListProps = {
-    serverId: string | number;
-    currentUserId: number;
-    currentUserRole?: string;
-    onOpenBanModal: (member: { id: number; username: string }) => void;
+  serverId: string | number;
+  currentUserId: number;
+  currentUserRole?: string;
+  onOpenBanModal: (member: { id: number; username: string }) => void;
 };
 
 export function ServerMembersList({
-    serverId,
-    currentUserId,
-    currentUserRole,
-    onOpenBanModal
+  serverId,
+  currentUserId,
+  currentUserRole,
+  onOpenBanModal,
 }: ServerMembersListProps) {
-    const t = useTranslations("settings");
-    const tc = useTranslations("common");
-    const [page, setPage] = useState(1);
-    const [search, setSearch] = useState("");
-    const [searchInput, setSearchInput] = useState("");
-    const limit = 20;
+  const t = useTranslations("settings");
+  const tc = useTranslations("common");
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const limit = 20;
 
-    const { data, isLoading } = useGetServerMembers(serverId, { page, limit, search });
-    const banUser = useBanUser();
-    const updateMemberRole = useUpdateMemberRole();
-    const transferOwnership = useTransferOwnership();
-    const { isConnected, on, off } = useSocket();
-    const queryClient = useQueryClient();
+  const { data, isLoading } = useGetServerMembers(serverId, {
+    page,
+    limit,
+    search,
+  });
+  const banUser = useBanUser();
+  const updateMemberRole = useUpdateMemberRole();
+  const transferOwnership = useTransferOwnership();
+  const { isConnected, on, off } = useSocket();
+  const queryClient = useQueryClient();
 
-    useEffect(() => {
-        if (!isConnected) return;
+  useEffect(() => {
+    if (!isConnected) return;
 
-        const handleServerMembersUpdate = (data: { serverId: number }) => {
-            if (String(data.serverId) === String(serverId)) {
-                queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
-                queryClient.invalidateQueries({ queryKey: ["allservers"] });
-            }
-        };
-
-        on("memberRoleChanged", handleServerMembersUpdate);
-        on("memberBanned", handleServerMembersUpdate);
-
-        return () => {
-            off("memberRoleChanged", handleServerMembersUpdate);
-            off("memberBanned", handleServerMembersUpdate);
-        };
-    }, [isConnected, on, off, serverId, queryClient]);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setSearch(searchInput);
-        setPage(1);
+    const handleServerMembersUpdate = (data: { serverId: number }) => {
+      if (String(data.serverId) === String(serverId)) {
+        queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
+        queryClient.invalidateQueries({ queryKey: ["allservers"] });
+      }
     };
 
-    const handleRoleChange = (memberId: number, newRole: MemberRole) => {
-        if (newRole === "server_owner") {
-            transferOwnership.mutate({ serverId, newOwnerId: memberId });
-        } else {
-            updateMemberRole.mutate({ serverId, memberId, role: newRole });
-        }
-    };
+    on("memberRoleChanged", handleServerMembersUpdate);
+    on("memberBanned", handleServerMembersUpdate);
 
-    if (isLoading) {
-        return (
-            <div className="p-4 flex items-center justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-            </div>
-        );
+    return () => {
+      off("memberRoleChanged", handleServerMembersUpdate);
+      off("memberBanned", handleServerMembersUpdate);
+    };
+  }, [isConnected, on, off, serverId, queryClient]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearch(searchInput);
+    setPage(1);
+  };
+
+  const handleRoleChange = (memberId: number, newRole: MemberRoleType) => {
+    if (newRole === "server_owner") {
+      transferOwnership.mutate({ serverId, newOwnerId: memberId });
+    } else {
+      updateMemberRole.mutate({ serverId, memberId, role: newRole });
     }
+  };
 
-    const rawMembers = data?.data || [];
-    const meta = data?.meta;
-
-    const members = [...rawMembers].sort((a, b) => {
-        if (a.role === b.role) {
-            const aIsCurrentUser = a.members?.id === currentUserId;
-            const bIsCurrentUser = b.members?.id === currentUserId;
-            if (aIsCurrentUser) return -1;
-            if (bIsCurrentUser) return 1;
-        }
-        return 0;
-    });
-
+  if (isLoading) {
     return (
-        <div className="p-4 space-y-4">
-            <form onSubmit={handleSearch} className="flex gap-2">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                    <Input
-                        type="text"
-                        placeholder={t("searchMember")}
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        className="pl-9 bg-[#1E1F22] border-white/10 text-white placeholder:text-zinc-500"
-                    />
-                </div>
-                <Button type="submit" variant="secondary" size="sm">
-                    {tc("search")}
-                </Button>
-            </form>
-
-            {members.length === 0 ? (
-                <div className="text-center text-zinc-500 text-sm py-4">
-                    {search ? tc("noMemberFound") : t("noMembers")}
-                </div>
-            ) : (
-                <div className="space-y-3">
-                    {members.map((membership) => {
-                        const isCurrentUser = membership.members?.id === currentUserId;
-                        return (
-                            <MemberCard
-                                key={membership.id}
-                                member={{
-                                    id: membership.members?.id,
-                                    username: membership.members?.username,
-                                    role: membership.role,
-                                }}
-                                currentUserRole={currentUserRole}
-                                isCurrentUser={isCurrentUser}
-                                onBan={() => onOpenBanModal({
-                                    id: membership.members?.id,
-                                    username: membership.members?.username
-                                })}
-                                onRoleChange={(newRole) => handleRoleChange(membership.members?.id, newRole)}
-                                isPending={banUser.isPending}
-                                isRoleChangePending={updateMemberRole.isPending || transferOwnership.isPending}
-                            />
-                        );
-                    })}
-                </div>
-            )}
-
-            {meta && meta.totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <span className="text-xs text-zinc-500">
-                        {t("totalMembers", { total: meta.total, page: meta.page, totalPages: meta.totalPages })}
-                    </span>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage((p) => p - 1)}
-                            disabled={!meta.hasPreviousPage}
-                            className="border-white/10 text-zinc-400 hover:text-white disabled:opacity-50"
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage((p) => p + 1)}
-                            disabled={!meta.hasNextPage}
-                            className="border-white/10 text-zinc-400 hover:text-white disabled:opacity-50"
-                        >
-                            <ChevronRight className="w-4 h-4" />
-                        </Button>
-                    </div>
-                </div>
-            )}
-        </div>
+      <div className="p-4 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+      </div>
     );
+  }
+
+  const rawMembers = data?.data || [];
+  const meta = data?.meta;
+
+  const members = [...rawMembers].sort((a, b) => {
+    if (a.role === b.role) {
+      const aIsCurrentUser = a.members?.id === currentUserId;
+      const bIsCurrentUser = b.members?.id === currentUserId;
+      if (aIsCurrentUser) return -1;
+      if (bIsCurrentUser) return 1;
+    }
+    return 0;
+  });
+
+  return (
+    <div className="p-4 space-y-4">
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <Input
+            type="text"
+            placeholder={t("searchMember")}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-9 bg-[#1E1F22] border-white/10 text-white placeholder:text-zinc-500"
+          />
+        </div>
+        <Button type="submit" variant="secondary" size="sm">
+          {tc("search")}
+        </Button>
+      </form>
+
+      {members.length === 0 ? (
+        <div className="text-center text-zinc-500 text-sm py-4">
+          {search ? tc("noMemberFound") : t("noMembers")}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {members.map((membership) => {
+            const isCurrentUser = membership.members?.id === currentUserId;
+            return (
+              <MemberCard
+                key={membership.id}
+                member={{
+                  id: membership.members?.id,
+                  username: membership.members?.username,
+                  role: membership.role,
+                }}
+                currentUserRole={currentUserRole}
+                isCurrentUser={isCurrentUser}
+                onBan={() =>
+                  onOpenBanModal({
+                    id: membership.members?.id,
+                    username: membership.members?.username,
+                  })
+                }
+                onRoleChange={(newRole) =>
+                  handleRoleChange(membership.members?.id, newRole)
+                }
+                isPending={banUser.isPending}
+                isRoleChangePending={
+                  updateMemberRole.isPending || transferOwnership.isPending
+                }
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {meta && meta.totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <span className="text-xs text-zinc-500">
+            {t("totalMembers", {
+              total: meta.total,
+              page: meta.page,
+              totalPages: meta.totalPages,
+            })}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p - 1)}
+              disabled={!meta.hasPreviousPage}
+              className="border-white/10 text-zinc-400 hover:text-white disabled:opacity-50"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!meta.hasNextPage}
+              className="border-white/10 text-zinc-400 hover:text-white disabled:opacity-50"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
