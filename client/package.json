@@ -7,9 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "format": "prettier --write \"**/*.{ts,tsx,css,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,css,json}\"",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "cd .. && husky",
+    "ci": "eslint . && prettier --check \"**/*.{ts,tsx,css,json}\" && tsc --noEmit && next build"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "prettier --write",
+    "*.{css,json}": "prettier --write"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -60,6 +69,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
+    "husky": "^9.1.7",
     "install": "^0.13.0",
     "jsdom": "^28.0.0",
     "npm": "^11.9.0",
