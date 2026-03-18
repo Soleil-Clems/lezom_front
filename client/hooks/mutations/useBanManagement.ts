@@ -11,11 +11,13 @@ export function useBanUser() {
             serverId,
             userId,
             reason,
+            durationHours,
         }: {
             serverId: string | number;
             userId: number;
             reason?: string;
-        }) => banUserRequest(serverId, userId, reason),
+            durationHours?: number;
+        }) => banUserRequest(serverId, userId, reason, durationHours),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["server-bans", variables.serverId] });
             queryClient.invalidateQueries({ queryKey: ["serverMembers"] });

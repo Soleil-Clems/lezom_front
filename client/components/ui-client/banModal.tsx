@@ -14,9 +14,20 @@ import { Label } from "@/components/ui/label";
 import { Loader2, UserX } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+const BAN_DURATIONS = [
+    { labelKey: "duration1h", value: 1 },
+    { labelKey: "duration6h", value: 6 },
+    { labelKey: "duration12h", value: 12 },
+    { labelKey: "duration24h", value: 24 },
+    { labelKey: "duration3d", value: 72 },
+    { labelKey: "duration7d", value: 168 },
+    { labelKey: "duration30d", value: 720 },
+    { labelKey: "durationPermanent", value: undefined },
+] as const;
+
 type BanModalContentProps = {
     username: string;
-    onConfirm: (reason?: string) => void;
+    onConfirm: (reason?: string, durationHours?: number) => void;
     onCancel: () => void;
     isPending: boolean;
 };
@@ -30,10 +41,11 @@ export function BanModalContent({
     const t = useTranslations("ban");
     const tc = useTranslations("common");
     const [reason, setReason] = useState("");
+    const [durationHours, setDurationHours] = useState<number | undefined>(undefined);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onConfirm(reason.trim() || undefined);
+        onConfirm(reason.trim() || undefined, durationHours);
     };
 
     return (
@@ -49,6 +61,27 @@ export function BanModalContent({
             </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                    <Label className="text-zinc-400">{t("duration")}</Label>
+                    <div className="flex flex-wrap gap-2">
+                        {BAN_DURATIONS.map((d) => (
+                            <button
+                                key={d.labelKey}
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => setDurationHours(d.value)}
+                                className={`px-3 py-1 rounded text-sm transition-colors ${
+                                    durationHours === d.value
+                                        ? "bg-rose-500 text-white"
+                                        : "bg-[#1e1f22] text-zinc-400 hover:bg-zinc-700"
+                                }`}
+                            >
+                                {t(d.labelKey)}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="space-y-2">
                     <Label htmlFor="reason" className="text-zinc-400">
                         {t("reason")}

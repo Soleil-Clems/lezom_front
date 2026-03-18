@@ -204,7 +204,18 @@
     "unbanning": "Débannissement...",
     "bannedBy": "Banni par {username} le {date}",
     "bannedOn": "Banni le {date}",
-    "reasonLabel": "Raison: {reason}"
+    "reasonLabel": "Raison: {reason}",
+    "duration": "Durée du ban",
+    "duration1h": "1h",
+    "duration6h": "6h",
+    "duration12h": "12h",
+    "duration24h": "24h",
+    "duration3d": "3 jours",
+    "duration7d": "7 jours",
+    "duration30d": "30 jours",
+    "durationPermanent": "Permanent",
+    "expiresAt": "Expire le {date}",
+    "permanent": "Ban permanent"
   },
   "roles": {
     "owner": "Propriétaire",
