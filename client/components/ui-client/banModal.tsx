@@ -22,8 +22,10 @@ const BAN_DURATIONS = [
     { labelKey: "duration3d", value: 72 },
     { labelKey: "duration7d", value: 168 },
     { labelKey: "duration30d", value: 720 },
-    { labelKey: "durationPermanent", value: undefined },
+    { labelKey: "durationPermanent", value: "permanent" as const },
 ] as const;
+
+type DurationValue = number | "permanent" | null;
 
 type BanModalContentProps = {
     username: string;
@@ -41,10 +43,12 @@ export function BanModalContent({
     const t = useTranslations("ban");
     const tc = useTranslations("common");
     const [reason, setReason] = useState("");
-    const [durationHours, setDurationHours] = useState<number | undefined>(undefined);
+    const [selectedDuration, setSelectedDuration] = useState<DurationValue>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (selectedDuration === null) return;
+        const durationHours = selectedDuration === "permanent" ? undefined : selectedDuration;
         onConfirm(reason.trim() || undefined, durationHours);
     };
 
@@ -62,16 +66,19 @@ export function BanModalContent({
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                    <Label className="text-zinc-400">{t("duration")}</Label>
+                    <Label className="text-zinc-400">
+                        {t("duration")}
+                        <span className="text-rose-400 ml-1">*</span>
+                    </Label>
                     <div className="flex flex-wrap gap-2">
                         {BAN_DURATIONS.map((d) => (
                             <button
                                 key={d.labelKey}
                                 type="button"
                                 disabled={isPending}
-                                onClick={() => setDurationHours(d.value)}
+                                onClick={() => setSelectedDuration(d.value)}
                                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                                    durationHours === d.value
+                                    selectedDuration === d.value
                                         ? "bg-rose-500 text-white"
                                         : "bg-[#1e1f22] text-zinc-400 hover:bg-zinc-700"
                                 }`}
@@ -80,6 +87,9 @@ export function BanModalContent({
                             </button>
                         ))}
                     </div>
+                    {selectedDuration === null && (
+                        <p className="text-xs text-zinc-500">{t("durationRequired")}</p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -108,8 +118,8 @@ export function BanModalContent({
                     </Button>
                     <Button
                         type="submit"
-                        disabled={isPending}
-                        className="bg-rose-500 hover:bg-rose-600 text-white"
+                        disabled={isPending || selectedDuration === null}
+                        className="bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50"
                     >
                         {isPending ? (
                             <>
