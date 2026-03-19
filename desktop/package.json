@@ -1,0 +1,19 @@
+{
+  "name": "lezom-desktop",
+  "version": "0.1.0",
+  "description": "Lezom - Desktop App",
+  "private": true,
+  "main": "dist/main.js",
+  "author": "Lezom Team",
+  "scripts": {
+    "dev": "tsc && concurrently \"tsc -w\" \"electron .\"",
+    "dev:full": "tsc && concurrently \"cd ../client && npm run dev\" \"tsc -w\" \"wait-on http://localhost:3000 && electron .\""
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "concurrently": "^9.1.2",
+    "electron": "^33.4.0",
+    "typescript": "^5.8.2",
+    "wait-on": "^8.0.3"
+  }
+}
