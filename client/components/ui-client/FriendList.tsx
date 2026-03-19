@@ -35,7 +35,7 @@ export default function FriendList({ filter = "all" }: { filter?: Filter }) {
         createConversation(
             { userId },
             {
-                onSuccess: (data: any) => {
+                onSuccess: (data: { id: number }) => {
                     router.push(`/conversation/${data.id}`);
                 },
             }
@@ -109,6 +109,7 @@ export default function FriendList({ filter = "all" }: { filter?: Filter }) {
                         key={friend.id}
                         friend={friend}
                         isOnline={isOnline}
+                        onViewProfile={() => router.push(`/profil/${friend.id}`)}
                         onMessage={() => handleOpenConversation(friend.id)}
                         onRemove={() => setFriendToRemove(friend)}
                     />
@@ -161,11 +162,13 @@ function UserAvatar({ username, img, size = "h-9 w-9" }: { username: string; img
 function FriendItem({
     friend,
     isOnline,
+    onViewProfile,
     onMessage,
     onRemove,
 }: {
     friend: friendUserType;
     isOnline: boolean;
+    onViewProfile: () => void;
     onMessage: () => void;
     onRemove: () => void;
 }) {
@@ -173,7 +176,18 @@ function FriendItem({
     const tf = useTranslations("friends");
 
     return (
-        <div className="group flex items-center gap-3 px-3 py-3 rounded-md hover:bg-zinc-700/50 border-t border-zinc-700/40 transition-colors">
+        <div
+            role="button"
+            tabIndex={0}
+            onClick={onViewProfile}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onViewProfile();
+                }
+            }}
+            className="group flex w-full items-center gap-3 px-3 py-3 rounded-md hover:bg-zinc-700/50 border-t border-zinc-700/40 transition-colors text-left"
+        >
             <div className="relative shrink-0">
                 <UserAvatar username={friend.username} img={friend.img} />
                 <span
@@ -190,14 +204,22 @@ function FriendItem({
 
             <div className="flex items-center gap-2 shrink-0">
                 <button
-                    onClick={onMessage}
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onMessage();
+                    }}
                     className="p-1.5 rounded-full bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-colors"
                     title={tf("sendMessage")}
                 >
                     <MessageSquare className="w-4 h-4" />
                 </button>
                 <button
-                    onClick={onRemove}
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove();
+                    }}
                     className="p-1.5 rounded-full bg-zinc-700 hover:bg-red-600 text-zinc-300 hover:text-white transition-colors"
                     title={tf("removeFriend")}
                 >

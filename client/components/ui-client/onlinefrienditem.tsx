@@ -1,22 +1,30 @@
 "use client"
 
-import { useOnlineUserIds } from "@/hooks/queries/useOnlineUserIds"
+import { useRouter } from "next/navigation"
+
+type OnlineFriendMember = {
+    id?: number
+    username?: string
+}
 
 export function OnlineFriendItem({
                                      member,
                                      status = true,
                                  }: {
-    member: any
+    member: OnlineFriendMember
     status?: boolean
 }) {
-    const { data: onlineUserIds = [] } = useOnlineUserIds()
-    const isOnline = onlineUserIds.includes(member?.id)
+    const router = useRouter()
 
     const name = member?.username || "Inconnu"
     const initials = name.substring(0, 2).toUpperCase()
 
     return (
-        <div className="flex items-center gap-3 p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-all">
+        <button
+            type="button"
+            onClick={() => router.push(`/profil/${member?.id}`)}
+            className="flex w-full items-center gap-3 p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-all text-left"
+        >
             <div className="relative shrink-0">
                 <div className="h-8 w-8 rounded-full bg-[#313338] flex items-center justify-center text-[10px] font-bold text-white uppercase group-hover:bg-indigo-500 transition-colors">
                     {initials}
@@ -33,6 +41,6 @@ export function OnlineFriendItem({
             <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 truncate">
         {name}
       </span>
-        </div>
+        </button>
     )
 }
