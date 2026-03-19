@@ -4,25 +4,37 @@ import { useEffect, useState } from "react";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
 import { serversType } from "@/schemas/server.dto";
-import { ChevronLeft, ChevronRight, Inbox, HelpCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
+interface LezomDesktop {
+  isDesktop: boolean;
+  platform: string;
+}
+
+const drag = { WebkitAppRegion: "drag" } as React.CSSProperties;
 const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
+const iconBtnClass = "p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors";
 
 export default function DesktopTitleBar() {
   const [isDesktopMac, setIsDesktopMac] = useState(false);
-  const pathname = usePathname();
-  const params = useParams();
-  const router = useRouter();
-  const { data: servers } = useGetAllServers();
 
   useEffect(() => {
-    const desktop = (window as any).lezomDesktop;
+    const desktop = (window as unknown as { lezomDesktop?: LezomDesktop }).lezomDesktop;
     if (desktop?.isDesktop && desktop.platform === "darwin") {
       setIsDesktopMac(true);
     }
   }, []);
 
   if (!isDesktopMac) return null;
+
+  return <TitleBarContent />;
+}
+
+function TitleBarContent() {
+  const pathname = usePathname();
+  const params = useParams();
+  const router = useRouter();
+  const { data: servers } = useGetAllServers();
 
   const serverId = params?.serverId as string | undefined;
   const isInServer = pathname.startsWith("/servers/");
@@ -35,38 +47,20 @@ export default function DesktopTitleBar() {
   return (
     <div
       className="h-[38px] w-full shrink-0 bg-[#1E1F22] flex items-center px-20 relative"
-      style={{ WebkitAppRegion: "drag" } as React.CSSProperties}
+      style={drag}
     >
-      {/* Left - Navigation */}
       <div className="flex items-center gap-1" style={noDrag}>
-        <button
-          onClick={() => router.back()}
-          className="p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
-        >
+        <button onClick={() => router.back()} className={iconBtnClass}>
           <ChevronLeft size={18} />
         </button>
-        <button
-          onClick={() => router.forward()}
-          className="p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
-        >
+        <button onClick={() => router.forward()} className={iconBtnClass}>
           <ChevronRight size={18} />
         </button>
       </div>
 
-      {/* Center - Title */}
       <span className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold text-zinc-200 truncate max-w-[300px]">
         {title}
       </span>
-
-      {/* Right - Actions */}
-      <div className="ml-auto flex items-center gap-1" style={noDrag}>
-        <button className="p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
-          <Inbox size={18} />
-        </button>
-        <button className="p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors">
-          <HelpCircle size={18} />
-        </button>
-      </div>
     </div>
   );
 }
