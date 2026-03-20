@@ -2,22 +2,22 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { updatePictureRequest } from "@/requests/userRequest";
+import { updateBannerRequest } from "@/requests/userRequest";
 
-export function useEditProfilPicture(id?: number) {
+export function useEditProfilBanner(id?: number) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => updatePictureRequest(id!, file),
+    mutationFn: (file: File) => updateBannerRequest(id!, file),
     onSuccess: () => {
-      toast.success("Photo de profil mise à jour !");
+      toast.success("Banniere de profil mise a jour !");
       queryClient.invalidateQueries({ queryKey: ["authuser"] });
       if (id) {
         queryClient.invalidateQueries({ queryKey: ["user", id] });
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Erreur lors de la mise à jour");
+      toast.error(error.message || "Erreur lors de la mise a jour");
     },
   });
 }
