@@ -121,7 +121,7 @@ export function ProfileView({
 
   return (
     <div className="flex-1 bg-own-dark h-full overflow-y-auto">
-      <div className="relative h-40 w-full overflow-hidden bg-zinc-800">
+      <div className="relative h-40 w-full bg-zinc-800">
         <div
           className={`h-full w-full bg-cover bg-center ${
             user.banner
