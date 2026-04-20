@@ -6,6 +6,7 @@ import useAuthStore from '@/store/authStore';
 import { refreshAccessToken } from '@/lib/tokenRefresh';
 import { useSocketPresence } from '@/hooks/websocket/useSocketPresence';
 import { useSocketConversations } from '@/hooks/websocket/useSocketConversations';
+import { useDesktopNotifications } from '@/hooks/useDesktopNotifications';
 
 export default function SocketProvider({ children }: { children: React.ReactNode }) {
     const token = useAuthStore((state) => state.token);
@@ -13,6 +14,7 @@ export default function SocketProvider({ children }: { children: React.ReactNode
 
     useSocketPresence();
     useSocketConversations();
+    useDesktopNotifications();
 
     useEffect(() => {
         if (!token) {
