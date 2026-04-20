@@ -7,13 +7,36 @@
   "author": "Lezom Team",
   "scripts": {
     "dev": "tsc && concurrently \"tsc -w\" \"electron .\"",
-    "dev:full": "tsc && concurrently \"cd ../client && npm run dev\" \"tsc -w\" \"wait-on http://localhost:3000 && electron .\""
+    "dev:full": "tsc && concurrently \"cd ../client && npm run dev\" \"tsc -w\" \"wait-on http://localhost:3000 && electron .\"",
+    "build": "tsc",
+    "dist": "npm run build && electron-builder --mac"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
     "concurrently": "^9.1.2",
     "electron": "^33.4.0",
+    "electron-builder": "^25.1.8",
     "typescript": "^5.8.2",
     "wait-on": "^8.0.3"
+  },
+  "build": {
+    "appId": "com.lezom.desktop",
+    "productName": "Lezom",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.social-networking",
+      "target": [
+        { "target": "dmg", "arch": ["arm64"] }
+      ],
+      "icon": "assets/icon.icns",
+      "identity": null
+    }
   }
 }
