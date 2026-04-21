@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Hash, Volume2 } from 'lucide-react';
+import { Hash, Volume2, ShieldBan } from 'lucide-react';
 import Error from '@/components/ui-client/Error';
 import Loading from '@/components/ui-client/Loading';
 import { useGetAllChannelsOfAServer } from '@/hooks/queries/useGetAllChannelsOfAServer';
@@ -32,7 +32,7 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
     );
   }
 
-  const { data, isLoading, isError } = useGetAllChannelsOfAServer(serverId);
+  const { data, isLoading, isError, error } = useGetAllChannelsOfAServer(serverId);
 
   const servers = Array.isArray(allServersData)
     ? allServersData
@@ -41,7 +41,25 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
   const userMembership = currentServer?.memberships?.find((m: any) => m.members?.id === user?.id);
   const userRole = userMembership?.role;
 
+  const isBanned = isError && (error as Error)?.message?.toLowerCase().includes('banni');
+
   if (isLoading) return <Loading />;
+
+  if (isBanned)
+    return (
+      <aside className="flex shrink-0 w-full md:w-72 border-r border-black/20">
+        <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col items-center justify-center gap-4 p-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center">
+            <ShieldBan className="w-8 h-8 text-rose-400" />
+          </div>
+          <div>
+            <p className="text-white font-semibold text-lg">{t('bannedTitle')}</p>
+            <p className="text-zinc-400 text-sm mt-1">{t('bannedDesc')}</p>
+          </div>
+        </div>
+      </aside>
+    );
+
   if (isError) return <Error />;
 
   const channels: channelType[] = data?.[0]?.channels || [];

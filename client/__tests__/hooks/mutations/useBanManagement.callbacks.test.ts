@@ -10,6 +10,7 @@ vi.mock('@/requests/banRequest', () => ({
   getBannedUsersRequest: vi.fn(),
 }));
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock('next-intl', () => ({ useTranslations: () => (k: string) => k }));
 
 import { useBanUser, useUnbanUser } from '@/hooks/mutations/useBanManagement';
 
@@ -22,9 +23,7 @@ describe('useBanUser callbacks', () => {
     await act(async () => {
       await result.current.mutateAsync({ serverId: '1', userId: 2, reason: 'spam' });
     });
-    await waitFor(() =>
-      expect(vi.mocked(toast.success)).toHaveBeenCalledWith('Utilisateur banni avec succès'),
-    );
+    await waitFor(() => expect(vi.mocked(toast.success)).toHaveBeenCalledWith('banSuccess'));
   });
 
   it('onError appelle toast.error', async () => {
@@ -48,9 +47,7 @@ describe('useUnbanUser callbacks', () => {
     await act(async () => {
       await result.current.mutateAsync({ serverId: '1', userId: 2 });
     });
-    await waitFor(() =>
-      expect(vi.mocked(toast.success)).toHaveBeenCalledWith('Utilisateur débanni avec succès'),
-    );
+    await waitFor(() => expect(vi.mocked(toast.success)).toHaveBeenCalledWith('unbanSuccess'));
   });
 
   it('onError appelle toast.error', async () => {

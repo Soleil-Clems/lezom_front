@@ -101,7 +101,7 @@ export function ServerSidebar() {
         </SidebarContent>
 
         <SidebarFooter className="py-4 px-3 flex flex-col items-start md:items-center">
-          <a
+          <Link
             href="/profil"
             onClick={() => setOpenMobile(false)}
             className="group flex items-center gap-3 outline-none"
@@ -109,7 +109,7 @@ export function ServerSidebar() {
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white transition-all duration-200 hover:rounded-[16px]">
               <User size={24} />
             </div>
-          </a>
+          </Link>
         </SidebarFooter>
       </Sidebar>
     </TooltipProvider>

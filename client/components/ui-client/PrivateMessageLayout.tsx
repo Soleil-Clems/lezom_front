@@ -51,7 +51,7 @@ export default function PrivateMessageLayout({ conversationId }: PrivateMessageL
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto discord-scrollbar">
         <div ref={sentinelRef} className="h-1" />
         <PrivateMessageScreen
@@ -61,7 +61,9 @@ export default function PrivateMessageLayout({ conversationId }: PrivateMessageL
         />
       </div>
 
-      <Message conversationId={conversationId} />
+      <div className="shrink-0">
+        <Message conversationId={conversationId} />
+      </div>
     </div>
   );
 }
