@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useTransition } from "react";
-import { useLocale } from "next-intl";
+import { useTransition } from 'react';
+import { useLocale } from 'next-intl';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { setLocale } from "@/i18n/actions";
+} from '@/components/ui/select';
+import { setLocale } from '@/i18n/actions';
 
 const languages = [
-  { value: "fr", label: "Français" },
-  { value: "en", label: "English" },
+  { value: 'fr', label: 'Français' },
+  { value: 'en', label: 'English' },
 ];
 
 export function LanguageSwitcher() {

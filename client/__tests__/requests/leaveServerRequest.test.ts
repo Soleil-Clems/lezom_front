@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { leaveServerRequest } from '@/requests/leaveServerRequest'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { leaveServerRequest } from '@/requests/leaveServerRequest';
 
 vi.mock('@/lib/customFetch', () => ({
   default: {
@@ -8,22 +8,22 @@ vi.mock('@/lib/customFetch', () => ({
     patch: vi.fn(),
     delete: vi.fn(),
   },
-}))
+}));
 
-import customfetch from '@/lib/customFetch'
+import customfetch from '@/lib/customFetch';
 
 describe('leaveServerRequest', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks());
 
   it('appelle POST servers/:id/leave sans newOwnerId', async () => {
-    vi.mocked(customfetch.post).mockResolvedValue({})
-    await leaveServerRequest(1)
-    expect(customfetch.post).toHaveBeenCalledWith('servers/1/leave', {})
-  })
+    vi.mocked(customfetch.post).mockResolvedValue({});
+    await leaveServerRequest(1);
+    expect(customfetch.post).toHaveBeenCalledWith('servers/1/leave', {});
+  });
 
   it('appelle POST servers/:id/leave avec newOwnerId', async () => {
-    vi.mocked(customfetch.post).mockResolvedValue({})
-    await leaveServerRequest(1, 5)
-    expect(customfetch.post).toHaveBeenCalledWith('servers/1/leave', { newOwnerId: 5 })
-  })
-})
+    vi.mocked(customfetch.post).mockResolvedValue({});
+    await leaveServerRequest(1, 5);
+    expect(customfetch.post).toHaveBeenCalledWith('servers/1/leave', { newOwnerId: 5 });
+  });
+});

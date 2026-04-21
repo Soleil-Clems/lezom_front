@@ -1,5 +1,5 @@
-import { useRef, useEffect, useLayoutEffect, useState } from "react";
-import { InfiniteData } from "@tanstack/react-query";
+import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { InfiniteData } from '@tanstack/react-query';
 
 interface UseInfiniteScrollOptions<T> {
   data: InfiniteData<T> | undefined;
@@ -96,12 +96,11 @@ export function useInfiniteScroll<T>({
       (entries) => {
         if (entries[0].isIntersecting && !isFetchingRef.current && hasNextPageRef.current) {
           isLoadingOlderRef.current = true;
-          prevScrollHeightRef.current =
-            scrollContainerRef.current?.scrollHeight || 0;
+          prevScrollHeightRef.current = scrollContainerRef.current?.scrollHeight || 0;
           fetchNextPage();
         }
       },
-      { threshold: 0, rootMargin: "500px 0px 0px 0px" },
+      { threshold: 0, rootMargin: '500px 0px 0px 0px' },
     );
 
     if (sentinelRef.current) {

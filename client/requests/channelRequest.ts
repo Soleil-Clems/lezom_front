@@ -1,6 +1,6 @@
-import customfetch from "@/lib/customFetch";
-import { channelSchema, createChannelType } from "@/schemas/channel.dto";
-import z from "zod";
+import customfetch from '@/lib/customFetch';
+import { channelSchema, createChannelType } from '@/schemas/channel.dto';
+import z from 'zod';
 
 //
 // export const getAllServersRequest = async () => {
@@ -14,7 +14,7 @@ import z from "zod";
 
 export const channelRequest = async (body: createChannelType) => {
   try {
-    const response = await customfetch.post("channels", body);
+    const response = await customfetch.post('channels', body);
     return response;
   } catch (error) {
     throw error;

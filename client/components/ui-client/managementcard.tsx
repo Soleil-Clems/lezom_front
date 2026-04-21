@@ -1,13 +1,13 @@
-"use client"
+'use client';
 
-import React, { useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Loader2, Save, Hash } from "lucide-react"
-import { DeleteConfirmModal } from "./DeleteConfirmModal"
-import { useTranslations } from "next-intl"
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Loader2, Save, Hash } from 'lucide-react';
+import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { useTranslations } from 'next-intl';
 
 type ManagementCardProps = {
   id: string | number;
@@ -18,7 +18,7 @@ type ManagementCardProps = {
   onDelete: () => void;
   isPending: boolean;
   isOwner?: boolean;
-}
+};
 
 export function ManagementCard({
   id,
@@ -28,13 +28,13 @@ export function ManagementCard({
   onSave,
   onDelete,
   isPending,
-  isOwner = false
+  isOwner = false,
 }: ManagementCardProps) {
-  const t = useTranslations("server");
-  const tc = useTranslations("common");
+  const t = useTranslations('server');
+  const tc = useTranslations('common');
   const [currentValue, setCurrentValue] = useState(initialValue);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const hasChanged = currentValue !== initialValue && currentValue.trim() !== "";
+  const hasChanged = currentValue !== initialValue && currentValue.trim() !== '';
 
   return (
     <Card className="bg-[#2B2D31] border-none shadow-lg mb-4">
@@ -43,7 +43,9 @@ export function ManagementCard({
           <div className="flex-1 space-y-1.5">
             <Label className="text-zinc-400 text-[11px] font-bold uppercase">{label}</Label>
             <div className="relative">
-              {type === 'channel' && <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />}
+              {type === 'channel' && (
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" />
+              )}
               <Input
                 value={currentValue}
                 onChange={(e) => setCurrentValue(e.target.value)}
@@ -56,8 +58,12 @@ export function ManagementCard({
             className="bg-indigo-500 hover:bg-indigo-600 h-10 px-6"
             onClick={() => onSave(currentValue)}
           >
-            {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            {tc("save")}
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
+            {tc('save')}
           </Button>
         </div>
         {isOwner && (
@@ -68,7 +74,7 @@ export function ManagementCard({
               className="w-full border-rose-500 text-rose-400 hover:text-white hover:bg-rose-500 h-10"
               onClick={() => setShowDeleteModal(true)}
             >
-              {type === 'server' ? t("deleteServer") : t("deleteChannel")}
+              {type === 'server' ? t('deleteServer') : t('deleteChannel')}
             </Button>
           </div>
         )}
@@ -81,8 +87,8 @@ export function ManagementCard({
           onDelete();
           setShowDeleteModal(false);
         }}
-        title={type === 'server' ? t("deleteServer") : t("deleteChannel")}
-        message={type === 'server' ? t("deleteServerConfirm") : t("deleteChannelConfirm")}
+        title={type === 'server' ? t('deleteServer') : t('deleteChannel')}
+        message={type === 'server' ? t('deleteServerConfirm') : t('deleteChannelConfirm')}
         itemName={initialValue}
         isPending={isPending}
       />

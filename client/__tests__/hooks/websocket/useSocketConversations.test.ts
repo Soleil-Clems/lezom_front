@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React from 'react'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 
 vi.mock('@/lib/socket', () => ({
   socketManager: {
@@ -17,22 +17,21 @@ vi.mock('@/lib/socket', () => ({
     on: vi.fn(),
     off: vi.fn(),
   },
-}))
+}));
 
-import { useSocketConversations } from '@/hooks/websocket/useSocketConversations'
+import { useSocketConversations } from '@/hooks/websocket/useSocketConversations';
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
+const wrapper = ({ children }: { children: React.ReactNode }) =>
   React.createElement(QueryClientProvider, {
     client: new QueryClient({ defaultOptions: { queries: { retry: false } } }),
     children,
-  })
-)
+  });
 
 describe('useSocketConversations', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks());
 
   it('est défini', () => {
-    const { result } = renderHook(() => useSocketConversations(), { wrapper })
-    expect(result).toBeDefined()
-  })
-})
+    const { result } = renderHook(() => useSocketConversations(), { wrapper });
+    expect(result).toBeDefined();
+  });
+});

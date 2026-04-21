@@ -1,28 +1,18 @@
-import { customfetch } from "@/lib/customFetch";
-import {
-  sendPrivateMessageType,
-  createConversationType,
-} from "@/schemas/conversation.dto";
+import { customfetch } from '@/lib/customFetch';
+import { sendPrivateMessageType, createConversationType } from '@/schemas/conversation.dto';
 
-export const createConversationRequest = async (
-  body: createConversationType,
-) => {
+export const createConversationRequest = async (body: createConversationType) => {
   try {
-    const response = await customfetch.post("conversations", body);
+    const response = await customfetch.post('conversations', body);
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const getAllConversationsRequest = async (
-  page: number = 1,
-  limit: number = 20,
-) => {
+export const getAllConversationsRequest = async (page: number = 1, limit: number = 20) => {
   try {
-    const response = await customfetch.get(
-      `conversations?page=${page}&limit=${limit}`,
-    );
+    const response = await customfetch.get(`conversations?page=${page}&limit=${limit}`);
     return response;
   } catch (error) {
     throw error;
@@ -55,28 +45,19 @@ export const getConversationMessagesRequest = async (
 
 export const sendPrivateMessageRequest = async (
   id: number,
-  body: { content: string; type: "text" | "img" | "file" | "pdf" },
+  body: { content: string; type: 'text' | 'img' | 'file' | 'pdf' },
 ) => {
   try {
-    const response = await customfetch.post(
-      `conversations/${id}/messages`,
-      body,
-    );
+    const response = await customfetch.post(`conversations/${id}/messages`, body);
     return response;
   } catch (error) {
     throw error;
   }
 };
 
-export const updatePrivateMessageRequest = async (
-  messageId: number,
-  body: { content: string },
-) => {
+export const updatePrivateMessageRequest = async (messageId: number, body: { content: string }) => {
   try {
-    const response = await customfetch.patch(
-      `conversations/messages/${messageId}`,
-      body,
-    );
+    const response = await customfetch.patch(`conversations/messages/${messageId}`, body);
     return response;
   } catch (error) {
     throw error;
@@ -85,9 +66,7 @@ export const updatePrivateMessageRequest = async (
 
 export const deletePrivateMessageRequest = async (messageId: number) => {
   try {
-    const response = await customfetch.delete(
-      `conversations/messages/${messageId}`,
-    );
+    const response = await customfetch.delete(`conversations/messages/${messageId}`);
     return response;
   } catch (error) {
     throw error;

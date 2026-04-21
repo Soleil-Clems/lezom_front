@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest';
 import {
   conversationSchema,
   privateMessageSchema,
   sendPrivateMessageSchema,
   createConversationSchema,
-} from '@/schemas/conversation.dto'
+} from '@/schemas/conversation.dto';
 
 const validUser = {
   id: 1,
@@ -19,17 +19,17 @@ const validUser = {
   lastSeen: new Date(),
   createdAt: new Date(),
   updatedAt: new Date(),
-}
+};
 
 describe('conversationSchema', () => {
   it('valide un objet conversation minimal', () => {
-    const data = { id: 1, user1: validUser, user2: { ...validUser, id: 2, username: 'bob' } }
-    expect(() => conversationSchema.parse(data)).not.toThrow()
-  })
+    const data = { id: 1, user1: validUser, user2: { ...validUser, id: 2, username: 'bob' } };
+    expect(() => conversationSchema.parse(data)).not.toThrow();
+  });
 
   it('rejette sans id', () => {
-    expect(() => conversationSchema.parse({ user1: validUser, user2: validUser })).toThrow()
-  })
+    expect(() => conversationSchema.parse({ user1: validUser, user2: validUser })).toThrow();
+  });
 
   it('accepte createdAt/updatedAt optionnels', () => {
     const data = {
@@ -38,10 +38,10 @@ describe('conversationSchema', () => {
       user2: { ...validUser, id: 2 },
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
-    expect(() => conversationSchema.parse(data)).not.toThrow()
-  })
-})
+    };
+    expect(() => conversationSchema.parse(data)).not.toThrow();
+  });
+});
 
 describe('privateMessageSchema', () => {
   it('valide un message privé valide', () => {
@@ -51,9 +51,9 @@ describe('privateMessageSchema', () => {
       type: 'text',
       sender: validUser,
       conversation: 42,
-    }
-    expect(() => privateMessageSchema.parse(data)).not.toThrow()
-  })
+    };
+    expect(() => privateMessageSchema.parse(data)).not.toThrow();
+  });
 
   it('rejette un type invalide', () => {
     const data = {
@@ -62,9 +62,9 @@ describe('privateMessageSchema', () => {
       type: 'invalid',
       sender: validUser,
       conversation: 42,
-    }
-    expect(() => privateMessageSchema.parse(data)).toThrow()
-  })
+    };
+    expect(() => privateMessageSchema.parse(data)).toThrow();
+  });
 
   it('accepte reactions optionnel', () => {
     const data = {
@@ -74,37 +74,37 @@ describe('privateMessageSchema', () => {
       sender: validUser,
       conversation: 42,
       reactions: [],
-    }
-    expect(() => privateMessageSchema.parse(data)).not.toThrow()
-  })
-})
+    };
+    expect(() => privateMessageSchema.parse(data)).not.toThrow();
+  });
+});
 
 describe('sendPrivateMessageSchema', () => {
   it('valide les données minimales', () => {
-    const data = { content: 'msg', type: 'text', conversationId: 1 }
-    expect(() => sendPrivateMessageSchema.parse(data)).not.toThrow()
-  })
+    const data = { content: 'msg', type: 'text', conversationId: 1 };
+    expect(() => sendPrivateMessageSchema.parse(data)).not.toThrow();
+  });
 
   it('rejette content vide', () => {
-    const data = { content: '', type: 'text', conversationId: 1 }
-    expect(() => sendPrivateMessageSchema.parse(data)).toThrow()
-  })
+    const data = { content: '', type: 'text', conversationId: 1 };
+    expect(() => sendPrivateMessageSchema.parse(data)).toThrow();
+  });
 
   it('rejette sans conversationId', () => {
-    expect(() => sendPrivateMessageSchema.parse({ content: 'msg', type: 'text' })).toThrow()
-  })
-})
+    expect(() => sendPrivateMessageSchema.parse({ content: 'msg', type: 'text' })).toThrow();
+  });
+});
 
 describe('createConversationSchema', () => {
   it('valide un userId valide', () => {
-    expect(() => createConversationSchema.parse({ userId: 5 })).not.toThrow()
-  })
+    expect(() => createConversationSchema.parse({ userId: 5 })).not.toThrow();
+  });
 
   it('rejette sans userId', () => {
-    expect(() => createConversationSchema.parse({})).toThrow()
-  })
+    expect(() => createConversationSchema.parse({})).toThrow();
+  });
 
   it('rejette un userId non numérique', () => {
-    expect(() => createConversationSchema.parse({ userId: 'abc' })).toThrow()
-  })
-})
+    expect(() => createConversationSchema.parse({ userId: 'abc' })).toThrow();
+  });
+});

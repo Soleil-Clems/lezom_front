@@ -1,11 +1,7 @@
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { ServerSidebar } from "@/components/ui-client/serversidebar";
-import SocketProvider from "@/providers/SocketProvider";
-import AuthGuard from "@/components/ui-client/AuthGuard";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { ServerSidebar } from '@/components/ui-client/serversidebar';
+import SocketProvider from '@/providers/SocketProvider';
+import AuthGuard from '@/components/ui-client/AuthGuard';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

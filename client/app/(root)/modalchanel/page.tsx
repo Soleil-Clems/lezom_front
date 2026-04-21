@@ -1,9 +1,9 @@
-import { ModalChanelContent } from "@/components/ui-client/modalchanel";
+import { ModalChanelContent } from '@/components/ui-client/modalchanel';
 
 export default function Page() {
-    return (
-        <div className="w-full">
-            <ModalChanelContent onSuccess={() => {}} />
-        </div>
-    )
+  return (
+    <div className="w-full">
+      <ModalChanelContent onSuccess={() => {}} />
+    </div>
+  );
 }

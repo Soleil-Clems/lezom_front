@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import {
   Form,
   FormControl,
@@ -16,17 +16,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from '@/components/ui/form';
 
-import { useTranslations } from "next-intl";
-import { useEditProfil } from "@/hooks/mutations/useEditProfil";
-import { userType } from "@/schemas/user.dto";
+import { useTranslations } from 'next-intl';
+import { useEditProfil } from '@/hooks/mutations/useEditProfil';
+import { userType } from '@/schemas/user.dto';
 
 const editProfileSchema = z.object({
-  username: z.string().min(3, "Pseudo trop court"),
-  description: z.string().max(200, "200 caractères max").or(z.literal("")),
-  firstname: z.string().min(2, "Prénom trop court"),
-  lastname: z.string().min(2, "Nom trop court"),
+  username: z.string().min(3, 'Pseudo trop court'),
+  description: z.string().max(200, '200 caractères max').or(z.literal('')),
+  firstname: z.string().min(2, 'Prénom trop court'),
+  lastname: z.string().min(2, 'Nom trop court'),
   isActive: z.boolean(),
 });
 
@@ -39,17 +39,17 @@ export function EditProfileInfoForm({
   user: userType;
   onSuccess: () => void;
 }) {
-  const t = useTranslations("profile");
-  const ta = useTranslations("auth");
+  const t = useTranslations('profile');
+  const ta = useTranslations('auth');
   const editProfile = useEditProfil(user.id);
 
   const form = useForm<EditProfileFormValues>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       username: user.username,
-      description: user.description ?? "",
-      firstname: user.firstname ?? "",
-      lastname: user.lastname ?? "",
+      description: user.description ?? '',
+      firstname: user.firstname ?? '',
+      lastname: user.lastname ?? '',
       isActive: user.isActive ?? true,
     },
   });
@@ -68,7 +68,7 @@ export function EditProfileInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                  {ta("firstname")}
+                  {ta('firstname')}
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="bg-[#1E1F22] border-none text-white" />
@@ -83,7 +83,7 @@ export function EditProfileInfoForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                  {ta("lastname")}
+                  {ta('lastname')}
                 </FormLabel>
                 <FormControl>
                   <Input {...field} className="bg-[#1E1F22] border-none text-white" />
@@ -100,7 +100,7 @@ export function EditProfileInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                {t("usernameLabel")}
+                {t('usernameLabel')}
               </FormLabel>
               <FormControl>
                 <Input {...field} className="bg-[#1E1F22] border-none text-white" />
@@ -116,7 +116,7 @@ export function EditProfileInfoForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-xs uppercase font-bold text-zinc-400">
-                {t("description")}
+                {t('description')}
               </FormLabel>
               <FormControl>
                 <Textarea
@@ -136,10 +136,10 @@ export function EditProfileInfoForm({
             <FormItem className="flex items-center justify-between p-3 bg-[#1E1F22] rounded-lg">
               <div className="space-y-0.5">
                 <FormLabel className="text-sm font-medium text-white">
-                  {t("activeProfile")}
+                  {t('activeProfile')}
                 </FormLabel>
                 <FormDescription className="text-xs text-zinc-400">
-                  {t("activeProfileDesc")}
+                  {t('activeProfileDesc')}
                 </FormDescription>
               </div>
               <FormControl>
@@ -154,7 +154,7 @@ export function EditProfileInfoForm({
           className="w-full bg-[#5764f2] hover:bg-[#4752C4] text-white"
           disabled={editProfile.isPending}
         >
-          {editProfile.isPending ? t("savingChanges") : t("saveChanges")}
+          {editProfile.isPending ? t('savingChanges') : t('saveChanges')}
         </Button>
       </form>
     </Form>
