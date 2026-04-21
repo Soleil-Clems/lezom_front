@@ -56,7 +56,6 @@ describe('useInfiniteScroll', () => {
       { initialProps: { count: 0 } },
     );
 
-    // @ts-expect-error assignation directe pour le test
     result.current.scrollContainerRef.current = container;
 
     rerender({ count: 5 });
@@ -84,9 +83,7 @@ describe('useInfiniteScroll', () => {
       { initialProps: { count: 0, hasNextPage: false } },
     );
 
-    // @ts-expect-error assignation directe pour le test
     result.current.scrollContainerRef.current = container;
-    // @ts-expect-error assignation directe pour le test
     result.current.sentinelRef.current = sentinel;
 
     rerender({ count: 5, hasNextPage: true });
