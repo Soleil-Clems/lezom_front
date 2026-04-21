@@ -10,6 +10,8 @@ vi.mock('@/requests/banRequest', () => ({
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
+vi.mock('next-intl', () => ({ useTranslations: () => (k: string) => k }));
+
 describe('useBanManagement', () => {
   it('useBanUser expose mutate', () => {
     const { result } = renderHookWithQuery(() => useBanUser());

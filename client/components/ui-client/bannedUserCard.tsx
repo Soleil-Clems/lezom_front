@@ -23,6 +23,16 @@ export function BannedUserCard({ ban, isPending, onOpenUnbanModal }: BannedUserC
     year: 'numeric',
   });
 
+  const formattedExpiry = ban.expiresAt
+    ? new Date(ban.expiresAt).toLocaleDateString(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : null;
+
   return (
     <Card className="bg-[#1E1F22] border-none">
       <CardContent className="flex items-center justify-between p-4">
@@ -39,6 +49,13 @@ export function BannedUserCard({ ban, isPending, onOpenUnbanModal }: BannedUserC
               <p className="text-xs text-zinc-400 mt-1">
                 {t('reasonLabel', { reason: ban.reason })}
               </p>
+            )}
+            {formattedExpiry ? (
+              <p className="text-xs text-amber-400 mt-1">
+                {t('expiresAt', { date: formattedExpiry })}
+              </p>
+            ) : (
+              <p className="text-xs text-rose-400 mt-1">{t('permanent')}</p>
             )}
           </div>
         </div>

@@ -5,6 +5,10 @@ export const getAuthUserRequest = async () => {
   return customfetch.get('auth/me');
 };
 
+export const getUserByIdRequest = async (userId: number) => {
+  return customfetch.get(`users/${userId}`);
+};
+
 export const updateUserRequest = async (userId: number, body: userUpdateType) => {
   return customfetch.patch(`users/${userId}`, body);
 };
