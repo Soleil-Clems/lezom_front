@@ -1,26 +1,27 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { usePathname, useParams, useRouter } from "next/navigation";
-import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
-import { serversType } from "@/schemas/server.dto";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { usePathname, useParams, useRouter } from 'next/navigation';
+import { useGetAllServers } from '@/hooks/queries/useGetAllServers';
+import { serversType } from '@/schemas/server.dto';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface LezomDesktop {
   isDesktop: boolean;
   platform: string;
 }
 
-const drag = { WebkitAppRegion: "drag" } as React.CSSProperties;
-const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
-const iconBtnClass = "p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors";
+const drag = { WebkitAppRegion: 'drag' } as React.CSSProperties;
+const noDrag = { WebkitAppRegion: 'no-drag' } as React.CSSProperties;
+const iconBtnClass =
+  'p-1 rounded text-zinc-400 hover:text-white hover:bg-white/10 transition-colors';
 
 export default function DesktopTitleBar() {
   const [isDesktopMac, setIsDesktopMac] = useState(false);
 
   useEffect(() => {
     const desktop = (window as unknown as { lezomDesktop?: LezomDesktop }).lezomDesktop;
-    if (desktop?.isDesktop && desktop.platform === "darwin") {
+    if (desktop?.isDesktop && desktop.platform === 'darwin') {
       setIsDesktopMac(true);
     }
   }, []);
@@ -37,12 +38,13 @@ function TitleBarContent() {
   const { data: servers } = useGetAllServers();
 
   const serverId = params?.serverId as string | undefined;
-  const isInServer = pathname.startsWith("/servers/");
-  const currentServer = isInServer && serverId && servers
-    ? servers.find((s: serversType) => s.id.toString() === serverId)
-    : null;
+  const isInServer = pathname.startsWith('/servers/');
+  const currentServer =
+    isInServer && serverId && servers
+      ? servers.find((s: serversType) => s.id.toString() === serverId)
+      : null;
 
-  const title = currentServer?.name ?? "Messages privés";
+  const title = currentServer?.name ?? 'Messages privés';
 
   return (
     <div

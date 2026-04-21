@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { useSocket } from "@/hooks/websocket/useSocket";
-import { useAuthUser } from "@/hooks/queries/useAuthUser";
+import { useEffect, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSocket } from '@/hooks/websocket/useSocket';
+import { useAuthUser } from '@/hooks/queries/useAuthUser';
 
 interface ChannelNotificationPayload {
   messageId: number;
@@ -36,8 +36,8 @@ interface FriendRequestAcceptedPayload {
 }
 
 function getConversationId(msg: PrivateMessagePayload): number | undefined {
-  if (typeof msg.conversation === "number") return msg.conversation;
-  if (msg.conversation && typeof msg.conversation === "object") return msg.conversation.id;
+  if (typeof msg.conversation === 'number') return msg.conversation;
+  if (msg.conversation && typeof msg.conversation === 'object') return msg.conversation.id;
   return msg.conversationId;
 }
 
@@ -90,9 +90,9 @@ export function useDesktopNotifications() {
       unreadRef.current.delete(`channel-${chMatch[1]}`);
       updateBadge();
     }
-    if (pathname === "/") {
+    if (pathname === '/') {
       for (const key of Array.from(unreadRef.current.keys())) {
-        if (key.startsWith("friend-")) unreadRef.current.delete(key);
+        if (key.startsWith('friend-')) unreadRef.current.delete(key);
       }
       updateBadge();
     }
@@ -114,14 +114,13 @@ export function useDesktopNotifications() {
       const onPage = pathnameRef.current === `/conversation/${convId}`;
       if (focused && onPage) return;
 
-      const senderName =
-        message.sender?.firstName || message.sender?.username || "Nouveau message";
-      const body = (message.content ?? "").slice(0, 200);
+      const senderName = message.sender?.firstName || message.sender?.username || 'Nouveau message';
+      const body = (message.content ?? '').slice(0, 200);
 
       desktop.notify({
         title: senderName,
         body,
-        type: "dm",
+        type: 'dm',
         conversationId: convId,
         tag: `dm-${convId}`,
       });
@@ -140,7 +139,7 @@ export function useDesktopNotifications() {
       desktop.notify({
         title: `#${payload.channelName} · ${payload.serverName}`,
         body: `${payload.senderName}: ${payload.contentPreview}`,
-        type: "channel",
+        type: 'channel',
         channelId: payload.channelId,
         serverId: payload.serverId,
         tag: `channel-${payload.channelId}`,
@@ -154,13 +153,13 @@ export function useDesktopNotifications() {
     const handleFriendRequest = async (payload: FriendRequestReceivedPayload) => {
       if (Number(payload.senderId) === Number(authUser.id)) return;
       const focused = await desktop.isFocused();
-      const onPage = pathnameRef.current === "/";
+      const onPage = pathnameRef.current === '/';
       if (focused && onPage) return;
 
       desktop.notify({
         title: "Nouvelle demande d'ami",
         body: `${payload.senderName} souhaite vous ajouter`,
-        type: "friend-request",
+        type: 'friend-request',
         tag: `friend-request-${payload.requestId}`,
       });
 
@@ -171,13 +170,13 @@ export function useDesktopNotifications() {
     const handleFriendAccepted = async (payload: FriendRequestAcceptedPayload) => {
       if (Number(payload.accepterId) === Number(authUser.id)) return;
       const focused = await desktop.isFocused();
-      const onPage = pathnameRef.current === "/";
+      const onPage = pathnameRef.current === '/';
       if (focused && onPage) return;
 
       desktop.notify({
         title: "Demande d'ami acceptée",
         body: `${payload.accepterName} a accepté votre demande`,
-        type: "friend-accepted",
+        type: 'friend-accepted',
         tag: `friend-accepted-${payload.requestId}`,
       });
 
@@ -185,16 +184,16 @@ export function useDesktopNotifications() {
       updateBadge();
     };
 
-    on("newPrivateMessage", handleDM);
-    on("channelMessageNotification", handleChannel);
-    on("friendRequestReceived", handleFriendRequest);
-    on("friendRequestAccepted", handleFriendAccepted);
+    on('newPrivateMessage', handleDM);
+    on('channelMessageNotification', handleChannel);
+    on('friendRequestReceived', handleFriendRequest);
+    on('friendRequestAccepted', handleFriendAccepted);
 
     return () => {
-      off("newPrivateMessage", handleDM);
-      off("channelMessageNotification", handleChannel);
-      off("friendRequestReceived", handleFriendRequest);
-      off("friendRequestAccepted", handleFriendAccepted);
+      off('newPrivateMessage', handleDM);
+      off('channelMessageNotification', handleChannel);
+      off('friendRequestReceived', handleFriendRequest);
+      off('friendRequestAccepted', handleFriendAccepted);
     };
   }, [isConnected, authUser, on, off]);
 
@@ -202,14 +201,14 @@ export function useDesktopNotifications() {
     if (!window.lezomDesktop) return;
 
     return window.lezomDesktop.onNotificationClick((payload) => {
-      if (payload.type === "dm" && payload.conversationId) {
+      if (payload.type === 'dm' && payload.conversationId) {
         router.push(`/conversation/${payload.conversationId}`);
         unreadRef.current.delete(`dm-${payload.conversationId}`);
-      } else if (payload.type === "channel" && payload.channelId && payload.serverId) {
+      } else if (payload.type === 'channel' && payload.channelId && payload.serverId) {
         router.push(`/servers/${payload.serverId}/${payload.channelId}`);
         unreadRef.current.delete(`channel-${payload.channelId}`);
-      } else if (payload.type === "friend-request" || payload.type === "friend-accepted") {
-        router.push("/");
+      } else if (payload.type === 'friend-request' || payload.type === 'friend-accepted') {
+        router.push('/');
         if (payload.tag) unreadRef.current.delete(payload.tag);
       }
       updateBadge();

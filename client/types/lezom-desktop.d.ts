@@ -1,7 +1,7 @@
 export interface DesktopNotifyPayload {
   title: string;
   body: string;
-  type: "dm" | "channel" | "friend-request" | "friend-accepted";
+  type: 'dm' | 'channel' | 'friend-request' | 'friend-accepted';
   conversationId?: number;
   channelId?: number;
   serverId?: number;
@@ -15,9 +15,7 @@ export interface LezomDesktop {
   setBadge: (count: number) => void;
   focus: () => void;
   isFocused: () => Promise<boolean>;
-  onNotificationClick: (
-    callback: (payload: DesktopNotifyPayload) => void,
-  ) => () => void;
+  onNotificationClick: (callback: (payload: DesktopNotifyPayload) => void) => () => void;
 }
 
 declare global {

@@ -38,6 +38,10 @@ vi.mock('@/hooks/websocket/useSocketConversations', () => ({
   useSocketConversations: vi.fn(),
 }));
 
+vi.mock('@/hooks/useDesktopNotifications', () => ({
+  useDesktopNotifications: vi.fn(),
+}));
+
 vi.mock('@tanstack/react-query', async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
