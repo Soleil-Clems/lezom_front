@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useTranslations } from "next-intl";
-import { User, Shield, Loader2, Sword, ChevronDown } from "lucide-react";
-import { MemberRoleType } from "@/schemas/member.dto";
+} from '@/components/ui/dropdown-menu';
+import { useTranslations } from 'next-intl';
+import { User, Shield, Loader2, Sword, ChevronDown } from 'lucide-react';
+import { MemberRoleType } from '@/schemas/member.dto';
 
 type MemberCardProps = {
   member: {
@@ -35,38 +35,36 @@ export function MemberCard({
   isPending,
   isRoleChangePending = false,
 }: MemberCardProps) {
-  const t = useTranslations("roles");
-  const tb = useTranslations("ban");
-  const isOwner = member.role === "server_owner";
-  const isAdmin = member.role === "server_admin";
+  const t = useTranslations('roles');
+  const tb = useTranslations('ban');
+  const isOwner = member.role === 'server_owner';
+  const isAdmin = member.role === 'server_admin';
 
-  const currentUserIsOwner = currentUserRole === "server_owner";
-  const currentUserIsAdmin = currentUserRole === "server_admin";
+  const currentUserIsOwner = currentUserRole === 'server_owner';
+  const currentUserIsAdmin = currentUserRole === 'server_admin';
 
-  const canBan =
-    !isCurrentUser && !isOwner && (currentUserIsOwner || currentUserIsAdmin);
+  const canBan = !isCurrentUser && !isOwner && (currentUserIsOwner || currentUserIsAdmin);
 
   const canChangeRole =
     onRoleChange &&
     !isCurrentUser &&
-    ((currentUserIsOwner && !isOwner) ||
-      (currentUserIsAdmin && member.role === "server_member"));
+    ((currentUserIsOwner && !isOwner) || (currentUserIsAdmin && member.role === 'server_member'));
 
   const getAvailableRoles = (): { value: MemberRoleType; label: string }[] => {
     if (currentUserIsOwner) {
       if (isAdmin) {
         return [
-          { value: "server_member", label: t("member") },
-          { value: "server_owner", label: t("owner") },
+          { value: 'server_member', label: t('member') },
+          { value: 'server_owner', label: t('owner') },
         ];
       } else {
         return [
-          { value: "server_admin", label: t("administrator") },
-          { value: "server_owner", label: t("owner") },
+          { value: 'server_admin', label: t('administrator') },
+          { value: 'server_owner', label: t('owner') },
         ];
       }
-    } else if (currentUserIsAdmin && member.role === "server_member") {
-      return [{ value: "server_admin", label: t("administrator") }];
+    } else if (currentUserIsAdmin && member.role === 'server_member') {
+      return [{ value: 'server_admin', label: t('administrator') }];
     }
     return [];
   };
@@ -84,13 +82,13 @@ export function MemberCard({
     if (isOwner) {
       return (
         <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded">
-          {t("owner")}
+          {t('owner')}
         </span>
       );
     } else if (isAdmin) {
       return (
         <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded">
-          {t("admin")}
+          {t('admin')}
         </span>
       );
     }
@@ -107,9 +105,7 @@ export function MemberCard({
           <div>
             <p className="text-white font-medium flex items-center gap-2">
               {member.username}
-              {isCurrentUser && (
-                <span className="text-xs text-zinc-500">{t("you")}</span>
-              )}
+              {isCurrentUser && <span className="text-xs text-zinc-500">{t('you')}</span>}
               {getRoleBadge()}
             </p>
           </div>
@@ -129,7 +125,7 @@ export function MemberCard({
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <>
-                      {t("changeRole")}
+                      {t('changeRole')}
                       <ChevronDown className="w-4 h-4 ml-1" />
                     </>
                   )}
@@ -157,11 +153,7 @@ export function MemberCard({
               disabled={isPending}
               className="border-rose-500/50 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
             >
-              {isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                tb("ban")
-              )}
+              {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : tb('ban')}
             </Button>
           )}
         </div>

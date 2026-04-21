@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
 
 const mockSocket = {
   connected: true,
@@ -7,7 +7,7 @@ const mockSocket = {
   off: vi.fn(),
   once: vi.fn(),
   emit: vi.fn(),
-}
+};
 
 vi.mock('@/lib/socket', () => ({
   socketManager: {
@@ -17,15 +17,15 @@ vi.mock('@/lib/socket', () => ({
     on: vi.fn(),
     off: vi.fn(),
   },
-}))
+}));
 
-import { useSocketTyping } from '@/hooks/websocket/useSocketTyping'
+import { useSocketTyping } from '@/hooks/websocket/useSocketTyping';
 
 describe('useSocketTyping', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks());
 
   it('est défini avec un channelId', () => {
-    const { result } = renderHook(() => useSocketTyping('1'))
-    expect(result.current).toBeDefined()
-  })
-})
+    const { result } = renderHook(() => useSocketTyping('1'));
+    expect(result.current).toBeDefined();
+  });
+});

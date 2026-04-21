@@ -1,15 +1,15 @@
-import { describe, it, expect } from 'vitest'
-import { userUpdateSchema } from '@/schemas/user.dto'
+import { describe, it, expect } from 'vitest';
+import { userUpdateSchema } from '@/schemas/user.dto';
 
 describe('userUpdateSchema', () => {
   it('accepte un objet vide (tout optionnel)', () => {
-    expect(() => userUpdateSchema.parse({})).not.toThrow()
-  })
+    expect(() => userUpdateSchema.parse({})).not.toThrow();
+  });
 
   it('accepte une mise à jour partielle', () => {
-    const result = userUpdateSchema.parse({ username: 'newname' })
-    expect(result.username).toBe('newname')
-  })
+    const result = userUpdateSchema.parse({ username: 'newname' });
+    expect(result.username).toBe('newname');
+  });
 
   it('accepte toutes les propriétés', () => {
     const result = userUpdateSchema.parse({
@@ -18,8 +18,8 @@ describe('userUpdateSchema', () => {
       lastname: 'Dupont',
       isActive: true,
       isTwoFactorEnabled: false,
-    })
-    expect(result.username).toBe('alex')
-    expect(result.isActive).toBe(true)
-  })
-})
+    });
+    expect(result.username).toBe('alex');
+    expect(result.isActive).toBe(true);
+  });
+});

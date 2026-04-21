@@ -1,34 +1,29 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
-import { Mail, Shield, Calendar, Pencil, Camera, ShieldCheck } from "lucide-react";
+import { useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { Mail, Shield, Calendar, Pencil, Camera, ShieldCheck } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-import { useAuthUser } from "@/hooks/queries/useAuthUser";
-import { useEditProfilPicture } from "@/hooks/mutations/useEditProfilPicture";
-import { useEditProfil } from "@/hooks/mutations/useEditProfil";
-import Loading from "@/components/ui-client/Loading";
-import Error from "@/components/ui-client/Error";
-import useAuthStore from "@/store/authStore";
-import { EditProfileInfoForm } from "@/components/ui-client/EditProfileInfoForm";
-import { LanguageSwitcher } from "@/components/ui-client/LanguageSwitcher";
-import {Switch} from "@/components/ui/switch";
+import { useAuthUser } from '@/hooks/queries/useAuthUser';
+import { useEditProfilPicture } from '@/hooks/mutations/useEditProfilPicture';
+import { useEditProfil } from '@/hooks/mutations/useEditProfil';
+import Loading from '@/components/ui-client/Loading';
+import Error from '@/components/ui-client/Error';
+import useAuthStore from '@/store/authStore';
+import { EditProfileInfoForm } from '@/components/ui-client/EditProfileInfoForm';
+import { LanguageSwitcher } from '@/components/ui-client/LanguageSwitcher';
+import { Switch } from '@/components/ui/switch';
 
 export default function ProfilePage() {
-  const t = useTranslations("profile");
-  const ta = useTranslations("auth");
+  const t = useTranslations('profile');
+  const ta = useTranslations('auth');
   const locale = useLocale();
   const { data: user, isLoading, isError } = useAuthUser();
   const { logout } = useAuthStore();
@@ -41,8 +36,8 @@ export default function ProfilePage() {
   if (isError || !user) return <Error />;
 
   const joinedDate = new Date(user.createdAt).toLocaleDateString(locale, {
-    month: "long",
-    year: "numeric",
+    month: 'long',
+    year: 'numeric',
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,10 +53,7 @@ export default function ProfilePage() {
         <div className="absolute -bottom-12 left-8 group">
           <div className="relative p-1 bg-[#313338] rounded-full">
             <Avatar className="h-24 w-24 border-4 border-[#313338]">
-              <AvatarImage
-                src={(user as any).img ?? ""}
-                className="object-cover"
-              />
+              <AvatarImage src={(user as any).img ?? ''} className="object-cover" />
               <AvatarFallback className="bg-zinc-700 text-white text-xl">
                 {user.username?.substring(0, 2).toUpperCase()}
               </AvatarFallback>
@@ -97,7 +89,7 @@ export default function ProfilePage() {
                 <h1 className="text-2xl font-bold text-white flex items-center gap-2">
                   {user.username}
                   <span className="text-zinc-400 font-normal text-lg">
-                    #{user.id.toString().padStart(4, "0")}
+                    #{user.id.toString().padStart(4, '0')}
                   </span>
                   <button
                     onClick={() => setIsEditOpen(true)}
@@ -106,10 +98,7 @@ export default function ProfilePage() {
                     <Pencil size={16} />
                   </button>
                 </h1>
-                <Badge
-                  variant="secondary"
-                  className="bg-indigo-500/10 text-indigo-400 mt-1"
-                >
+                <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-400 mt-1">
                   {user.role}
                 </Badge>
               </div>
@@ -120,12 +109,9 @@ export default function ProfilePage() {
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogContent className="dark bg-[#313338] border-zinc-700 text-white">
             <DialogHeader>
-              <DialogTitle>{t("editProfile")}</DialogTitle>
+              <DialogTitle>{t('editProfile')}</DialogTitle>
             </DialogHeader>
-            <EditProfileInfoForm
-              user={user}
-              onSuccess={() => setIsEditOpen(false)}
-            />
+            <EditProfileInfoForm user={user} onSuccess={() => setIsEditOpen(false)} />
           </DialogContent>
         </Dialog>
 
@@ -134,31 +120,23 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
-              <CardHeader className="text-white font-semibold">
-                {t("aboutMe")}
-              </CardHeader>
+              <CardHeader className="text-white font-semibold">{t('aboutMe')}</CardHeader>
               <CardContent>
-                <p>
-                  {user.description || t("noBio")}
-                </p>
+                <p>{user.description || t('noBio')}</p>
               </CardContent>
             </Card>
 
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
-              <CardHeader className="text-white font-semibold">
-                {t("recentActivity")}
-              </CardHeader>
+              <CardHeader className="text-white font-semibold">{t('recentActivity')}</CardHeader>
               <CardContent className="text-sm italic text-zinc-500">
-                {t("lastSeen", { date: new Date(user.lastSeen).toLocaleDateString(locale) })}
+                {t('lastSeen', { date: new Date(user.lastSeen).toLocaleDateString(locale) })}
               </CardContent>
             </Card>
           </div>
 
           <div className="space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
-              <CardHeader className="text-white font-semibold">
-                {t("information")}
-              </CardHeader>
+              <CardHeader className="text-white font-semibold">{t('information')}</CardHeader>
               <CardContent className="space-y-4 text-sm">
                 <div className="flex items-center gap-3">
                   <Mail size={18} className="text-zinc-500" />
@@ -166,33 +144,35 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Calendar size={18} className="text-zinc-500" />
-                  <span>{t("memberSince", { date: joinedDate })}</span>
+                  <span>{t('memberSince', { date: joinedDate })}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield size={18} className="text-zinc-400" />
                   <span className="text-indigo-400 font-medium capitalize">
-                    {t("badge", { role: user.role })}
+                    {t('badge', { role: user.role })}
                   </span>
                 </div>
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-3">
                     <ShieldCheck size={18} className="text-zinc-500" />
                     <div>
-                      <p className="text-sm">{t("twoFactorAuth")}</p>
-                      <p className="text-xs text-zinc-500">{t("twoFactorDesc")}</p>
+                      <p className="text-sm">{t('twoFactorAuth')}</p>
+                      <p className="text-xs text-zinc-500">{t('twoFactorDesc')}</p>
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => editProfilMutation.mutate({ isTwoFactorEnabled: !user.isTwoFactorEnabled })}
+                    onClick={() =>
+                      editProfilMutation.mutate({ isTwoFactorEnabled: !user.isTwoFactorEnabled })
+                    }
                     disabled={editProfilMutation.isPending}
                     className={`relative shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                      user.isTwoFactorEnabled ? "bg-indigo-500" : "bg-zinc-600"
+                      user.isTwoFactorEnabled ? 'bg-indigo-500' : 'bg-zinc-600'
                     }`}
                   >
                     <span
                       className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        user.isTwoFactorEnabled ? "translate-x-6" : "translate-x-1"
+                        user.isTwoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
                   </button>
@@ -203,7 +183,7 @@ export default function ProfilePage() {
                     className="w-full hover:bg-red-500 bg-grey-purple text-white border border-black-200"
                     onClick={() => logout()}
                   >
-                    {ta("logout")}
+                    {ta('logout')}
                   </Button>
                 </div>
               </CardContent>

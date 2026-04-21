@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { useSocket } from "./useSocket";
-import { TypingUserType } from "@/schemas/conversation.dto";
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useSocket } from './useSocket';
+import { TypingUserType } from '@/schemas/conversation.dto';
 
 export function useSocketTyping(conversationId?: string) {
   const { isConnected, emit, on, off } = useSocket();
@@ -26,21 +26,18 @@ export function useSocketTyping(conversationId?: string) {
       });
     };
 
-    const handleUserStoppedTyping = (data: {
-      userId: number;
-      conversationId: number;
-    }) => {
+    const handleUserStoppedTyping = (data: { userId: number; conversationId: number }) => {
       if (String(data.conversationId) !== conversationId) return;
 
       setTypingUsers((prev) => prev.filter((u) => u.userId !== data.userId));
     };
 
-    on("userTyping", handleUserTyping);
-    on("userStoppedTyping", handleUserStoppedTyping);
+    on('userTyping', handleUserTyping);
+    on('userStoppedTyping', handleUserStoppedTyping);
 
     return () => {
-      off("userTyping", handleUserTyping);
-      off("userStoppedTyping", handleUserStoppedTyping);
+      off('userTyping', handleUserTyping);
+      off('userStoppedTyping', handleUserStoppedTyping);
     };
   }, [isConnected, conversationId, on, off]);
 
@@ -49,7 +46,7 @@ export function useSocketTyping(conversationId?: string) {
 
     if (!isTypingRef.current) {
       isTypingRef.current = true;
-      emit("typing", { conversationId: Number(conversationId) });
+      emit('typing', { conversationId: Number(conversationId) });
     }
 
     if (typingTimeoutRef.current) {
@@ -66,7 +63,7 @@ export function useSocketTyping(conversationId?: string) {
 
     if (isTypingRef.current) {
       isTypingRef.current = false;
-      emit("stopTyping", { conversationId: Number(conversationId) });
+      emit('stopTyping', { conversationId: Number(conversationId) });
     }
 
     if (typingTimeoutRef.current) {

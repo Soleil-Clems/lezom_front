@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook } from '@testing-library/react';
 
 vi.mock('@/lib/socket', () => ({
   socketManager: {
@@ -15,23 +15,23 @@ vi.mock('@/lib/socket', () => ({
     on: vi.fn(),
     off: vi.fn(),
   },
-}))
+}));
 
-import { useSocketPresence } from '@/hooks/websocket/useSocketPresence'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React from 'react'
+import { useSocketPresence } from '@/hooks/websocket/useSocketPresence';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
 
 const wrapper = ({ children }: { children: React.ReactNode }) =>
   React.createElement(QueryClientProvider, {
     client: new QueryClient({ defaultOptions: { queries: { retry: false } } }),
     children,
-  })
+  });
 
 describe('useSocketPresence', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => vi.clearAllMocks());
 
   it('retourne les propriétés de présence', () => {
-    const { result } = renderHook(() => useSocketPresence(), { wrapper })
-    expect(result).toBeDefined()
-  })
-})
+    const { result } = renderHook(() => useSocketPresence(), { wrapper });
+    expect(result).toBeDefined();
+  });
+});
