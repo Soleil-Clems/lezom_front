@@ -7,9 +7,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SocketProvider>
       <AuthGuard>
-        <main className="dark">
-          <SidebarProvider>
-            <div className="flex h-screen w-full overflow-hidden bg-[#1E1F22]">
+        <main className="dark flex-1 min-h-0">
+          <SidebarProvider className="min-h-0 h-full">
+            <div className="flex h-full w-full overflow-hidden bg-[#1E1F22]">
               <ServerSidebar />
 
               <SidebarInset className="flex-1 flex flex-col min-w-0 bg-[#313338]">

@@ -5,6 +5,7 @@ import { getLocale, getMessages } from 'next-intl/server';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
+import DesktopTitleBar from '@/components/ui-client/DesktopTitleBar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,9 +37,14 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-own-dark`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-own-dark flex flex-col h-screen overflow-hidden`}
+      >
         <NextIntlClientProvider messages={messages}>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <DesktopTitleBar />
+            {children}
+          </ReactQueryProvider>
         </NextIntlClientProvider>
         <Toaster position="top-center" />
       </body>
