@@ -23,6 +23,18 @@ interface PrivateMessagePayload {
   content?: string;
 }
 
+interface FriendRequestReceivedPayload {
+  requestId: number;
+  senderId: number;
+  senderName: string;
+}
+
+interface FriendRequestAcceptedPayload {
+  requestId: number;
+  accepterId: number;
+  accepterName: string;
+}
+
 function getConversationId(msg: PrivateMessagePayload): number | undefined {
   if (typeof msg.conversation === "number") return msg.conversation;
   if (msg.conversation && typeof msg.conversation === "object") return msg.conversation.id;
@@ -76,6 +88,12 @@ export function useDesktopNotifications() {
     const chMatch = pathname.match(/^\/servers\/\d+\/(\d+)/);
     if (chMatch) {
       unreadRef.current.delete(`channel-${chMatch[1]}`);
+      updateBadge();
+    }
+    if (pathname === "/") {
+      for (const key of Array.from(unreadRef.current.keys())) {
+        if (key.startsWith("friend-")) unreadRef.current.delete(key);
+      }
       updateBadge();
     }
   }, [pathname, authUser]);
@@ -133,12 +151,50 @@ export function useDesktopNotifications() {
       updateBadge();
     };
 
+    const handleFriendRequest = async (payload: FriendRequestReceivedPayload) => {
+      if (Number(payload.senderId) === Number(authUser.id)) return;
+      const focused = await desktop.isFocused();
+      const onPage = pathnameRef.current === "/";
+      if (focused && onPage) return;
+
+      desktop.notify({
+        title: "Nouvelle demande d'ami",
+        body: `${payload.senderName} souhaite vous ajouter`,
+        type: "friend-request",
+        tag: `friend-request-${payload.requestId}`,
+      });
+
+      unreadRef.current.set(`friend-request-${payload.requestId}`, 1);
+      updateBadge();
+    };
+
+    const handleFriendAccepted = async (payload: FriendRequestAcceptedPayload) => {
+      if (Number(payload.accepterId) === Number(authUser.id)) return;
+      const focused = await desktop.isFocused();
+      const onPage = pathnameRef.current === "/";
+      if (focused && onPage) return;
+
+      desktop.notify({
+        title: "Demande d'ami acceptée",
+        body: `${payload.accepterName} a accepté votre demande`,
+        type: "friend-accepted",
+        tag: `friend-accepted-${payload.requestId}`,
+      });
+
+      unreadRef.current.set(`friend-accepted-${payload.requestId}`, 1);
+      updateBadge();
+    };
+
     on("newPrivateMessage", handleDM);
     on("channelMessageNotification", handleChannel);
+    on("friendRequestReceived", handleFriendRequest);
+    on("friendRequestAccepted", handleFriendAccepted);
 
     return () => {
       off("newPrivateMessage", handleDM);
       off("channelMessageNotification", handleChannel);
+      off("friendRequestReceived", handleFriendRequest);
+      off("friendRequestAccepted", handleFriendAccepted);
     };
   }, [isConnected, authUser, on, off]);
 
@@ -152,6 +208,9 @@ export function useDesktopNotifications() {
       } else if (payload.type === "channel" && payload.channelId && payload.serverId) {
         router.push(`/servers/${payload.serverId}/${payload.channelId}`);
         unreadRef.current.delete(`channel-${payload.channelId}`);
+      } else if (payload.type === "friend-request" || payload.type === "friend-accepted") {
+        router.push("/");
+        if (payload.tag) unreadRef.current.delete(payload.tag);
       }
       updateBadge();
     });

@@ -1,7 +1,7 @@
 export interface DesktopNotifyPayload {
   title: string;
   body: string;
-  type: "dm" | "channel";
+  type: "dm" | "channel" | "friend-request" | "friend-accepted";
   conversationId?: number;
   channelId?: number;
   serverId?: number;
