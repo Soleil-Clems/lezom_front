@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { useSocket } from "./useSocket";
-import { useQueryClient, InfiniteData } from "@tanstack/react-query";
-import { messageType, ChannelMessagesPageType } from "@/schemas/message.dto";
+import { useEffect, useState } from 'react';
+import { useSocket } from './useSocket';
+import { useQueryClient, InfiniteData } from '@tanstack/react-query';
+import { messageType, ChannelMessagesPageType } from '@/schemas/message.dto';
 
 export function useSocketMessages(channelId?: string) {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
@@ -15,16 +15,15 @@ export function useSocketMessages(channelId?: string) {
   useEffect(() => {
     if (!channelId || !isConnected || !socket) return;
 
-    socket.emit("joinChannel", parseInt(channelId));
+    socket.emit('joinChannel', parseInt(channelId));
 
     const handleNewMessage = (newMessage: messageType) => {
       queryClient.setQueryData<InfiniteData<ChannelMessagesPageType>>(
-        ["channel", channelId],
+        ['channel', channelId],
         (old) => {
           if (!old) return old;
           const firstPage = old.pages[0];
-          if (firstPage?.messages?.some((m) => m.id === newMessage.id))
-            return old;
+          if (firstPage?.messages?.some((m) => m.id === newMessage.id)) return old;
           return {
             ...old,
             pages: old.pages.map((page, index) =>
@@ -43,16 +42,14 @@ export function useSocketMessages(channelId?: string) {
 
     const handleMessageUpdated = (updatedMessage: messageType) => {
       queryClient.setQueryData<InfiniteData<ChannelMessagesPageType>>(
-        ["channel", channelId],
+        ['channel', channelId],
         (old) => {
           if (!old) return old;
           return {
             ...old,
             pages: old.pages.map((page) => ({
               ...page,
-              messages: page.messages.map((m) =>
-                m.id === updatedMessage.id ? updatedMessage : m,
-              ),
+              messages: page.messages.map((m) => (m.id === updatedMessage.id ? updatedMessage : m)),
             })),
           };
         },
@@ -60,9 +57,9 @@ export function useSocketMessages(channelId?: string) {
     };
 
     const handleMessageDeleted = (data: any) => {
-      const messageId = typeof data === "object" ? data.messageId : data;
+      const messageId = typeof data === 'object' ? data.messageId : data;
       queryClient.setQueryData<InfiniteData<ChannelMessagesPageType>>(
-        ["channel", channelId],
+        ['channel', channelId],
         (old) => {
           if (!old) return old;
           return {
@@ -79,7 +76,7 @@ export function useSocketMessages(channelId?: string) {
 
     const handleReactionAdded = (updatedMessage: messageType) => {
       queryClient.setQueryData<InfiniteData<ChannelMessagesPageType>>(
-        ["channel", channelId],
+        ['channel', channelId],
         (old) => {
           if (!old) return old;
           return {
@@ -111,33 +108,31 @@ export function useSocketMessages(channelId?: string) {
       );
     };
 
-    socket.on("newMessage", handleNewMessage);
-    socket.on("messageUpdated", handleMessageUpdated);
-    socket.on("messageDeleted", handleMessageDeleted);
-    socket.on("userTyping", handleUserTyping);
-    socket.on("reactionAdded", handleReactionAdded);
+    socket.on('newMessage', handleNewMessage);
+    socket.on('messageUpdated', handleMessageUpdated);
+    socket.on('messageDeleted', handleMessageDeleted);
+    socket.on('userTyping', handleUserTyping);
+    socket.on('reactionAdded', handleReactionAdded);
 
     return () => {
-      socket.off("newMessage", handleNewMessage);
-      socket.off("messageUpdated", handleMessageUpdated);
-      socket.off("messageDeleted", handleMessageDeleted);
-      socket.off("userTyping", handleUserTyping);
-      socket.off("reactionAdded", handleReactionAdded);
+      socket.off('newMessage', handleNewMessage);
+      socket.off('messageUpdated', handleMessageUpdated);
+      socket.off('messageDeleted', handleMessageDeleted);
+      socket.off('userTyping', handleUserTyping);
+      socket.off('reactionAdded', handleReactionAdded);
     };
   }, [channelId, isConnected, socket, queryClient]);
 
   const updateMessage = (messageId: number, content: string) => {
     queryClient.setQueryData<InfiniteData<ChannelMessagesPageType>>(
-      ["channel", channelId],
+      ['channel', channelId],
       (old) => {
         if (!old) return old;
         return {
           ...old,
           pages: old.pages.map((page) => ({
             ...page,
-            messages: page.messages.map((m) =>
-              m.id === messageId ? { ...m, content } : m,
-            ),
+            messages: page.messages.map((m) => (m.id === messageId ? { ...m, content } : m)),
           })),
         };
       },
@@ -146,7 +141,7 @@ export function useSocketMessages(channelId?: string) {
 
   const removeMessage = (messageId: number) => {
     queryClient.setQueryData<InfiniteData<ChannelMessagesPageType>>(
-      ["channel", channelId],
+      ['channel', channelId],
       (old) => {
         if (!old) return old;
         return {
@@ -161,10 +156,10 @@ export function useSocketMessages(channelId?: string) {
   };
 
   const addReaction = (messageId: number, emoji: string) => {
-    socket?.emit("addReaction", {
+    socket?.emit('addReaction', {
       messageId,
       emoji,
-      channelId: parseInt(channelId ?? "0"),
+      channelId: parseInt(channelId ?? '0'),
     });
   };
 

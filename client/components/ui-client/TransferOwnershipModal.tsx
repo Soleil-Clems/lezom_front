@@ -1,189 +1,185 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Loader2, Search, Crown } from "lucide-react";
-import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
-import { MembershipType } from "@/schemas/member.dto";
-import { useTranslations } from "next-intl";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Loader2, Search, Crown } from 'lucide-react';
+import { useGetServerMembers } from '@/hooks/queries/useGetServerMembers';
+import { MembershipType } from '@/schemas/member.dto';
+import { useTranslations } from 'next-intl';
 
 type TransferOwnershipModalProps = {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm: (newOwnerId: number) => void;
-    onDeleteServer: () => void;
-    serverId: string | number;
-    serverName: string;
-    currentUserId: number;
-    isPending: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (newOwnerId: number) => void;
+  onDeleteServer: () => void;
+  serverId: string | number;
+  serverName: string;
+  currentUserId: number;
+  isPending: boolean;
 };
 
 export function TransferOwnershipModal({
-    isOpen,
-    onClose,
-    onConfirm,
-    onDeleteServer,
-    serverId,
-    serverName,
-    currentUserId,
-    isPending,
+  isOpen,
+  onClose,
+  onConfirm,
+  onDeleteServer,
+  serverId,
+  serverName,
+  currentUserId,
+  isPending,
 }: TransferOwnershipModalProps) {
-    const t = useTranslations("transfer");
-    const tc = useTranslations("common");
-    const [search, setSearch] = useState("");
-    const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+  const t = useTranslations('transfer');
+  const tc = useTranslations('common');
+  const [search, setSearch] = useState('');
+  const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
 
-    const { data: membersData, isLoading } = useGetServerMembers(serverId, {
-        search: search || undefined,
-        limit: 50,
-    });
+  const { data: membersData, isLoading } = useGetServerMembers(serverId, {
+    search: search || undefined,
+    limit: 50,
+  });
 
-    const members = membersData?.data || [];
-    const filteredMembers = members.filter(
-        (membership: MembershipType) => membership.members.id !== currentUserId
-    );
+  const members = membersData?.data || [];
+  const filteredMembers = members.filter(
+    (membership: MembershipType) => membership.members.id !== currentUserId,
+  );
 
-    const isAlone = filteredMembers.length === 0 && search === "";
+  const isAlone = filteredMembers.length === 0 && search === '';
 
-    const handleClose = () => {
-        setSearch("");
-        setSelectedMemberId(null);
-        onClose();
-    };
+  const handleClose = () => {
+    setSearch('');
+    setSelectedMemberId(null);
+    onClose();
+  };
 
-    const handleConfirm = () => {
-        if (selectedMemberId) {
-            onConfirm(selectedMemberId);
-        }
-    };
+  const handleConfirm = () => {
+    if (selectedMemberId) {
+      onConfirm(selectedMemberId);
+    }
+  };
 
-    return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-            <DialogContent className="bg-[#313338] border-none text-white sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="text-rose-400">
-                        {isAlone ? t("deleteServer") : t("transferAndLeave")}
-                    </DialogTitle>
-                    <DialogDescription className="text-zinc-400">
-                        {isAlone ? (
-                            <>
-                                {t("aloneDesc", { name: serverName })}
-                                <br />
-                                {t("serverWillBeDeleted")}
-                            </>
-                        ) : (
-                            <>
-                                {t("ownerDesc", { name: serverName })}
-                                <br />
-                                {t("selectNewOwner")}
-                            </>
-                        )}
-                    </DialogDescription>
-                </DialogHeader>
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="bg-[#313338] border-none text-white sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-rose-400">
+            {isAlone ? t('deleteServer') : t('transferAndLeave')}
+          </DialogTitle>
+          <DialogDescription className="text-zinc-400">
+            {isAlone ? (
+              <>
+                {t('aloneDesc', { name: serverName })}
+                <br />
+                {t('serverWillBeDeleted')}
+              </>
+            ) : (
+              <>
+                {t('ownerDesc', { name: serverName })}
+                <br />
+                {t('selectNewOwner')}
+              </>
+            )}
+          </DialogDescription>
+        </DialogHeader>
 
-                {!isAlone && (
-                    <div className="py-4">
-                        <div className="relative mb-4">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                            <Input
-                                placeholder={tc("searchMember")}
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="pl-10 bg-[#1e1f22] border-none text-white placeholder:text-zinc-500"
-                            />
-                        </div>
+        {!isAlone && (
+          <div className="py-4">
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+              <Input
+                placeholder={tc('searchMember')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 bg-[#1e1f22] border-none text-white placeholder:text-zinc-500"
+              />
+            </div>
 
-                        <div className="max-h-60 overflow-y-auto space-y-1">
-                            {isLoading ? (
-                                <div className="flex items-center justify-center py-8">
-                                    <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
-                                </div>
-                            ) : filteredMembers.length === 0 ? (
-                                <p className="text-center text-zinc-500 py-4">
-                                    {tc("noMemberFound")}
-                                </p>
-                            ) : (
-                                filteredMembers.map((membership: MembershipType) => (
-                                    <button
-                                        key={membership.id}
-                                        type="button"
-                                        onClick={() => setSelectedMemberId(membership.members.id)}
-                                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                                            selectedMemberId === membership.members.id
-                                                ? "bg-[#5865f2] text-white"
-                                                : "hover:bg-[#3f4147] text-zinc-300"
-                                        }`}
-                                    >
-                                        <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-white font-medium">
-                                            {membership.members.username.charAt(0).toUpperCase()}
-                                        </div>
-                                        <span className="flex-1 text-left truncate">
-                                            {membership.members.username}
-                                        </span>
-                                        {selectedMemberId === membership.members.id && (
-                                            <Crown className="w-4 h-4 text-yellow-400" />
-                                        )}
-                                    </button>
-                                ))
-                            )}
-                        </div>
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-zinc-400" />
+                </div>
+              ) : filteredMembers.length === 0 ? (
+                <p className="text-center text-zinc-500 py-4">{tc('noMemberFound')}</p>
+              ) : (
+                filteredMembers.map((membership: MembershipType) => (
+                  <button
+                    key={membership.id}
+                    type="button"
+                    onClick={() => setSelectedMemberId(membership.members.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                      selectedMemberId === membership.members.id
+                        ? 'bg-[#5865f2] text-white'
+                        : 'hover:bg-[#3f4147] text-zinc-300'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-[#5865f2] flex items-center justify-center text-white font-medium">
+                      {membership.members.username.charAt(0).toUpperCase()}
                     </div>
-                )}
-
-                <DialogFooter className="gap-2 sm:gap-0">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={handleClose}
-                        disabled={isPending}
-                        className="text-zinc-400 hover:text-white"
-                    >
-                        {tc("cancel")}
-                    </Button>
-                    {isAlone ? (
-                        <Button
-                            type="button"
-                            onClick={onDeleteServer}
-                            disabled={isPending}
-                            className="bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50"
-                        >
-                            {isPending ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    {t("deleting")}
-                                </>
-                            ) : (
-                                t("deleteServer")
-                            )}
-                        </Button>
-                    ) : (
-                        <Button
-                            type="button"
-                            onClick={handleConfirm}
-                            disabled={isPending || !selectedMemberId}
-                            className="bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50"
-                        >
-                            {isPending ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    {t("transferring")}
-                                </>
-                            ) : (
-                                t("transferAndLeaveBtn")
-                            )}
-                        </Button>
+                    <span className="flex-1 text-left truncate">{membership.members.username}</span>
+                    {selectedMemberId === membership.members.id && (
+                      <Crown className="w-4 h-4 text-yellow-400" />
                     )}
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleClose}
+            disabled={isPending}
+            className="text-zinc-400 hover:text-white"
+          >
+            {tc('cancel')}
+          </Button>
+          {isAlone ? (
+            <Button
+              type="button"
+              onClick={onDeleteServer}
+              disabled={isPending}
+              className="bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t('deleting')}
+                </>
+              ) : (
+                t('deleteServer')
+              )}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={handleConfirm}
+              disabled={isPending || !selectedMemberId}
+              className="bg-rose-500 hover:bg-rose-600 text-white disabled:opacity-50"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t('transferring')}
+                </>
+              ) : (
+                t('transferAndLeaveBtn')
+              )}
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }

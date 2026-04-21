@@ -1,6 +1,6 @@
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -22,9 +22,7 @@ export default defineConfig({
         'middleware.ts',
         'providers/**/*.tsx',
       ],
-      exclude: [
-        'lib/mock-data.ts',
-      ],
+      exclude: ['lib/mock-data.ts'],
     },
   },
   resolve: {
@@ -32,4 +30,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, '.'),
     },
   },
-})
+});

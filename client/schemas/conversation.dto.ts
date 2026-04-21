@@ -1,7 +1,7 @@
-import z from "zod";
-import { MessageTypeEnum } from "@/enums/enum";
-import { userSchema } from "@/schemas/user.dto";
-import { reactionSchema } from "@/schemas/reaction.dto";
+import z from 'zod';
+import { MessageTypeEnum } from '@/enums/enum';
+import { userSchema } from '@/schemas/user.dto';
+import { reactionSchema } from '@/schemas/reaction.dto';
 
 export const conversationSchema = z.object({
   id: z.number(),
@@ -23,7 +23,7 @@ export const privateMessageSchema = z.object({
 });
 
 export const sendPrivateMessageSchema = z.object({
-  content: z.string().min(1, "Le message ne peut pas être vide"),
+  content: z.string().min(1, 'Le message ne peut pas être vide'),
   type: MessageTypeEnum,
   conversationId: z.number(),
 });

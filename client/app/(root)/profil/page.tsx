@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { ProfileView } from "@/components/ui-client/ProfileView";
-import { useAuthUser } from "@/hooks/queries/useAuthUser";
+import { ProfileView } from '@/components/ui-client/ProfileView';
+import { useAuthUser } from '@/hooks/queries/useAuthUser';
 
 export default function ProfilePage() {
   const { data: user, isLoading, isError } = useAuthUser();

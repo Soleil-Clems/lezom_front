@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { updateUserRequest } from "@/requests/userRequest";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { userUpdateType } from "@/schemas/user.dto";
+import { updateUserRequest } from '@/requests/userRequest';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { userUpdateType } from '@/schemas/user.dto';
 
 export function useEditProfil(id: number) {
   const queryClient = useQueryClient();
@@ -11,8 +11,8 @@ export function useEditProfil(id: number) {
   return useMutation({
     mutationFn: (body: userUpdateType) => updateUserRequest(id, body),
     onSuccess: () => {
-      toast.success("Profil mis à jour !");
-      queryClient.invalidateQueries({ queryKey: ["authuser"] });
+      toast.success('Profil mis à jour !');
+      queryClient.invalidateQueries({ queryKey: ['authuser'] });
     },
     onError: (error) => {
       toast.error(error.message);

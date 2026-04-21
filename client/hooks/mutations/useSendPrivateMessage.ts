@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { socketManager } from "@/lib/socket";
-import { MessageType } from "@/enums/enum";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { socketManager } from '@/lib/socket';
+import { MessageType } from '@/enums/enum';
 
 export function useSendPrivateMessage(conversationId: string | undefined) {
   const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export function useSendPrivateMessage(conversationId: string | undefined) {
     mutationFn: async (data: { content: string; type: MessageType }) => {
       return new Promise((resolve, reject) => {
         socketManager.emit(
-          "sendPrivateMessage",
+          'sendPrivateMessage',
           {
             ...data,
             conversationId: Number(conversationId),
@@ -27,16 +27,16 @@ export function useSendPrivateMessage(conversationId: string | undefined) {
         );
 
         setTimeout(() => {
-          reject(new Error("Timeout"));
+          reject(new Error('Timeout'));
         }, 5000);
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversations"],
+        queryKey: ['conversations'],
       });
       queryClient.invalidateQueries({
-        queryKey: ["conversationMessages", conversationId],
+        queryKey: ['conversationMessages', conversationId],
       });
     },
     onError: (error: any) => {
