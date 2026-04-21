@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const userSchema = z.object({
   id: z.coerce.number(),
@@ -6,7 +6,7 @@ export const userSchema = z.object({
   firstname: z.string(),
   lastname: z.string(),
   description: z.string(),
-  email: z.email("Email invalide"),
+  email: z.email('Email invalide'),
   isActive: z.boolean(),
   isTwoFactorEnabled: z.boolean(),
   role: z.string(),

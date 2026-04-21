@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - uses: actions/cache/save@v4
+        with:
+          path: client/node_modules
+          key: node-modules-front-${{ hashFiles('client/package-lock.json') }}
+
+  lint:
+    needs: install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/cache/restore@v4
+        with:
+          path: client/node_modules
+          key: node-modules-front-${{ hashFiles('client/package-lock.json') }}
+      - run: npx eslint .
+
+  format:
+    needs: install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/cache/restore@v4
+        with:
+          path: client/node_modules
+          key: node-modules-front-${{ hashFiles('client/package-lock.json') }}
+      - run: npx prettier --check "**/*.{ts,tsx,css,json}"
+
+  typecheck:
+    needs: install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/cache/restore@v4
+        with:
+          path: client/node_modules
+          key: node-modules-front-${{ hashFiles('client/package-lock.json') }}
+      - run: npx tsc --noEmit
+
+  test:
+    needs: install
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/cache/restore@v4
+        with:
+          path: client/node_modules
+          key: node-modules-front-${{ hashFiles('client/package-lock.json') }}
+      - run: npm run test:coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-front
+          path: client/coverage
+
+  build:
+    needs: [lint, format, typecheck, test]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/cache/restore@v4
+        with:
+          path: client/node_modules
+          key: node-modules-front-${{ hashFiles('client/package-lock.json') }}
+      - run: npx next build

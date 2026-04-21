@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   Calendar,
   Camera,
@@ -12,29 +12,24 @@ import {
   Shield,
   ShieldCheck,
   UserPlus,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import Error from "@/components/ui-client/Error";
-import { EditProfileInfoForm } from "@/components/ui-client/EditProfileInfoForm";
-import { LanguageSwitcher } from "@/components/ui-client/LanguageSwitcher";
-import Loading from "@/components/ui-client/Loading";
-import { useCreateConversation } from "@/hooks/mutations/useCreateConversation";
-import { useEditProfil } from "@/hooks/mutations/useEditProfil";
-import { useEditProfilPicture } from "@/hooks/mutations/useEditProfilPicture";
-import { useSendFriendRequest } from "@/hooks/mutations/useSendFriendRequest";
-import { useGetFriends } from "@/hooks/queries/useGetFriends";
-import type { userType } from "@/schemas/user.dto";
-import useAuthStore from "@/store/authStore";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import Error from '@/components/ui-client/Error';
+import { EditProfileInfoForm } from '@/components/ui-client/EditProfileInfoForm';
+import { LanguageSwitcher } from '@/components/ui-client/LanguageSwitcher';
+import Loading from '@/components/ui-client/Loading';
+import { useCreateConversation } from '@/hooks/mutations/useCreateConversation';
+import { useEditProfil } from '@/hooks/mutations/useEditProfil';
+import { useEditProfilPicture } from '@/hooks/mutations/useEditProfilPicture';
+import { useSendFriendRequest } from '@/hooks/mutations/useSendFriendRequest';
+import { useGetFriends } from '@/hooks/queries/useGetFriends';
+import type { userType } from '@/schemas/user.dto';
+import useAuthStore from '@/store/authStore';
 
 type ProfileUser = {
   id: number;
@@ -65,10 +60,10 @@ export function ProfileView({
   isOwnProfile,
   errorMessage,
 }: ProfileViewProps) {
-  const t = useTranslations("profile");
-  const ta = useTranslations("auth");
-  const tf = useTranslations("friends");
-  const tm = useTranslations("messages");
+  const t = useTranslations('profile');
+  const ta = useTranslations('auth');
+  const tf = useTranslations('friends');
+  const tm = useTranslations('messages');
   const locale = useLocale();
   const router = useRouter();
   const { logout } = useAuthStore();
@@ -85,8 +80,8 @@ export function ProfileView({
 
   const joinedDate = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString(locale, {
-        month: "long",
-        year: "numeric",
+        month: 'long',
+        year: 'numeric',
       })
     : null;
 
@@ -112,7 +107,7 @@ export function ProfileView({
         <div className="absolute -bottom-12 left-8 group">
           <div className="relative p-1 bg-[#313338] rounded-full">
             <Avatar className="h-24 w-24 border-4 border-[#313338]">
-              <AvatarImage src={user.img ?? ""} className="object-cover" />
+              <AvatarImage src={user.img ?? ''} className="object-cover" />
               <AvatarFallback className="bg-zinc-700 text-white text-xl">
                 {user.username?.substring(0, 2).toUpperCase()}
               </AvatarFallback>
@@ -152,7 +147,7 @@ export function ProfileView({
                 <h1 className="text-2xl font-bold text-white flex flex-wrap items-center gap-2">
                   {user.username}
                   <span className="text-zinc-400 font-normal text-lg">
-                    #{user.id.toString().padStart(4, "0")}
+                    #{user.id.toString().padStart(4, '0')}
                   </span>
                   {isOwnProfile && (
                     <button
@@ -164,10 +159,7 @@ export function ProfileView({
                   )}
                 </h1>
                 {user.role && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-indigo-500/10 text-indigo-400 mt-2"
-                  >
+                  <Badge variant="secondary" className="bg-indigo-500/10 text-indigo-400 mt-2">
                     {user.role}
                   </Badge>
                 )}
@@ -182,7 +174,7 @@ export function ProfileView({
                   className="bg-indigo-600 hover:bg-indigo-500 text-white"
                 >
                   <MessageSquare className="size-4" />
-                  {tm("sendMessage")}
+                  {tm('sendMessage')}
                 </Button>
                 {!isAlreadyFriend && (
                   <Button
@@ -192,7 +184,7 @@ export function ProfileView({
                     className="border-zinc-600 bg-transparent text-zinc-200 hover:bg-zinc-800 hover:text-white"
                   >
                     <UserPlus className="size-4" />
-                    {tf("addFriend")}
+                    {tf('addFriend')}
                   </Button>
                 )}
               </div>
@@ -204,12 +196,9 @@ export function ProfileView({
           <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
             <DialogContent className="dark bg-[#313338] border-zinc-700 text-white">
               <DialogHeader>
-                <DialogTitle>{t("editProfile")}</DialogTitle>
+                <DialogTitle>{t('editProfile')}</DialogTitle>
               </DialogHeader>
-              <EditProfileInfoForm
-                user={user as userType}
-                onSuccess={() => setIsEditOpen(false)}
-              />
+              <EditProfileInfoForm user={user as userType} onSuccess={() => setIsEditOpen(false)} />
             </DialogContent>
           </Dialog>
         )}
@@ -219,33 +208,27 @@ export function ProfileView({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
-              <CardHeader className="text-white font-semibold">
-                {t("aboutMe")}
-              </CardHeader>
+              <CardHeader className="text-white font-semibold">{t('aboutMe')}</CardHeader>
               <CardContent>
-                <p>{user.description || t("noBio")}</p>
+                <p>{user.description || t('noBio')}</p>
               </CardContent>
             </Card>
 
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
-              <CardHeader className="text-white font-semibold">
-                {t("recentActivity")}
-              </CardHeader>
+              <CardHeader className="text-white font-semibold">{t('recentActivity')}</CardHeader>
               <CardContent className="text-sm italic text-zinc-500">
                 {user.lastSeen
-                  ? t("lastSeen", {
+                  ? t('lastSeen', {
                       date: new Date(user.lastSeen).toLocaleDateString(locale),
                     })
-                  : t("noBio")}
+                  : t('noBio')}
               </CardContent>
             </Card>
           </div>
 
           <div className="space-y-6">
             <Card className="bg-[#2B2D31] border-none text-zinc-300">
-              <CardHeader className="text-white font-semibold">
-                {t("information")}
-              </CardHeader>
+              <CardHeader className="text-white font-semibold">{t('information')}</CardHeader>
               <CardContent className="space-y-4 text-sm">
                 {isOwnProfile && user.email && (
                   <div className="flex items-center gap-3">
@@ -256,14 +239,14 @@ export function ProfileView({
                 {joinedDate && (
                   <div className="flex items-center gap-3">
                     <Calendar size={18} className="text-zinc-500" />
-                    <span>{t("memberSince", { date: joinedDate })}</span>
+                    <span>{t('memberSince', { date: joinedDate })}</span>
                   </div>
                 )}
                 {user.role && (
                   <div className="flex items-center gap-3">
                     <Shield size={18} className="text-zinc-400" />
                     <span className="text-indigo-400 font-medium capitalize">
-                      {t("badge", { role: user.role })}
+                      {t('badge', { role: user.role })}
                     </span>
                   </div>
                 )}
@@ -273,8 +256,8 @@ export function ProfileView({
                     <div className="flex items-center gap-3">
                       <ShieldCheck size={18} className="text-zinc-500" />
                       <div>
-                        <p className="text-sm">{t("twoFactorAuth")}</p>
-                        <p className="text-xs text-zinc-500">{t("twoFactorDesc")}</p>
+                        <p className="text-sm">{t('twoFactorAuth')}</p>
+                        <p className="text-xs text-zinc-500">{t('twoFactorDesc')}</p>
                       </div>
                     </div>
                     <button
@@ -286,12 +269,12 @@ export function ProfileView({
                       }
                       disabled={editProfilMutation.isPending}
                       className={`relative shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                        user.isTwoFactorEnabled ? "bg-indigo-500" : "bg-zinc-600"
+                        user.isTwoFactorEnabled ? 'bg-indigo-500' : 'bg-zinc-600'
                       }`}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          user.isTwoFactorEnabled ? "translate-x-6" : "translate-x-1"
+                          user.isTwoFactorEnabled ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
                     </button>
@@ -305,7 +288,7 @@ export function ProfileView({
                       className="w-full hover:bg-red-500 bg-grey-purple text-white border border-black-200"
                       onClick={() => logout()}
                     >
-                      {ta("logout")}
+                      {ta('logout')}
                     </Button>
                   </div>
                 )}

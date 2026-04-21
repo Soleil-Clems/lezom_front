@@ -1,29 +1,21 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { useGetConversationMessages } from "@/hooks/queries/useGetConversationMessages";
-import { useSocketPrivateMessages } from "@/hooks/websocket/useSocketPrivateMessages";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import PrivateMessageScreen from "@/components/ui-client/PrivateMessageScreen";
-import Message from "@/components/ui-client/messageComponent";
-import Loading from "@/components/ui-client/Loading";
-import Error from "@/components/ui-client/Error";
+import { useMemo } from 'react';
+import { useGetConversationMessages } from '@/hooks/queries/useGetConversationMessages';
+import { useSocketPrivateMessages } from '@/hooks/websocket/useSocketPrivateMessages';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import PrivateMessageScreen from '@/components/ui-client/PrivateMessageScreen';
+import Message from '@/components/ui-client/messageComponent';
+import Loading from '@/components/ui-client/Loading';
+import Error from '@/components/ui-client/Error';
 
 interface PrivateMessageLayoutProps {
   conversationId: string;
 }
 
-export default function PrivateMessageLayout({
-  conversationId,
-}: PrivateMessageLayoutProps) {
-  const {
-    data,
-    isLoading,
-    isError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useGetConversationMessages(conversationId);
+export default function PrivateMessageLayout({ conversationId }: PrivateMessageLayoutProps) {
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetConversationMessages(conversationId);
 
   const { addPrivateReaction } = useSocketPrivateMessages(conversationId);
 
@@ -60,10 +52,7 @@ export default function PrivateMessageLayout({
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <div
-        ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto discord-scrollbar"
-      >
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto discord-scrollbar">
         <div ref={sentinelRef} className="h-1" />
         <PrivateMessageScreen
           messages={messages}

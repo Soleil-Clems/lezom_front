@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect } from 'react';
 import { socketManager } from '@/lib/socket';
@@ -9,36 +9,36 @@ import { useSocketConversations } from '@/hooks/websocket/useSocketConversations
 import { useDesktopNotifications } from '@/hooks/useDesktopNotifications';
 
 export default function SocketProvider({ children }: { children: React.ReactNode }) {
-    const token = useAuthStore((state) => state.token);
-    const logout = useAuthStore((state) => state.logout);
+  const token = useAuthStore((state) => state.token);
+  const logout = useAuthStore((state) => state.logout);
 
-    useSocketPresence();
-    useSocketConversations();
-    useDesktopNotifications();
+  useSocketPresence();
+  useSocketConversations();
+  useDesktopNotifications();
 
-    useEffect(() => {
-        if (!token) {
-            socketManager.disconnect();
-            return;
+  useEffect(() => {
+    if (!token) {
+      socketManager.disconnect();
+      return;
+    }
+
+    const socket = socketManager.connect();
+
+    if (!socket) return;
+    // Gérer les erreurs d'authentification avec refresh
+    socket.on('error', async (error: any) => {
+      if (error.message === 'Unauthorized') {
+        const newToken = await refreshAccessToken();
+        if (!newToken) {
+          logout();
         }
+      }
+    });
 
-        const socket = socketManager.connect();
+    return () => {
+      // Ne pas déconnecter immédiatement, garder la connexion active
+    };
+  }, [token, logout]);
 
-        if (!socket) return;
-        // Gérer les erreurs d'authentification avec refresh
-        socket.on('error', async (error: any) => {
-            if (error.message === 'Unauthorized') {
-                const newToken = await refreshAccessToken();
-                if (!newToken) {
-                    logout();
-                }
-            }
-        });
-
-        return () => {
-            // Ne pas déconnecter immédiatement, garder la connexion active
-        };
-    }, [token, logout]);
-
-    return <>{children}</>;
+  return <>{children}</>;
 }

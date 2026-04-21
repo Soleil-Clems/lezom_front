@@ -1,46 +1,46 @@
-"use client"
+'use client';
 
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation';
 
 type OnlineFriendMember = {
-    id?: number
-    username?: string
-}
+  id?: number;
+  username?: string;
+};
 
 export function OnlineFriendItem({
-                                     member,
-                                     status = true,
-                                 }: {
-    member: OnlineFriendMember
-    status?: boolean
+  member,
+  status = true,
+}: {
+  member: OnlineFriendMember;
+  status?: boolean;
 }) {
-    const router = useRouter()
+  const router = useRouter();
 
-    const name = member?.username || "Inconnu"
-    const initials = name.substring(0, 2).toUpperCase()
+  const name = member?.username || 'Inconnu';
+  const initials = name.substring(0, 2).toUpperCase();
 
-    return (
-        <button
-            type="button"
-            onClick={() => router.push(`/profil/${member?.id}`)}
-            className="flex w-full items-center gap-3 p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-all text-left"
-        >
-            <div className="relative shrink-0">
-                <div className="h-8 w-8 rounded-full bg-[#313338] flex items-center justify-center text-[10px] font-bold text-white uppercase group-hover:bg-indigo-500 transition-colors">
-                    {initials}
-                </div>
+  return (
+    <button
+      type="button"
+      onClick={() => router.push(`/profil/${member?.id}`)}
+      className="flex w-full items-center gap-3 p-2 rounded-md hover:bg-white/5 cursor-pointer group transition-all text-left"
+    >
+      <div className="relative shrink-0">
+        <div className="h-8 w-8 rounded-full bg-[#313338] flex items-center justify-center text-[10px] font-bold text-white uppercase group-hover:bg-indigo-500 transition-colors">
+          {initials}
+        </div>
 
-                {status && (
-                    <div
-                        className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full
+        {status && (
+          <div
+            className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full
                        border-[3px] border-[#2B2D31] bg-green-500"
-                    />
-                )}
-            </div>
+          />
+        )}
+      </div>
 
-            <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 truncate">
+      <span className="text-sm font-medium text-zinc-400 group-hover:text-zinc-200 truncate">
         {name}
       </span>
-        </button>
-    )
+    </button>
+  );
 }

@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const serversSchema = z.object({
   id: z.number(),
@@ -20,6 +20,4 @@ export const transferOwnershipParamsSchema = z.object({
 
 export type serversType = z.infer<typeof serversSchema>;
 export type LeaveServerParamsType = z.infer<typeof leaveServerParamsSchema>;
-export type TransferOwnershipParamsType = z.infer<
-  typeof transferOwnershipParamsSchema
->;
+export type TransferOwnershipParamsType = z.infer<typeof transferOwnershipParamsSchema>;

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { updateChannelMessageRequest } from "@/requests/messageRequest";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { UpdateMessageParamsType } from "@/schemas/message.dto";
+import { updateChannelMessageRequest } from '@/requests/messageRequest';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { UpdateMessageParamsType } from '@/schemas/message.dto';
 
 export function useUpdateChannelMessage(channelId: string | undefined) {
   const queryClient = useQueryClient();
@@ -13,12 +13,12 @@ export function useUpdateChannelMessage(channelId: string | undefined) {
       updateChannelMessageRequest(messageId, { content }),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["messages", channelId],
+        queryKey: ['messages', channelId],
       });
-      toast.success("Message modifié");
+      toast.success('Message modifié');
     },
     onError: (error: any) => {
-      toast.error(error.message || "Erreur lors de la modification du message");
+      toast.error(error.message || 'Erreur lors de la modification du message');
     },
   });
 }

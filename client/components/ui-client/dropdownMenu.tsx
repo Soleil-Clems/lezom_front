@@ -1,16 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Settings,
-  LogOut,
-  UserPlus,
-  PlusCircle,
-  Settings2,
-} from "lucide-react";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Settings, LogOut, UserPlus, PlusCircle, Settings2 } from 'lucide-react';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,15 +13,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ModalChanelContent } from "./modalchanel";
-import { InvitationModalContent } from "./invitationModal";
-import { LeaveServerModal } from "./LeaveServerModal";
-import { TransferOwnershipModal } from "./TransferOwnershipModal";
-import { useLeaveServer } from "@/hooks/mutations/useLeaveServer";
-import { useDeleteServer } from "@/hooks/mutations/updateServerSettings";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+} from '@/components/ui/dropdown-menu';
+import { ModalChanelContent } from './modalchanel';
+import { InvitationModalContent } from './invitationModal';
+import { LeaveServerModal } from './LeaveServerModal';
+import { TransferOwnershipModal } from './TransferOwnershipModal';
+import { useLeaveServer } from '@/hooks/mutations/useLeaveServer';
+import { useDeleteServer } from '@/hooks/mutations/updateServerSettings';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 interface ServerSettingsDropdownProps {
   serverId: string | number;
@@ -42,9 +36,9 @@ export function ServerSettingsDropdown({
   serverName,
   currentUserId,
 }: ServerSettingsDropdownProps) {
-  const t = useTranslations("server");
-  const canAccessSettings = userRole === "server_owner" || userRole === "server_admin";
-  const isOwner = userRole === "server_owner";
+  const t = useTranslations('server');
+  const canAccessSettings = userRole === 'server_owner' || userRole === 'server_admin';
+  const isOwner = userRole === 'server_owner';
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [chanelModalOpen, setChannelModalOpen] = useState(false);
   const [leaveModalOpen, setLeaveModalOpen] = useState(false);
@@ -60,27 +54,23 @@ export function ServerSettingsDropdown({
         onSuccess: () => {
           setLeaveModalOpen(false);
         },
-      }
+      },
     );
   };
 
   return (
     <>
-      <Dialog  open={chanelModalOpen} onOpenChange={setChannelModalOpen}>
+      <Dialog open={chanelModalOpen} onOpenChange={setChannelModalOpen}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-zinc-400 hover:text-white"
-            >
+            <Button variant="ghost" size="icon" className="text-zinc-400 hover:text-white">
               <Settings size={20} />
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-56 bg-[#111214] border-none text-[#b5bac1] p-2">
             <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-bold uppercase text-zinc-500">
-              {t("serverOptions")}
+              {t('serverOptions')}
             </DropdownMenuLabel>
 
             <DropdownMenuGroup className="space-y-0.5">
@@ -91,7 +81,7 @@ export function ServerSettingsDropdown({
                     onSelect={(e) => e.preventDefault()}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    <span className="text-sm font-medium">{t("createChannel")}</span>
+                    <span className="text-sm font-medium">{t('createChannel')}</span>
                   </DropdownMenuItem>
                 </DialogTrigger>
               )}
@@ -103,9 +93,7 @@ export function ServerSettingsDropdown({
                 >
                   <Link href={`/settings/${serverId}`}>
                     <Settings2 className="mr-2 h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      {t("serverSettings")}
-                    </span>
+                    <span className="text-sm font-medium">{t('serverSettings')}</span>
                   </Link>
                 </DropdownMenuItem>
               )}
@@ -118,9 +106,7 @@ export function ServerSettingsDropdown({
                 }}
               >
                 <UserPlus className="mr-2 h-4 w-4" />
-                <span className="text-sm font-medium">
-                  {t("inviteToServer")}
-                </span>
+                <span className="text-sm font-medium">{t('inviteToServer')}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
 
@@ -134,12 +120,12 @@ export function ServerSettingsDropdown({
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              <span className="text-sm font-medium">{t("leaveServer")}</span>
+              <span className="text-sm font-medium">{t('leaveServer')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <ModalChanelContent onSuccess={() => setChannelModalOpen(false)}  />
+        <ModalChanelContent onSuccess={() => setChannelModalOpen(false)} />
       </Dialog>
 
       <Dialog open={inviteModalOpen} onOpenChange={setInviteModalOpen}>
@@ -159,7 +145,7 @@ export function ServerSettingsDropdown({
             deleteServer.mutate(serverId, {
               onSuccess: () => {
                 setLeaveModalOpen(false);
-                router.push("/");
+                router.push('/');
               },
             });
           }}
