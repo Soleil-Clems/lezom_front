@@ -153,6 +153,9 @@ export default function LoginPage() {
               {loginMutation.isPending && <Loader2 className="animate-spin" />}
               {loginMutation.isPending ? t('loggingIn') : t('login')}
             </Button>
+            <Link href="/forgot-password" className="text-sm text-[#00A8FC] hover:underline">
+              Mot de passe oublié ?
+            </Link>
             <p className="text-sm text-[#A3A6AA] mt-1">
               {t('noAccount')}{' '}
               <Link href="/register" className="text-[#00A8FC] hover:underline">
