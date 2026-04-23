@@ -14,12 +14,14 @@ export const banUserRequest = async (
   userId: number,
   reason?: string,
   durationHours?: number,
+  durationMinutes?: number,
 ) => {
   try {
     const response = await customfetch.post(`servers/${serverId}/bans`, {
       userId,
       reason,
       durationHours,
+      durationMinutes,
     });
     return response;
   } catch (error) {

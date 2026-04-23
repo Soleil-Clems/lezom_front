@@ -77,10 +77,10 @@ export default function SettingsPage() {
     setBanModalOpen(true);
   };
 
-  const handleConfirmBan = (reason?: string, durationHours?: number) => {
+  const handleConfirmBan = (reason?: string, durationHours?: number, durationMinutes?: number) => {
     if (memberToBan) {
       banUser.mutate(
-        { serverId: currentServer.id, userId: memberToBan.id, reason, durationHours },
+        { serverId: currentServer.id, userId: memberToBan.id, reason, durationHours, durationMinutes },
         {
           onSuccess: () => {
             setBanModalOpen(false);
