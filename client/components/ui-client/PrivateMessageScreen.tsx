@@ -166,7 +166,7 @@ export default function PrivateMessageScreen({
           return (
             <div
               key={message.id}
-              className={`flex flex-col gap-1 ${isMyMessage ? 'items-end' : 'items-start'}`}
+              className={`group flex flex-col gap-1 ${isMyMessage ? 'items-end' : 'items-start'}`}
               onClick={() => setActiveMessageId(isActive ? null : message.id)}
             >
               <div className="flex items-center gap-2">
@@ -180,7 +180,7 @@ export default function PrivateMessageScreen({
 
               {/* ── GIF ── */}
               {isGif && (
-                <div className="relative group">
+                <div className="relative">
                   <div
                     className={`absolute -top-4 ${isMyMessage ? '-left-2' : '-right-2'} ${actionsVisibility}`}
                     onClick={(e) => e.stopPropagation()}
@@ -209,7 +209,7 @@ export default function PrivateMessageScreen({
 
               {/* ── IMAGE ── */}
               {isImage && (
-                <div className="relative group">
+                <div className="relative">
                   <div
                     className={`absolute -top-4 ${isMyMessage ? '-left-2' : '-right-2'} ${actionsVisibility}`}
                     onClick={(e) => e.stopPropagation()}
@@ -236,7 +236,7 @@ export default function PrivateMessageScreen({
 
               {/* ── VOICE ── */}
               {isVoice && (
-                <div className="relative group">
+                <div className="relative">
                   <div
                     className={`absolute -top-4 ${isMyMessage ? '-left-2' : '-right-2'} ${actionsVisibility}`}
                     onClick={(e) => e.stopPropagation()}
@@ -293,7 +293,7 @@ export default function PrivateMessageScreen({
 
               {/* ── FILE ── */}
               {isFile && (
-                <div className="relative group">
+                <div className="relative">
                   <div
                     className={`absolute -top-4 ${isMyMessage ? '-left-2' : '-right-2'} ${actionsVisibility}`}
                     onClick={(e) => e.stopPropagation()}
@@ -348,7 +348,7 @@ export default function PrivateMessageScreen({
               {/* ── TEXT ── */}
               {isText && (
                 <div
-                  className={`relative group p-3 max-w-[80%] wrap-break-word ${
+                  className={`relative p-3 max-w-[80%] wrap-break-word ${
                     isMyMessage
                       ? 'bg-indigo-600 rounded-l-xl rounded-br-xl text-white'
                       : 'bg-[#383a40] rounded-r-xl rounded-bl-xl text-zinc-200'
