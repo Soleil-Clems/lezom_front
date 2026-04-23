@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, CheckCircle } from 'lucide-react';
@@ -23,7 +23,7 @@ import { ResetPasswordSchema, type ResetPasswordType } from '@/schemas/auth.dto'
 import { useResetPassword } from '@/hooks/mutations/useResetPassword';
 import { AuthBackground } from '@/components/ui-client/AuthBackground';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -141,5 +141,13 @@ export default function ResetPasswordPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

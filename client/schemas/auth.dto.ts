@@ -1,6 +1,11 @@
 import { z } from 'zod';
 
-export const passwordSchema = z.string().min(8, { message: 'Au moins 8 caractères' });
+export const passwordSchema = z
+  .string()
+  .min(8, { message: 'Au moins 8 caractères' })
+  .regex(/[a-z]/, { message: 'Au moins une minuscule' })
+  .regex(/[A-Z]/, { message: 'Au moins une majuscule' })
+  .regex(/\d/, { message: 'Au moins un chiffre' });
 
 export const LoginSchema = z.object({
   email: z.email({ message: 'Email invalide' }),
