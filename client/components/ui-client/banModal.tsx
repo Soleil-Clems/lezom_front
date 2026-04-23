@@ -15,21 +15,22 @@ import { Loader2, UserX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 const BAN_DURATIONS = [
-  { labelKey: 'duration1h', value: 1 },
-  { labelKey: 'duration6h', value: 6 },
-  { labelKey: 'duration12h', value: 12 },
-  { labelKey: 'duration24h', value: 24 },
-  { labelKey: 'duration3d', value: 72 },
-  { labelKey: 'duration7d', value: 168 },
-  { labelKey: 'duration30d', value: 720 },
+  { labelKey: 'duration1min', value: { hours: 0, minutes: 1 } },
+  { labelKey: 'duration1h', value: { hours: 1, minutes: 0 } },
+  { labelKey: 'duration6h', value: { hours: 6, minutes: 0 } },
+  { labelKey: 'duration12h', value: { hours: 12, minutes: 0 } },
+  { labelKey: 'duration24h', value: { hours: 24, minutes: 0 } },
+  { labelKey: 'duration3d', value: { hours: 72, minutes: 0 } },
+  { labelKey: 'duration7d', value: { hours: 168, minutes: 0 } },
+  { labelKey: 'duration30d', value: { hours: 720, minutes: 0 } },
   { labelKey: 'durationPermanent', value: 'permanent' as const },
-] as const;
+];
 
-type DurationValue = number | 'permanent' | null;
+type DurationValue = { hours: number; minutes: number } | 'permanent' | null;
 
 type BanModalContentProps = {
   username: string;
-  onConfirm: (reason?: string, durationHours?: number) => void;
+  onConfirm: (reason?: string, durationHours?: number, durationMinutes?: number) => void;
   onCancel: () => void;
   isPending: boolean;
 };
@@ -45,11 +46,18 @@ export function BanModalContent({
   const [reason, setReason] = useState('');
   const [selectedDuration, setSelectedDuration] = useState<DurationValue>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedDuration === null) return;
-    const durationHours = selectedDuration === 'permanent' ? undefined : selectedDuration;
-    onConfirm(reason.trim() || undefined, durationHours);
+    if (selectedDuration === 'permanent') {
+      onConfirm(reason.trim() || undefined);
+    } else {
+      onConfirm(
+        reason.trim() || undefined,
+        selectedDuration.hours || undefined,
+        selectedDuration.minutes || undefined,
+      );
+    }
   };
 
   return (
@@ -78,7 +86,7 @@ export function BanModalContent({
                 disabled={isPending}
                 onClick={() => setSelectedDuration(d.value)}
                 className={`px-3 py-1 rounded text-sm transition-colors ${
-                  selectedDuration === d.value
+                  JSON.stringify(selectedDuration) === JSON.stringify(d.value)
                     ? 'bg-rose-500 text-white'
                     : 'bg-[#1e1f22] text-zinc-400 hover:bg-zinc-700'
                 }`}

@@ -2,12 +2,20 @@ import { describe, it, expect } from 'vitest';
 import { LoginSchema, RegisterSchema, passwordSchema } from '@/schemas/auth.dto';
 
 describe('passwordSchema', () => {
-  it('accepte un mot de passe >= 8 caractères', () => {
-    expect(passwordSchema.parse('password1')).toBe('password1');
+  it('accepte un mot de passe conforme', () => {
+    expect(passwordSchema.parse('Password1')).toBe('Password1');
   });
 
   it('rejette un mot de passe < 8 caractères', () => {
-    expect(() => passwordSchema.parse('short')).toThrow();
+    expect(() => passwordSchema.parse('Short1')).toThrow();
+  });
+
+  it('rejette un mot de passe sans majuscule', () => {
+    expect(() => passwordSchema.parse('password1')).toThrow();
+  });
+
+  it('rejette un mot de passe sans chiffre', () => {
+    expect(() => passwordSchema.parse('Password')).toThrow();
   });
 });
 
@@ -41,7 +49,7 @@ describe('RegisterSchema', () => {
     lastname: 'Dupont',
     username: 'jdupont',
     email: 'jean@test.com',
-    password: 'password123',
+    password: 'Password123',
     birthdate: '2000-01-01',
   };
 

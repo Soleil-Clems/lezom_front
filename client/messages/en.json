@@ -208,6 +208,7 @@
     "bannedOn": "Banned on {date}",
     "reasonLabel": "Reason: {reason}",
     "duration": "Ban duration",
+    "duration1min": "1 min",
     "duration1h": "1h",
     "duration6h": "6h",
     "duration12h": "12h",

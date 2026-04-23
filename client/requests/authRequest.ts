@@ -16,3 +16,11 @@ export const verifyOtpRequest = async (body: { userId: number; code: string }) =
 export const resendOtpRequest = async (body: { userId: number }) => {
   return customfetch.post('auth/resend-otp', body);
 };
+
+export const forgotPasswordRequest = async (body: { email: string }) => {
+  return customfetch.post('auth/forgot-password', body);
+};
+
+export const resetPasswordRequest = async (body: { token: string; password: string }) => {
+  return customfetch.post('auth/reset-password', body);
+};
