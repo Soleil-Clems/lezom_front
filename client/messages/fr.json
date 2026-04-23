@@ -1,5 +1,6 @@
 {
   "common": {
+    "_i18nWorkflowTest": "ping",
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "save": "Enregistrer",
