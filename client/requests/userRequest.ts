@@ -18,3 +18,9 @@ export const updatePictureRequest = async (userId: number, file: File) => {
   formData.append('file', file);
   return customfetch.patch(`users/picture/${userId}`, formData);
 };
+
+export const updateBannerRequest = async (userId: number, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return customfetch.patch(`users/banner/${userId}`, formData);
+};

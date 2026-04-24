@@ -25,6 +25,7 @@ import { LanguageSwitcher } from '@/components/ui-client/LanguageSwitcher';
 import Loading from '@/components/ui-client/Loading';
 import { useCreateConversation } from '@/hooks/mutations/useCreateConversation';
 import { useEditProfil } from '@/hooks/mutations/useEditProfil';
+import { useEditProfilBanner } from '@/hooks/mutations/useEditProfilBanner';
 import { useEditProfilPicture } from '@/hooks/mutations/useEditProfilPicture';
 import { useSendFriendRequest } from '@/hooks/mutations/useSendFriendRequest';
 import { useGetFriends } from '@/hooks/queries/useGetFriends';
@@ -41,6 +42,7 @@ type ProfileUser = {
   isTwoFactorEnabled?: boolean;
   role?: string;
   img?: string;
+  banner?: string;
   lastSeen?: Date | string;
   createdAt?: Date | string;
 };
@@ -71,9 +73,11 @@ export function ProfileView({
   const createConversation = useCreateConversation();
   const sendFriendRequest = useSendFriendRequest();
   const editPictureMutation = useEditProfilPicture(user?.id);
+  const editBannerMutation = useEditProfilBanner(user?.id);
   const editProfilMutation = useEditProfil(user?.id ?? 0);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   if (isLoading) return <Loading />;
   if (isError || !user) return <Error message={errorMessage} />;
@@ -91,6 +95,15 @@ export function ProfileView({
     const file = e.target.files?.[0];
     if (file) {
       editPictureMutation.mutate(file);
+      e.target.value = '';
+    }
+  };
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      editBannerMutation.mutate(file);
+      e.target.value = '';
     }
   };
 
@@ -103,7 +116,40 @@ export function ProfileView({
 
   return (
     <div className="flex-1 bg-own-dark h-full overflow-y-auto">
-      <div className="h-32 w-full bg-indigo-600 relative">
+      <div className="relative h-40 w-full bg-zinc-800">
+        <div
+          className={`h-full w-full bg-cover bg-center ${
+            user.banner ? '' : 'bg-gradient-to-r from-indigo-700 via-sky-600 to-cyan-500'
+          }`}
+          style={user.banner ? { backgroundImage: `url(${user.banner})` } : undefined}
+          aria-label={user.banner ? `${user.username} banner` : undefined}
+        />
+        <div className="absolute inset-0 bg-black/25" />
+        {isOwnProfile && (
+          <>
+            <button
+              type="button"
+              onClick={() => bannerInputRef.current?.click()}
+              disabled={editBannerMutation.isPending}
+              className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-full bg-black/50 px-3 py-2 text-sm font-medium text-white transition hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {editBannerMutation.isPending ? (
+                <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              ) : (
+                <Camera className="h-4 w-4" />
+              )}
+              Changer la bannière
+            </button>
+            <input
+              type="file"
+              ref={bannerInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleBannerChange}
+            />
+          </>
+        )}
+
         <div className="absolute -bottom-12 left-8 group">
           <div className="relative p-1 bg-[#313338] rounded-full">
             <Avatar className="h-24 w-24 border-4 border-[#313338]">

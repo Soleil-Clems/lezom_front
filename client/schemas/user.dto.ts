@@ -10,6 +10,8 @@ export const userSchema = z.object({
   isActive: z.boolean(),
   isTwoFactorEnabled: z.boolean(),
   role: z.string(),
+  img: z.string().nullish(),
+  banner: z.string().nullish(),
   lastSeen: z.date(),
   createdAt: z.date(),
   updatedAt: z.date(),
