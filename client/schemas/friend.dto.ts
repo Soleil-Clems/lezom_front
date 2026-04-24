@@ -12,7 +12,7 @@ export type friendRequestType = {
   id: number;
   sender: friendUserType;
   receiver: friendUserType;
-  status: "pending" | "accepted";
+  status: 'pending' | 'accepted';
   createdAt: Date | string;
   updatedAt: Date | string;
 };

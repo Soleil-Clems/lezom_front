@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { registerRequest } from "@/requests/authRequest";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { registerRequest } from '@/requests/authRequest';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 export function useRegister() {
   return useMutation({

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { updatePictureRequest } from "@/requests/userRequest";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { updatePictureRequest } from '@/requests/userRequest';
 
 export function useEditProfilPicture(id?: number) {
   const queryClient = useQueryClient();
@@ -10,14 +10,14 @@ export function useEditProfilPicture(id?: number) {
   return useMutation({
     mutationFn: (file: File) => updatePictureRequest(id!, file),
     onSuccess: () => {
-      toast.success("Photo de profil mise à jour !");
-      queryClient.invalidateQueries({ queryKey: ["authuser"] });
+      toast.success('Photo de profil mise à jour !');
+      queryClient.invalidateQueries({ queryKey: ['authuser'] });
       if (id) {
-        queryClient.invalidateQueries({ queryKey: ["user", id] });
+        queryClient.invalidateQueries({ queryKey: ['user', id] });
       }
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Erreur lors de la mise à jour");
+      toast.error(error.message || 'Erreur lors de la mise à jour');
     },
   });
 }

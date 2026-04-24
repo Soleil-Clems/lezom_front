@@ -1,6 +1,6 @@
-import { apiUrl } from "@/lib/apiurl";
-import useAuthStore from "@/store/authStore";
-import { refreshAccessToken } from "@/lib/tokenRefresh";
+import { apiUrl } from '@/lib/apiurl';
+import useAuthStore from '@/store/authStore';
+import { refreshAccessToken } from '@/lib/tokenRefresh';
 
 type RequestOptions = {
   headers?: Record<string, string>;
@@ -33,10 +33,10 @@ class CustomFetch {
 
     const res = await fetch(`${this.baseURL}${endpoint}`, {
       method,
-      credentials: "include",
+      credentials: 'include',
       headers: {
         Authorization: `Bearer ${token}`,
-        ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(headers || {}),
       },
       body: isFormData ? body : body ? JSON.stringify(body) : undefined,
@@ -44,29 +44,29 @@ class CustomFetch {
 
     if (res.status === 401) {
       const skipRefreshEndpoints = [
-        "auth/login",
-        "auth/register",
-        "auth/refresh",
-        "auth/logout",
-        "auth/verify-otp",
-        "auth/resend-otp",
+        'auth/login',
+        'auth/register',
+        'auth/refresh',
+        'auth/logout',
+        'auth/verify-otp',
+        'auth/resend-otp',
       ];
-      const shouldSkipRefresh = skipRefreshEndpoints.some((e) =>
-        endpoint.includes(e),
-      );
+      const shouldSkipRefresh = skipRefreshEndpoints.some((e) => endpoint.includes(e));
 
       if (shouldSkipRefresh) {
-        let message = "Identifiants incorrects";
+        let message = 'Identifiants incorrects';
         try {
           const errorData = await res.json();
           message = errorData.message ?? message;
-        } catch { /* response body not JSON-parseable, use fallback message */ }
+        } catch {
+          /* response body not JSON-parseable, use fallback message */
+        }
         throw new Error(message);
       }
 
       if (isRetry) {
         this.handleAuthFailure();
-        throw new Error("Session expirée. Veuillez vous reconnecter.");
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
       }
 
       const newToken = await refreshAccessToken();
@@ -76,13 +76,13 @@ class CustomFetch {
       }
 
       this.handleAuthFailure();
-      throw new Error("Session expirée. Veuillez vous reconnecter.");
+      throw new Error('Session expirée. Veuillez vous reconnecter.');
     }
 
     if (!res.ok) {
-      if (endpoint === "auth/me" && res.status >= 400 && res.status < 500) {
+      if (endpoint === 'auth/me' && res.status >= 400 && res.status < 500) {
         this.handleAuthFailure();
-        throw new Error("Session expirée. Veuillez vous reconnecter.");
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
       }
 
       let message = `Erreur ${res.status}`;
@@ -99,41 +99,29 @@ class CustomFetch {
   private handleAuthFailure() {
     useAuthStore.getState().logout();
 
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
     }
   }
 
   get(endpoint: string, options: RequestOptions = {}) {
-    return this.request(endpoint, { method: "GET", ...options });
+    return this.request(endpoint, { method: 'GET', ...options });
   }
 
-  post(
-    endpoint: string,
-    body?: BodyData | FormData,
-    options: RequestOptions = {},
-  ) {
-    return this.request(endpoint, { method: "POST", body, ...options });
+  post(endpoint: string, body?: BodyData | FormData, options: RequestOptions = {}) {
+    return this.request(endpoint, { method: 'POST', body, ...options });
   }
 
-  put(
-    endpoint: string,
-    body?: BodyData | FormData,
-    options: RequestOptions = {},
-  ) {
-    return this.request(endpoint, { method: "PUT", body, ...options });
+  put(endpoint: string, body?: BodyData | FormData, options: RequestOptions = {}) {
+    return this.request(endpoint, { method: 'PUT', body, ...options });
   }
 
-  patch(
-    endpoint: string,
-    body?: BodyData | FormData,
-    options: RequestOptions = {},
-  ) {
-    return this.request(endpoint, { method: "PATCH", body, ...options });
+  patch(endpoint: string, body?: BodyData | FormData, options: RequestOptions = {}) {
+    return this.request(endpoint, { method: 'PATCH', body, ...options });
   }
 
   delete(endpoint: string, options: RequestOptions = {}) {
-    return this.request(endpoint, { method: "DELETE", ...options });
+    return this.request(endpoint, { method: 'DELETE', ...options });
   }
 }
 

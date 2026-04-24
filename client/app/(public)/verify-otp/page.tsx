@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
-import { Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -14,29 +14,29 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useVerifyOtp } from "@/hooks/mutations/useVerifyOtp";
-import { useResendOtp } from "@/hooks/mutations/useResendOtp";
-import useAuthStore from "@/store/authStore";
-import { AuthBackground } from "@/components/ui-client/AuthBackground";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { useVerifyOtp } from '@/hooks/mutations/useVerifyOtp';
+import { useResendOtp } from '@/hooks/mutations/useResendOtp';
+import useAuthStore from '@/store/authStore';
+import { AuthBackground } from '@/components/ui-client/AuthBackground';
 
 export default function VerifyOtpPage() {
-  const t = useTranslations("auth");
+  const t = useTranslations('auth');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userId = Number(searchParams.get("userId"));
+  const userId = Number(searchParams.get('userId'));
   const { setToken } = useAuthStore();
   const verifyMutation = useVerifyOtp();
   const resendMutation = useResendOtp();
 
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState(['', '', '', '', '', '']);
   const [cooldown, setCooldown] = useState(60);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     if (!userId) {
-      router.replace("/login");
+      router.replace('/login');
     }
   }, [userId, router]);
 
@@ -58,23 +58,23 @@ export default function VerifyOtpPage() {
       inputRefs.current[index + 1]?.focus();
     }
 
-    const fullCode = newCode.join("");
+    const fullCode = newCode.join('');
     if (fullCode.length === 6) {
       handleSubmit(fullCode);
     }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (pasted.length === 6) {
-      const newCode = pasted.split("");
+      const newCode = pasted.split('');
       setCode(newCode);
       handleSubmit(pasted);
     }
@@ -87,13 +87,13 @@ export default function VerifyOtpPage() {
       {
         onSuccess: (data) => {
           setToken(data.access_token);
-          router.replace("/");
+          router.replace('/');
         },
         onError: () => {
-          setCode(["", "", "", "", "", ""]);
+          setCode(['', '', '', '', '', '']);
           inputRefs.current[0]?.focus();
         },
-      }
+      },
     );
   };
 
@@ -112,20 +112,10 @@ export default function VerifyOtpPage() {
       <Card className="relative z-10 w-full max-w-[440px] p-6 sm:p-8 bg-[#313338] border-white/[0.06] animate-in fade-in-0 zoom-in-95 duration-500">
         <CardHeader className="text-center pb-0">
           <div className="flex justify-center mb-3">
-            <Image
-              src="/lezom.svg"
-              alt="Lezom"
-              width={48}
-              height={48}
-              className="drop-shadow-lg"
-            />
+            <Image src="/lezom.svg" alt="Lezom" width={48} height={48} className="drop-shadow-lg" />
           </div>
-          <CardTitle className="text-2xl font-bold text-white">
-            {t("verifyOtp")}
-          </CardTitle>
-          <CardDescription className="text-[#B5BAC1]">
-            {t("verifyOtpDesc")}
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold text-white">{t('verifyOtp')}</CardTitle>
+          <CardDescription className="text-[#B5BAC1]">{t('verifyOtpDesc')}</CardDescription>
         </CardHeader>
 
         <CardContent className="pt-6">
@@ -133,7 +123,9 @@ export default function VerifyOtpPage() {
             {code.map((digit, index) => (
               <Input
                 key={index}
-                ref={(el) => { inputRefs.current[index] = el; }}
+                ref={(el) => {
+                  inputRefs.current[index] = el;
+                }}
                 type="text"
                 inputMode="numeric"
                 maxLength={1}
@@ -150,12 +142,12 @@ export default function VerifyOtpPage() {
         <CardFooter className="flex-col gap-3 pt-2">
           <Button
             type="button"
-            disabled={verifyMutation.isPending || code.join("").length < 6}
-            onClick={() => handleSubmit(code.join(""))}
+            disabled={verifyMutation.isPending || code.join('').length < 6}
+            onClick={() => handleSubmit(code.join(''))}
             className="w-full h-11 bg-purple-discord text-white font-medium hover:bg-purple-discord/85 transition-colors"
           >
             {verifyMutation.isPending && <Loader2 className="animate-spin" />}
-            {verifyMutation.isPending ? t("verifying") : t("verify")}
+            {verifyMutation.isPending ? t('verifying') : t('verify')}
           </Button>
 
           <button
@@ -164,9 +156,7 @@ export default function VerifyOtpPage() {
             disabled={cooldown > 0 || resendMutation.isPending}
             className="text-sm text-[#00A8FC] hover:underline disabled:text-[#A3A6AA] disabled:no-underline transition-colors"
           >
-            {cooldown > 0
-              ? t("resendIn", { seconds: cooldown })
-              : t("resendCode")}
+            {cooldown > 0 ? t('resendIn', { seconds: cooldown }) : t('resendCode')}
           </button>
         </CardFooter>
       </Card>

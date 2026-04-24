@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { useParams } from "next/navigation";
-import MessageScreenComponent from "./MessageScreenComponent";
-import Message from "@/components/ui-client/messageComponent";
-import Loading from "@/components/ui-client/Loading";
-import { useGetAllMessagesOfAChannel } from "@/hooks/queries/useGetAllMessagesOfAChannel";
-import { useSocketMessages } from "@/hooks/websocket/useSocketMessages";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { OnlineFriendsList } from "@/components/ui-client/onlinefriendlist";
+import { useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import MessageScreenComponent from './MessageScreenComponent';
+import Message from '@/components/ui-client/messageComponent';
+import Loading from '@/components/ui-client/Loading';
+import { useGetAllMessagesOfAChannel } from '@/hooks/queries/useGetAllMessagesOfAChannel';
+import { useSocketMessages } from '@/hooks/websocket/useSocketMessages';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
+import { OnlineFriendsList } from '@/components/ui-client/onlinefriendlist';
 
 export default function MessageLayout({ channelId }: { channelId: string }) {
   const params = useParams();
@@ -17,8 +17,7 @@ export default function MessageLayout({ channelId }: { channelId: string }) {
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetAllMessagesOfAChannel(channelId);
 
-  const { typingUsers, updateMessage, removeMessage, addReaction } =
-    useSocketMessages(channelId);
+  const { typingUsers, updateMessage, removeMessage, addReaction } = useSocketMessages(channelId);
 
   const messages = useMemo(
     () => (data ? [...data.pages].reverse().flatMap((p) => p.messages) : []),

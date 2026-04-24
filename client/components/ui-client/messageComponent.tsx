@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import {
   Plus,
   Send,
@@ -14,24 +14,23 @@ import {
   X,
   Mic,
   Square,
-} from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Field, FieldError } from "@/components/ui/field";
-import { sendMessageSchema, sendMessageType } from "@/schemas/message.dto";
-import { useSendMessage } from "@/hooks/mutations/useSendMessage";
-import { useSendPrivateMessage } from "@/hooks/mutations/useSendPrivateMessage";
-import { socketManager } from "@/lib/socket";
-import { useSocketTyping } from "@/hooks/websocket/useSocketTyping";
-import { useState, useRef, useEffect, useCallback } from "react";
-import EmojiPicker, { EmojiClickData, Theme } from "emoji-picker-react";
-import { Input } from "@/components/ui/input";
-import { gifApiKey, gifClientKey } from "@/lib/constants";
-import { upload } from "@/lib/upload";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
-
+} from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Field, FieldError } from '@/components/ui/field';
+import { sendMessageSchema, sendMessageType } from '@/schemas/message.dto';
+import { useSendMessage } from '@/hooks/mutations/useSendMessage';
+import { useSendPrivateMessage } from '@/hooks/mutations/useSendPrivateMessage';
+import { socketManager } from '@/lib/socket';
+import { useSocketTyping } from '@/hooks/websocket/useSocketTyping';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
+import { Input } from '@/components/ui/input';
+import { gifApiKey, gifClientKey } from '@/lib/constants';
+import { upload } from '@/lib/upload';
+import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
+import { useGetServerMembers } from '@/hooks/queries/useGetServerMembers';
 
 const TENOR_API_KEY = gifApiKey;
 const TENOR_CLIENT_KEY = gifClientKey;
@@ -50,20 +49,16 @@ interface MessageProps {
 }
 
 export default function Message({ channelId, conversationId }: MessageProps) {
-  const tm = useTranslations("messages");
-  const tc = useTranslations("common");
-  const ta = useTranslations("attachments");
+  const tm = useTranslations('messages');
+  const tc = useTranslations('common');
+  const ta = useTranslations('attachments');
   const socket = socketManager.getSocket();
   const isPrivateMessage = !!conversationId;
 
   const params = useParams();
-const serverId = params?.serverId as string;
-const { data: membersData } = useGetServerMembers(serverId, { limit: 100 });
-const members = membersData?.data?.map((m) => m.members) ?? [];
-
-
-
-
+  const serverId = params?.serverId as string;
+  const { data: membersData } = useGetServerMembers(serverId, { limit: 100 });
+  const members = membersData?.data?.map((m) => m.members) ?? [];
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
@@ -72,19 +67,15 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
   const [mentionQuery, setMentionQuery] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const filteredMembers = mentionQuery !== null
-  ? members.filter((m: any) =>
-      m.username?.toLowerCase().startsWith(mentionQuery.toLowerCase())
-    )
-  : [];
-
-
+  const filteredMembers =
+    mentionQuery !== null
+      ? members.filter((m: any) => m.username?.toLowerCase().startsWith(mentionQuery.toLowerCase()))
+      : [];
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [gifs, setGifs] = useState<TenorGif[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingGifs, setIsLoadingGifs] = useState(false);
-
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
@@ -106,8 +97,8 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
   const form = useForm<sendMessageType>({
     resolver: zodResolver(sendMessageSchema),
     defaultValues: {
-      content: "",
-      type: "text",
+      content: '',
+      type: 'text',
       channelId: channelId ? parseInt(channelId) : 0,
     },
   });
@@ -116,7 +107,7 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
     if (isPrivateMessage) {
       privateTyping.startTyping();
     } else {
-      socket?.emit("typing", {
+      socket?.emit('typing', {
         channelId: parseInt(channelId!),
         isTyping: value.length > 0,
       });
@@ -127,21 +118,20 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
     if (isPrivateMessage) {
       privateTyping.stopTyping();
     } else {
-      socket?.emit("typing", {
+      socket?.emit('typing', {
         channelId: parseInt(channelId!),
         isTyping: false,
       });
     }
   };
 
-
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
-            ? "audio/webm;codecs=opus"
-            : "audio/webm",
+        mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : 'audio/webm',
       });
 
       audioChunksRef.current = [];
@@ -154,7 +144,7 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         setAudioBlob(blob);
         setAudioPreviewUrl(URL.createObjectURL(blob));
         stream.getTracks().forEach((track) => track.stop());
@@ -168,12 +158,12 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
         setRecordingDuration((prev) => prev + 1);
       }, 1000);
     } catch (error) {
-      console.error("Erreur accès microphone:", error);
+      console.error('Erreur accès microphone:', error);
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
     }
     setIsRecording(false);
@@ -198,7 +188,7 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
 
     try {
       const file = new File([audioBlob], `voice-${Date.now()}.webm`, {
-        type: "audio/webm",
+        type: 'audio/webm',
       });
 
       const result = await upload(file);
@@ -206,12 +196,12 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
       if (isPrivateMessage) {
         sendPrivateMessageMutation.mutate({
           content: result.url,
-          type: "voice",
+          type: 'voice',
         });
       } else {
         sendChannelMessageMutation.mutate({
           content: result.url,
-          type: "voice",
+          type: 'voice',
           channelId: channelId ? parseInt(channelId) : 0,
         });
       }
@@ -223,26 +213,25 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
       }
       setRecordingDuration(0);
     } catch (error) {
-      console.error("Erreur envoi vocal:", error);
+      console.error('Erreur envoi vocal:', error);
     }
   };
 
   const formatDuration = (seconds: number) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
+    return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   useEffect(() => {
     return () => {
       if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
       if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
         mediaRecorderRef.current.stop();
       }
     };
   }, []);
-
 
   const sendFileMessage = async () => {
     if (selectedFiles.length === 0) return;
@@ -266,11 +255,11 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
         });
       }
     } catch (error) {
-      console.error("Erreur upload fichier:", error);
+      console.error('Erreur upload fichier:', error);
     }
 
     setSelectedFiles([]);
-    form.setValue("type", "text");
+    form.setValue('type', 'text');
   };
 
   const onSubmit = async (values: sendMessageType) => {
@@ -286,29 +275,28 @@ const members = membersData?.data?.map((m) => m.members) ?? [];
     }
 
     form.reset({
-      content: "",
-      type: "text",
+      content: '',
+      type: 'text',
       channelId: channelId ? parseInt(channelId) : 0,
     });
 
     stopTyping();
   };
 
-const insertMention = (username: string) => {
-  const current = form.getValues("content");
-  const cursor = textareaRef.current?.selectionStart ?? current.length;
-  const textBefore = current.slice(0, cursor);
-  const textAfter = current.slice(cursor);
-  const newBefore = textBefore.replace(/@\w*$/, `@${username} `);
-  form.setValue("content", newBefore + textAfter);
-  setMentionQuery(null);
-  setTimeout(() => textareaRef.current?.focus(), 0);
-};
-
+  const insertMention = (username: string) => {
+    const current = form.getValues('content');
+    const cursor = textareaRef.current?.selectionStart ?? current.length;
+    const textBefore = current.slice(0, cursor);
+    const textAfter = current.slice(cursor);
+    const newBefore = textBefore.replace(/@\w*$/, `@${username} `);
+    form.setValue('content', newBefore + textAfter);
+    setMentionQuery(null);
+    setTimeout(() => textareaRef.current?.focus(), 0);
+  };
 
   const onEmojiClick = (emojiData: EmojiClickData) => {
-    const current = form.getValues("content");
-    form.setValue("content", current + emojiData.emoji);
+    const current = form.getValues('content');
+    form.setValue('content', current + emojiData.emoji);
     setShowEmojiPicker(false);
   };
 
@@ -316,11 +304,11 @@ const insertMention = (username: string) => {
     setIsLoadingGifs(true);
     try {
       const endpoint =
-          query === "trending"
-              ? `https://tenor.googleapis.com/v2/featured?key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`
-              : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(
-                  query,
-              )}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`;
+        query === 'trending'
+          ? `https://tenor.googleapis.com/v2/featured?key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`
+          : `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(
+              query,
+            )}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=20`;
 
       const res = await fetch(endpoint);
       const data = await res.json();
@@ -334,7 +322,7 @@ const insertMention = (username: string) => {
 
   useEffect(() => {
     if (showGifPicker && gifs.length === 0) {
-      fetchGifs("trending");
+      fetchGifs('trending');
     }
   }, [showGifPicker]);
 
@@ -345,23 +333,23 @@ const insertMention = (username: string) => {
   };
 
   const onGifClick = (url: string) => {
-    form.setValue("content", url);
-    form.setValue("type", "gif");
+    form.setValue('content', url);
+    form.setValue('type', 'gif');
     setShowGifPicker(false);
     form.handleSubmit(onSubmit)();
   };
 
   const getMessageTypeFromFile = (file: File) => {
-    if (file.type.startsWith("image/")) return "img";
-    return "file";
+    if (file.type.startsWith('image/')) return 'img';
+    return 'file';
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if ((form.getValues("content") ?? "").trim().length > 0) {
-      form.setValue("content", "");
+    if ((form.getValues('content') ?? '').trim().length > 0) {
+      form.setValue('content', '');
       stopTyping();
     }
 
@@ -372,18 +360,17 @@ const insertMention = (username: string) => {
   const removeFile = (index: number) => {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     if (selectedFiles.length <= 1) {
-      form.setValue("type", "text");
+      form.setValue('type', 'text');
     }
   };
-
 
   const handleScreenCapture = async () => {
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { mediaSource: "screen" } as any,
+        video: { mediaSource: 'screen' } as any,
       });
 
-      const video = document.createElement("video");
+      const video = document.createElement('video');
       video.srcObject = stream;
       video.play();
 
@@ -391,10 +378,10 @@ const insertMention = (username: string) => {
         video.onloadedmetadata = resolve;
       });
 
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext('2d');
       ctx?.drawImage(video, 0, 0);
 
       stream.getTracks().forEach((track) => track.stop());
@@ -402,7 +389,7 @@ const insertMention = (username: string) => {
       canvas.toBlob(async (blob) => {
         if (blob) {
           const file = new File([blob], `screenshot-${Date.now()}.png`, {
-            type: "image/png",
+            type: 'image/png',
           });
 
           try {
@@ -411,18 +398,18 @@ const insertMention = (username: string) => {
             if (isPrivateMessage) {
               sendPrivateMessageMutation.mutate({
                 content: result.url,
-                type: "img",
+                type: 'img',
               });
             } else {
               sendChannelMessageMutation.mutate({
                 content: result.url,
-                type: "img",
+                type: 'img',
                 channelId: channelId ? parseInt(channelId) : 0,
               });
             }
           } catch (error) {
-            console.error("Erreur upload screenshot:", error);
-            form.setValue("type", "img");
+            console.error('Erreur upload screenshot:', error);
+            form.setValue('type', 'img');
             setSelectedFiles([file]);
           }
         }
@@ -434,453 +421,415 @@ const insertMention = (username: string) => {
     }
   };
 
-
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-          emojiPickerRef.current &&
-          !emojiPickerRef.current.contains(e.target as Node)
-      ) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
         setShowEmojiPicker(false);
       }
-      if (
-          gifPickerRef.current &&
-          !gifPickerRef.current.contains(e.target as Node)
-      ) {
+      if (gifPickerRef.current && !gifPickerRef.current.contains(e.target as Node)) {
         setShowGifPicker(false);
       }
-      if (
-          attachMenuRef.current &&
-          !attachMenuRef.current.contains(e.target as Node)
-      ) {
+      if (attachMenuRef.current && !attachMenuRef.current.contains(e.target as Node)) {
         setShowAttachMenu(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   if (!channelId && !conversationId) return null;
 
   const isPending = isPrivateMessage
-      ? sendPrivateMessageMutation.isPending
-      : sendChannelMessageMutation.isPending;
+    ? sendPrivateMessageMutation.isPending
+    : sendChannelMessageMutation.isPending;
 
-  const hasContent =
-      (form.watch("content") ?? "").trim().length > 0 || selectedFiles.length > 0;
+  const hasContent = (form.watch('content') ?? '').trim().length > 0 || selectedFiles.length > 0;
 
   return (
-      <div className="w-full px-4 pb-4">
-        {isPrivateMessage && privateTyping.isAnyoneTyping && (
-            <div className="px-2 py-1 text-xs text-zinc-400 italic">
-              {privateTyping.typingUsers.length === 1
-                  ? tm("typing", { name: privateTyping.typingUsers[0].username })
-                  : tm("typingMultiple", { count: privateTyping.typingUsers.length })}
-            </div>
-        )}
+    <div className="w-full px-4 pb-4">
+      {isPrivateMessage && privateTyping.isAnyoneTyping && (
+        <div className="px-2 py-1 text-xs text-zinc-400 italic">
+          {privateTyping.typingUsers.length === 1
+            ? tm('typing', { name: privateTyping.typingUsers[0].username })
+            : tm('typingMultiple', { count: privateTyping.typingUsers.length })}
+        </div>
+      )}
 
-
-        {(isRecording || audioBlob) && (
-            <div className="mb-2 flex items-center gap-3 p-3 bg-[#2B2D31] rounded-xl border border-zinc-700">
-              {isRecording ? (
-                  <>
-                    {/* Recording in progress */}
-                    <div className="flex items-center gap-2 flex-1">
-                      <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                      <span className="text-sm text-red-400 font-medium">
-                  {tm("recording")}
-                </span>
-                      <span className="text-sm text-zinc-400 font-mono">
+      {(isRecording || audioBlob) && (
+        <div className="mb-2 flex items-center gap-3 p-3 bg-[#2B2D31] rounded-xl border border-zinc-700">
+          {isRecording ? (
+            <>
+              {/* Recording in progress */}
+              <div className="flex items-center gap-2 flex-1">
+                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-sm text-red-400 font-medium">{tm('recording')}</span>
+                <span className="text-sm text-zinc-400 font-mono">
                   {formatDuration(recordingDuration)}
                 </span>
 
-                      {/* Animated bars */}
-                      <div className="flex items-center gap-[2px] ml-2">
-                        {Array.from({ length: 12 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="w-[3px] bg-red-400/70 rounded-full animate-pulse"
-                                style={{
-                                  height: `${Math.random() * 16 + 6}px`,
-                                  animationDelay: `${i * 80}ms`,
-                                  animationDuration: "0.5s",
-                                }}
-                            />
-                        ))}
-                      </div>
-                    </div>
+                {/* Animated bars */}
+                <div className="flex items-center gap-[2px] ml-2">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-[3px] bg-red-400/70 rounded-full animate-pulse"
+                      style={{
+                        height: `${Math.random() * 16 + 6}px`,
+                        animationDelay: `${i * 80}ms`,
+                        animationDuration: '0.5s',
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
 
-                    <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={cancelRecording}
-                        className="text-zinc-400 hover:text-white"
-                    >
-                      <X className="size-4 mr-1" />
-                      {tc("cancel")}
-                    </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={cancelRecording}
+                className="text-zinc-400 hover:text-white"
+              >
+                <X className="size-4 mr-1" />
+                {tc('cancel')}
+              </Button>
 
-                    <Button
-                        type="button"
-                        size="sm"
-                        onClick={stopRecording}
-                        className="bg-red-500 hover:bg-red-600 text-white"
-                    >
-                      <Square className="size-4 mr-1" />
-                      {tm("stop")}
-                    </Button>
-                  </>
-              ) : audioBlob ? (
-                  <>
-                    {/* Audio preview */}
-                    <div className="flex flex-col gap-2 flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <div className="w-3 h-3 bg-indigo-500 rounded-full shrink-0" />
-                        <span className="text-sm text-zinc-300">{tm("voiceMessage")}</span>
-                        <span className="text-sm text-zinc-500 font-mono">
-                          {formatDuration(recordingDuration)}
-                        </span>
-                      </div>
-                      {audioPreviewUrl && (
-                          <audio
-                              src={audioPreviewUrl}
-                              controls
-                              className="h-8 w-full"
-                          />
-                      )}
-                    </div>
+              <Button
+                type="button"
+                size="sm"
+                onClick={stopRecording}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                <Square className="size-4 mr-1" />
+                {tm('stop')}
+              </Button>
+            </>
+          ) : audioBlob ? (
+            <>
+              {/* Audio preview */}
+              <div className="flex flex-col gap-2 flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="w-3 h-3 bg-indigo-500 rounded-full shrink-0" />
+                  <span className="text-sm text-zinc-300">{tm('voiceMessage')}</span>
+                  <span className="text-sm text-zinc-500 font-mono">
+                    {formatDuration(recordingDuration)}
+                  </span>
+                </div>
+                {audioPreviewUrl && <audio src={audioPreviewUrl} controls className="h-8 w-full" />}
+              </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={cancelRecording}
-                          className="text-zinc-400 hover:text-white"
-                      >
-                        <X className="size-4 mr-1" />
-                        {tc("delete")}
-                      </Button>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={cancelRecording}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  <X className="size-4 mr-1" />
+                  {tc('delete')}
+                </Button>
 
-                      <Button
-                          type="button"
-                          size="sm"
-                          onClick={sendVoiceMessage}
-                          disabled={isPending}
-                          className="bg-indigo-600 hover:bg-indigo-500 text-white"
-                      >
-                        <Send className="size-4 mr-1" />
-                        {tm("send")}
-                      </Button>
-                    </div>
-                  </>
-              ) : null}
-            </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={sendVoiceMessage}
+                  disabled={isPending}
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white"
+                >
+                  <Send className="size-4 mr-1" />
+                  {tm('send')}
+                </Button>
+              </div>
+            </>
+          ) : null}
+        </div>
+      )}
+
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {selectedFiles.length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-2 p-2 bg-[#2B2D31] rounded-lg">
+            {selectedFiles.map((file, index) => (
+              <div
+                key={index}
+                className="relative bg-[#1E1F22] rounded-lg p-2 flex items-center gap-2"
+              >
+                {file.type.startsWith('image/') ? (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                ) : (
+                  <FileText className="w-8 h-8 text-gray-400" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-300 truncate">{file.name}</p>
+                  <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+                </div>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => removeFile(index)}
+                  className="h-6 w-6"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
         )}
 
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {selectedFiles.length > 0 && (
-              <div className="mb-2 flex flex-wrap gap-2 p-2 bg-[#2B2D31] rounded-lg">
-                {selectedFiles.map((file, index) => (
-                    <div
-                        key={index}
-                        className="relative bg-[#1E1F22] rounded-lg p-2 flex items-center gap-2"
-                    >
-                      {file.type.startsWith("image/") ? (
-                          <img
-                              src={URL.createObjectURL(file)}
-                              alt={file.name}
-                              className="w-16 h-16 object-cover rounded"
-                          />
-                      ) : (
-                          <FileText className="w-8 h-8 text-gray-400" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-300 truncate">{file.name}</p>
-                        <p className="text-xs text-gray-500">
-                          {(file.size / 1024).toFixed(1)} KB
-                        </p>
-                      </div>
-                      <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => removeFile(index)}
-                          className="h-6 w-6"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                ))}
-              </div>
+        <div className="flex items-end gap-2 rounded-2xl bg-[#1E1F22] p-2 shadow-lg relative">
+          {filteredMembers.length > 0 && (
+            <div className="absolute bottom-full mb-1 left-0 right-0 z-50 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+              {filteredMembers.map((member: any) => (
+                <button
+                  key={member.id}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    insertMention(member.username);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-zinc-700 text-left"
+                >
+                  <span className="text-sm text-zinc-200">@{member.username}</span>
+                </button>
+              ))}
+            </div>
           )}
+          <div ref={attachMenuRef} className="relative">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                setShowAttachMenu(!showAttachMenu);
+                setShowEmojiPicker(false);
+                setShowGifPicker(false);
+              }}
+            >
+              <Plus className="h-5 w-5 text-gray-300" />
+            </Button>
 
-          <div className="flex items-end gap-2 rounded-2xl bg-[#1E1F22] p-2 shadow-lg relative">
-            {filteredMembers.length > 0 && (
-              <div className="absolute bottom-full mb-1 left-0 right-0 z-50 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                {filteredMembers.map((member: any) => (
+            {showAttachMenu && (
+              <div className="absolute bottom-12 left-0 z-50 bg-[#111214] rounded-lg shadow-2xl w-[240px] overflow-hidden border border-zinc-800">
+                <div className="p-2 space-y-1">
                   <button
-                    key={member.id}
                     type="button"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      insertMention(member.username);
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 hover:bg-zinc-700 text-left"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm text-gray-200 hover:bg-[#5865f2] rounded transition-colors"
                   >
-                    <span className="text-sm text-zinc-200">@{member.username}</span>
+                    <div className="w-8 h-8 bg-[#5865f2] rounded-full flex items-center justify-center">
+                      <Image className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{ta('uploadFile')}</p>
+                      <p className="text-xs text-gray-400">{ta('uploadFileDesc')}</p>
+                    </div>
                   </button>
-                ))}
+
+                  <button
+                    type="button"
+                    onClick={handleScreenCapture}
+                    className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm text-gray-200 hover:bg-[#5865f2] rounded transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-[#ED4245] rounded-full flex items-center justify-center">
+                      <Monitor className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{ta('screenshot')}</p>
+                      <p className="text-xs text-gray-400">{ta('screenshotDesc')}</p>
+                    </div>
+                  </button>
+                </div>
               </div>
             )}
-            <div ref={attachMenuRef} className="relative">
-              <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowAttachMenu(!showAttachMenu);
-                    setShowEmojiPicker(false);
-                    setShowGifPicker(false);
-                  }}
-              >
-                <Plus className="h-5 w-5 text-gray-300" />
-              </Button>
 
-              {showAttachMenu && (
-                  <div className="absolute bottom-12 left-0 z-50 bg-[#111214] rounded-lg shadow-2xl w-[240px] overflow-hidden border border-zinc-800">
-                    <div className="p-2 space-y-1">
-                      <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm text-gray-200 hover:bg-[#5865f2] rounded transition-colors"
-                      >
-                        <div className="w-8 h-8 bg-[#5865f2] rounded-full flex items-center justify-center">
-                          <Image className="h-4 w-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{ta("uploadFile")}</p>
-                          <p className="text-xs text-gray-400">
-                            {ta("uploadFileDesc")}
-                          </p>
-                        </div>
-                      </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*,.pdf,.doc,.docx,.txt,webp,audio/*"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </div>
 
-                      <button
-                          type="button"
-                          onClick={handleScreenCapture}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm text-gray-200 hover:bg-[#5865f2] rounded transition-colors"
-                      >
-                        <div className="w-8 h-8 bg-[#ED4245] rounded-full flex items-center justify-center">
-                          <Monitor className="h-4 w-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-medium">{ta("screenshot")}</p>
-                          <p className="text-xs text-gray-400">
-                            {ta("screenshotDesc")}
-                          </p>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-              )}
+          <div className="flex-1">
+            <Controller
+              name="content"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Textarea
+                    {...field}
+                    ref={(el) => {
+                      field.ref(el);
+                      (textareaRef as any).current = el;
+                    }}
+                    disabled={selectedFiles.length > 0 || isRecording || !!audioBlob}
+                    placeholder={
+                      isRecording
+                        ? tm('recordingInProgress')
+                        : audioBlob
+                          ? tm('voiceReady')
+                          : tm('writeMessage')
+                    }
+                    className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0 overflow-y-auto"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleTyping(e.target.value);
 
-              <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/*,.pdf,.doc,.docx,.txt,webp,audio/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-              />
-            </div>
-
-            <div className="flex-1">
-              <Controller
-                  name="content"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <Textarea
-                            {...field}
-                            ref={(el) => { field.ref(el); (textareaRef as any).current = el; }}
-                            disabled={selectedFiles.length > 0 || isRecording || !!audioBlob}
-                            placeholder={
-                              isRecording
-                                  ? tm("recordingInProgress")
-                                  : audioBlob
-                                      ? tm("voiceReady")
-                                      : tm("writeMessage")
-                            }
-                            className="min-h-[44px] max-h-[200px] resize-none border-0 bg-transparent px-2 text-gray-100 focus-visible:ring-0 overflow-y-auto"
-                            onChange={(e) => {
-                            field.onChange(e);
-                            handleTyping(e.target.value);
-
-                              const val = e.target.value;
-                              const cursor = e.target.selectionStart ?? 0;
-                              const textBeforeCursor = val.slice(0, cursor);
-                              const match = textBeforeCursor.match(/@(\w*)$/);
-                              if (match) {
-                                setMentionQuery(match[1]);
-                              } else {
-                                setMentionQuery(null);
-                              }
-                            }}
-
-                            onBlur={() => {
-                              field.onBlur();
-                              if (isPrivateMessage) {
-                                privateTyping.stopTyping();
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                form.handleSubmit(onSubmit)();
-                              }
-                            }}
-                        />
-                        {fieldState.invalid && (
-                            <FieldError
-                                errors={[fieldState.error]}
-                                className="mt-1 text-xs text-red-500"
-                            />
-                        )}
-                        {selectedFiles.length > 0 && (
-                            <p className="text-xs text-zinc-400">
-                              {tm("fileNoText")}
-                            </p>
-                        )}
-                      </Field>
+                      const val = e.target.value;
+                      const cursor = e.target.selectionStart ?? 0;
+                      const textBeforeCursor = val.slice(0, cursor);
+                      const match = textBeforeCursor.match(/@(\w*)$/);
+                      if (match) {
+                        setMentionQuery(match[1]);
+                      } else {
+                        setMentionQuery(null);
+                      }
+                    }}
+                    onBlur={() => {
+                      field.onBlur();
+                      if (isPrivateMessage) {
+                        privateTyping.stopTyping();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        form.handleSubmit(onSubmit)();
+                      }
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} className="mt-1 text-xs text-red-500" />
                   )}
-              />
-            </div>
-
-            <div ref={emojiPickerRef} className="relative">
-              <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowEmojiPicker(!showEmojiPicker);
-                    setShowGifPicker(false);
-                    setShowAttachMenu(false);
-                  }}
-              >
-                <Smile className="h-5 w-5 text-gray-300" />
-              </Button>
-
-              {showEmojiPicker && (
-                  <div className="fixed bottom-20 left-2 right-2 z-50 sm:absolute sm:bottom-12 sm:right-0 sm:left-auto sm:w-auto">
-                    <EmojiPicker
-                        onEmojiClick={onEmojiClick}
-                        theme={Theme.DARK}
-                        width="100%"
-                        height={400}
-                    />
-                  </div>
-              )}
-            </div>
-
-            <div ref={gifPickerRef} className="relative">
-              <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => {
-                    setShowGifPicker(!showGifPicker);
-                    setShowEmojiPicker(false);
-                    setShowAttachMenu(false);
-                  }}
-              >
-                <Sticker className="h-5 w-5 text-gray-300" />
-              </Button>
-
-              {showGifPicker && (
-                  <div className="fixed bottom-20 left-2 right-2 z-50 bg-[#2B2D31] rounded-lg h-105 flex flex-col sm:absolute sm:bottom-12 sm:left-auto sm:right-0 sm:w-105 sm:h-130">
-                    <div className="p-4 border-b border-zinc-700">
-                      <div className="flex gap-2">
-                        <Input
-                            placeholder="Rechercher..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleGifSearch();
-                              }
-                            }}
-                            className="flex-1 bg-[#1E1F22] text-white"
-                        />
-                        <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            onClick={handleGifSearch}
-                        >
-                          <Search />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-4">
-                      {isLoadingGifs ? (
-                          <p className="text-center text-gray-400">{tc("loading")}</p>
-                      ) : (
-                          <div className="grid grid-cols-2 gap-2">
-                            {gifs.map((gif) => (
-                                <button
-                                    key={gif.id}
-                                    type="button"
-                                    onClick={() => onGifClick(gif.media_formats.gif.url)}
-                                >
-                                  <img
-                                      src={gif.media_formats.tinygif.url}
-                                      className="rounded-lg"
-                                      loading="lazy"
-                                  />
-                                </button>
-                            ))}
-                          </div>
-                      )}
-                    </div>
-                  </div>
-              )}
-            </div>
-
-            {hasContent || selectedFiles.length > 0 ? (
-                <Button
-                    type={selectedFiles.length > 0 ? "button" : "submit"}
-                    size="icon"
-                    className="h-10 w-10 rounded-xl bg-purple-discord text-white"
-                    disabled={isPending}
-                    onClick={selectedFiles.length > 0 ? sendFileMessage : undefined}
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
-            ) : (
-                <Button
-                    type="button"
-                    size="icon"
-                    className={`h-10 w-10 rounded-xl transition-colors ${
-                        isRecording
-                            ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                            : "bg-zinc-700 hover:bg-zinc-600 text-gray-300"
-                    }`}
-                    onClick={isRecording ? stopRecording : startRecording}
-                    disabled={!!audioBlob}
-                >
-                  {isRecording ? (
-                      <Square className="h-4 w-4" />
-                  ) : (
-                      <Mic className="h-5 w-5" />
+                  {selectedFiles.length > 0 && (
+                    <p className="text-xs text-zinc-400">{tm('fileNoText')}</p>
                   )}
-                </Button>
+                </Field>
+              )}
+            />
+          </div>
+
+          <div ref={emojiPickerRef} className="relative">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                setShowEmojiPicker(!showEmojiPicker);
+                setShowGifPicker(false);
+                setShowAttachMenu(false);
+              }}
+            >
+              <Smile className="h-5 w-5 text-gray-300" />
+            </Button>
+
+            {showEmojiPicker && (
+              <div className="fixed bottom-20 left-2 right-2 z-50 sm:absolute sm:bottom-12 sm:right-0 sm:left-auto sm:w-auto">
+                <EmojiPicker
+                  onEmojiClick={onEmojiClick}
+                  theme={Theme.DARK}
+                  width="100%"
+                  height={400}
+                />
+              </div>
             )}
           </div>
-        </form>
-      </div>
+
+          <div ref={gifPickerRef} className="relative">
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                setShowGifPicker(!showGifPicker);
+                setShowEmojiPicker(false);
+                setShowAttachMenu(false);
+              }}
+            >
+              <Sticker className="h-5 w-5 text-gray-300" />
+            </Button>
+
+            {showGifPicker && (
+              <div className="fixed bottom-20 left-2 right-2 z-50 bg-[#2B2D31] rounded-lg h-105 flex flex-col sm:absolute sm:bottom-12 sm:left-auto sm:right-0 sm:w-105 sm:h-130">
+                <div className="p-4 border-b border-zinc-700">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Rechercher..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleGifSearch();
+                        }
+                      }}
+                      className="flex-1 bg-[#1E1F22] text-white"
+                    />
+                    <Button type="button" size="icon" variant="ghost" onClick={handleGifSearch}>
+                      <Search />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4">
+                  {isLoadingGifs ? (
+                    <p className="text-center text-gray-400">{tc('loading')}</p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {gifs.map((gif) => (
+                        <button
+                          key={gif.id}
+                          type="button"
+                          onClick={() => onGifClick(gif.media_formats.gif.url)}
+                        >
+                          <img
+                            src={gif.media_formats.tinygif.url}
+                            className="rounded-lg"
+                            loading="lazy"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {hasContent || selectedFiles.length > 0 ? (
+            <Button
+              type={selectedFiles.length > 0 ? 'button' : 'submit'}
+              size="icon"
+              className="h-10 w-10 rounded-xl bg-purple-discord text-white"
+              disabled={isPending}
+              onClick={selectedFiles.length > 0 ? sendFileMessage : undefined}
+            >
+              <Send className="h-5 w-5" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="icon"
+              className={`h-10 w-10 rounded-xl transition-colors ${
+                isRecording
+                  ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+                  : 'bg-zinc-700 hover:bg-zinc-600 text-gray-300'
+              }`}
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={!!audioBlob}
+            >
+              {isRecording ? <Square className="h-4 w-4" /> : <Mic className="h-5 w-5" />}
+            </Button>
+          )}
+        </div>
+      </form>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const memberSchema = z.object({
   id: z.number(),
@@ -7,12 +7,7 @@ export const memberSchema = z.object({
 
 export const membershipSchema = z.object({
   id: z.number(),
-  role: z.enum([
-    "server_owner",
-    "server_admin",
-    "server_moderator",
-    "server_member",
-  ]),
+  role: z.enum(['server_owner', 'server_admin', 'server_moderator', 'server_member']),
   members: memberSchema,
 });
 
@@ -28,11 +23,7 @@ export const getMembersResponseSchema = z.object({
   }),
 });
 
-export const memberRoleSchema = z.enum([
-  "server_member",
-  "server_admin",
-  "server_owner",
-]);
+export const memberRoleSchema = z.enum(['server_member', 'server_admin', 'server_owner']);
 
 export type MemberType = z.infer<typeof memberSchema>;
 export type MembershipType = z.infer<typeof membershipSchema>;

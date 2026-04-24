@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
-import { getUserByIdRequest } from "@/requests/userRequest";
+import { getUserByIdRequest } from '@/requests/userRequest';
 
 export function useUserById(userId: number) {
   return useQuery({
-    queryKey: ["user", userId],
+    queryKey: ['user', userId],
     queryFn: () => getUserByIdRequest(userId),
     enabled: Number.isFinite(userId) && userId > 0,
     staleTime: 5 * 60 * 1000,

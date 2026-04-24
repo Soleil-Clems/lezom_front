@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 
-import { ProfileView } from "@/components/ui-client/ProfileView";
-import { useAuthUser } from "@/hooks/queries/useAuthUser";
-import { useGetFriends } from "@/hooks/queries/useGetFriends";
-import { useUserById } from "@/hooks/queries/useUserById";
+import { ProfileView } from '@/components/ui-client/ProfileView';
+import { useAuthUser } from '@/hooks/queries/useAuthUser';
+import { useGetFriends } from '@/hooks/queries/useGetFriends';
+import { useUserById } from '@/hooks/queries/useUserById';
 
 export default function UserProfilePage() {
   const params = useParams<{ userId: string }>();
@@ -24,7 +24,7 @@ export default function UserProfilePage() {
         lastname: friend.lastname,
         img: friend.img,
         lastSeen: friend.lastSeen,
-        description: "",
+        description: '',
       }
     : undefined;
 

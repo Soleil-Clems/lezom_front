@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { MemberCard } from "@/components/ui-client/memberCard";
-import { useGetServerMembers } from "@/hooks/queries/useGetServerMembers";
-import { useUpdateMemberRole } from "@/hooks/mutations/updateServerSettings";
-import { useBanUser } from "@/hooks/mutations/useBanManagement";
-import { useTransferOwnership } from "@/hooks/mutations/useTransferOwnership";
-import { useSocket } from "@/hooks/websocket/useSocket";
-import { useQueryClient } from "@tanstack/react-query";
-import { MemberRoleType } from "@/schemas/member.dto";
+import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { Loader2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { MemberCard } from '@/components/ui-client/memberCard';
+import { useGetServerMembers } from '@/hooks/queries/useGetServerMembers';
+import { useUpdateMemberRole } from '@/hooks/mutations/updateServerSettings';
+import { useBanUser } from '@/hooks/mutations/useBanManagement';
+import { useTransferOwnership } from '@/hooks/mutations/useTransferOwnership';
+import { useSocket } from '@/hooks/websocket/useSocket';
+import { useQueryClient } from '@tanstack/react-query';
+import { MemberRoleType } from '@/schemas/member.dto';
 
 type ServerMembersListProps = {
   serverId: string | number;
@@ -27,11 +27,11 @@ export function ServerMembersList({
   currentUserRole,
   onOpenBanModal,
 }: ServerMembersListProps) {
-  const t = useTranslations("settings");
-  const tc = useTranslations("common");
+  const t = useTranslations('settings');
+  const tc = useTranslations('common');
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const limit = 20;
 
   const { data, isLoading } = useGetServerMembers(serverId, {
@@ -50,17 +50,17 @@ export function ServerMembersList({
 
     const handleServerMembersUpdate = (data: { serverId: number }) => {
       if (String(data.serverId) === String(serverId)) {
-        queryClient.invalidateQueries({ queryKey: ["serverMembers"] });
-        queryClient.invalidateQueries({ queryKey: ["allservers"] });
+        queryClient.invalidateQueries({ queryKey: ['serverMembers'] });
+        queryClient.invalidateQueries({ queryKey: ['allservers'] });
       }
     };
 
-    on("memberRoleChanged", handleServerMembersUpdate);
-    on("memberBanned", handleServerMembersUpdate);
+    on('memberRoleChanged', handleServerMembersUpdate);
+    on('memberBanned', handleServerMembersUpdate);
 
     return () => {
-      off("memberRoleChanged", handleServerMembersUpdate);
-      off("memberBanned", handleServerMembersUpdate);
+      off('memberRoleChanged', handleServerMembersUpdate);
+      off('memberBanned', handleServerMembersUpdate);
     };
   }, [isConnected, on, off, serverId, queryClient]);
 
@@ -71,7 +71,7 @@ export function ServerMembersList({
   };
 
   const handleRoleChange = (memberId: number, newRole: MemberRoleType) => {
-    if (newRole === "server_owner") {
+    if (newRole === 'server_owner') {
       transferOwnership.mutate({ serverId, newOwnerId: memberId });
     } else {
       updateMemberRole.mutate({ serverId, memberId, role: newRole });
@@ -106,20 +106,20 @@ export function ServerMembersList({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <Input
             type="text"
-            placeholder={t("searchMember")}
+            placeholder={t('searchMember')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="pl-9 bg-[#1E1F22] border-white/10 text-white placeholder:text-zinc-500"
           />
         </div>
         <Button type="submit" variant="secondary" size="sm">
-          {tc("search")}
+          {tc('search')}
         </Button>
       </form>
 
       {members.length === 0 ? (
         <div className="text-center text-zinc-500 text-sm py-4">
-          {search ? tc("noMemberFound") : t("noMembers")}
+          {search ? tc('noMemberFound') : t('noMembers')}
         </div>
       ) : (
         <div className="space-y-3">
@@ -141,13 +141,9 @@ export function ServerMembersList({
                     username: membership.members?.username,
                   })
                 }
-                onRoleChange={(newRole) =>
-                  handleRoleChange(membership.members?.id, newRole)
-                }
+                onRoleChange={(newRole) => handleRoleChange(membership.members?.id, newRole)}
                 isPending={banUser.isPending}
-                isRoleChangePending={
-                  updateMemberRole.isPending || transferOwnership.isPending
-                }
+                isRoleChangePending={updateMemberRole.isPending || transferOwnership.isPending}
               />
             );
           })}
@@ -157,7 +153,7 @@ export function ServerMembersList({
       {meta && meta.totalPages > 1 && (
         <div className="flex items-center justify-between pt-4 border-t border-white/5">
           <span className="text-xs text-zinc-500">
-            {t("totalMembers", {
+            {t('totalMembers', {
               total: meta.total,
               page: meta.page,
               totalPages: meta.totalPages,

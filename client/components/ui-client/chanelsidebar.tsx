@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Hash, Volume2, ShieldBan } from "lucide-react";
-import Error from "@/components/ui-client/Error";
-import Loading from "@/components/ui-client/Loading";
-import { useGetAllChannelsOfAServer } from "@/hooks/queries/useGetAllChannelsOfAServer";
-import { useAuthUser } from "@/hooks/queries/useAuthUser";
-import { useGetAllServers } from "@/hooks/queries/useGetAllServers";
-import { channelType } from "@/schemas/channel.dto";
-import { ServerSettingsDropdown } from "./dropdownMenu";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import Link from 'next/link';
+import { Hash, Volume2, ShieldBan } from 'lucide-react';
+import Error from '@/components/ui-client/Error';
+import Loading from '@/components/ui-client/Loading';
+import { useGetAllChannelsOfAServer } from '@/hooks/queries/useGetAllChannelsOfAServer';
+import { useAuthUser } from '@/hooks/queries/useAuthUser';
+import { useGetAllServers } from '@/hooks/queries/useGetAllServers';
+import { channelType } from '@/schemas/channel.dto';
+import { ServerSettingsDropdown } from './dropdownMenu';
+import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 type ChannelSidebarProps = {
   serverId?: string;
@@ -22,12 +22,12 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
   const channelId = params?.channelId as string | undefined;
   const { data: user } = useAuthUser();
   const { data: allServersData } = useGetAllServers();
-  const t = useTranslations("server");
+  const t = useTranslations('server');
 
   if (!serverId) {
     return (
       <div className="w-72 h-full bg-[#2B2D31] flex flex-col items-center justify-center p-4 text-zinc-500 text-center">
-        <p>{t("selectServer")}</p>
+        <p>{t('selectServer')}</p>
       </div>
     );
   }
@@ -38,28 +38,27 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
     ? allServersData
     : (allServersData as any)?.data || [];
   const currentServer = servers.find((s: any) => s.id.toString() === serverId);
-  const userMembership = currentServer?.memberships?.find(
-    (m: any) => m.members?.id === user?.id,
-  );
+  const userMembership = currentServer?.memberships?.find((m: any) => m.members?.id === user?.id);
   const userRole = userMembership?.role;
 
   const isBanned = isError && (error as Error)?.message?.toLowerCase().includes('banni');
 
   if (isLoading) return <Loading />;
 
-  if (isBanned) return (
-    <aside className="flex shrink-0 w-full md:w-72 border-r border-black/20">
-      <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center">
-          <ShieldBan className="w-8 h-8 text-rose-400" />
+  if (isBanned)
+    return (
+      <aside className="flex shrink-0 w-full md:w-72 border-r border-black/20">
+        <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col items-center justify-center gap-4 p-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center">
+            <ShieldBan className="w-8 h-8 text-rose-400" />
+          </div>
+          <div>
+            <p className="text-white font-semibold text-lg">{t('bannedTitle')}</p>
+            <p className="text-zinc-400 text-sm mt-1">{t('bannedDesc')}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-white font-semibold text-lg">{t("bannedTitle")}</p>
-          <p className="text-zinc-400 text-sm mt-1">{t("bannedDesc")}</p>
-        </div>
-      </div>
-    </aside>
-  );
+      </aside>
+    );
 
   if (isError) return <Error />;
 
@@ -67,16 +66,16 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
 
   return (
     <aside
-      className={`${channelId ? "hidden" : "flex"} md:flex shrink-0 w-full md:w-72 border-r border-black/20`}
+      className={`${channelId ? 'hidden' : 'flex'} md:flex shrink-0 w-full md:w-72 border-r border-black/20`}
     >
       <div className="w-full md:w-72 h-full bg-[#2B2D31] flex flex-col shrink-0 border-r border-black/20">
         {/* HEADER */}
         <div className="h-12 px-5 flex items-center justify-between border-b border-black/20 shrink-0">
-          <h2 className="font-semibold text-white">{t("channels")}</h2>
+          <h2 className="font-semibold text-white">{t('channels')}</h2>
           <ServerSettingsDropdown
             serverId={serverId}
             userRole={userRole}
-            serverName={currentServer?.name || ""}
+            serverName={currentServer?.name || ''}
             currentUserId={user?.id || 0}
           />
         </div>
@@ -94,24 +93,22 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
                   flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors group
                   ${
                     isActive
-                      ? "bg-zinc-700/60 text-white"
-                      : "text-zinc-400 hover:bg-zinc-700/30 hover:text-zinc-200"
+                      ? 'bg-zinc-700/60 text-white'
+                      : 'text-zinc-400 hover:bg-zinc-700/30 hover:text-zinc-200'
                   }
                 `}
               >
-                {channel.type === "text" ? (
+                {channel.type === 'text' ? (
                   <Hash
-                    className={`w-5 h-5 shrink-0 ${isActive ? "text-zinc-200" : "text-zinc-500"}`}
+                    className={`w-5 h-5 shrink-0 ${isActive ? 'text-zinc-200' : 'text-zinc-500'}`}
                   />
                 ) : (
                   <Volume2
-                    className={`w-5 h-5 shrink-0 ${isActive ? "text-zinc-200" : "text-zinc-500"}`}
+                    className={`w-5 h-5 shrink-0 ${isActive ? 'text-zinc-200' : 'text-zinc-500'}`}
                   />
                 )}
 
-                <span
-                  className={`truncate font-medium ${isActive ? "text-white" : ""}`}
-                >
+                <span className={`truncate font-medium ${isActive ? 'text-white' : ''}`}>
                   {channel.name}
                 </span>
               </Link>
@@ -119,9 +116,7 @@ export function ChannelSidebar({ serverId }: ChannelSidebarProps) {
           })}
 
           {channels.length === 0 && (
-            <p className="text-xs text-zinc-500 text-center mt-4">
-              {t("noChannelFound")}
-            </p>
+            <p className="text-xs text-zinc-500 text-center mt-4">{t('noChannelFound')}</p>
           )}
         </div>
       </div>
